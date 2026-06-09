@@ -4,15 +4,16 @@
 
 ## 核心功能
 
-- 固定評分者：`Reviewer1`、`Reviewer2`。
+- 評分者名單集中於 `js/config.js` 的 `reviewers` 設定，可由 `Reviewer1`、`Reviewer2` 改成實際姓名。
 - 模型匿名：`cut=Model A`、`cyc=Model B`、`fast=Model C`、`p2p=Model D`、`reg=Model E`。
 - 每張 Tripanel 以 Google Form 矩陣方式評分：
   - 第一張、第二張、第三張
   - Whole image quality、Noise suppression、Contrast、Edge sharpness
   - 共 3 × 4 = 12 個分數
-- 每次點選立即儲存：
-  - localStorage
-  - Google Sheet `responses`
+- 每次點選會先存入 localStorage 作為作答進度；已選分數再次點選可取消，取消後會維持空值暫存。
+- 按「下一張」時，若目前這張 Tripanel 的 12 個分數完整，才寫入 Google Sheet `responses` 作為正式紀錄；若未完整，只保留暫存進度。
+- 所有頁面皆有「確認完成並送出」按鈕；若有漏題，會列出漏題並可直接跳題補做。
+- 作答紀錄 `responses` 僅保留已確認/完整的正式紀錄；同一 reviewer + strategy + dataset + model + imageId 只保留最新一筆。
 - Google Drive 新增影像後，首頁會重新讀取最新影像清單。
 - 已作答內容與影像清單分離：
   - 影像清單來自 Google Drive
@@ -132,7 +133,8 @@ cut-v7-carotid_001.png → cut-v7-carotid_001
 
 - 新增 `cut-v7-carotid_126.png` 不會影響 001–125 的作答。
 - 重新讀取 Google Drive 不會清空 `responses` 或 `progress`。
-- 除非評分者在同一張圖重新點選答案，否則舊答案不會被覆蓋。
+- 除非評分者在同一張圖重新點選並再次完成 12 個分數，否則舊的正式答案不會被新資料覆蓋。
+- 同一 reviewer + strategy + dataset + model + imageId 僅保留一筆最新的完整作答紀錄。
 
 ## 圖片權限
 
