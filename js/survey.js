@@ -45,28 +45,50 @@
     return section;
   }
 
+  function findRadioFromEvent(event) {
+    const target = event.target;
+    if (!target) return null;
+    if (target.matches && target.matches('input[type="radio"]')) return target;
+    const label = target.closest ? target.closest('label.matrix-radio') : null;
+    return label ? label.querySelector('input[type="radio"]') : null;
+  }
+
   function buildForm() {
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
-    // Custom radio behavior: clicking an already selected score cancels it.
-    // Native radio buttons cannot uncheck themselves, so we handle the label click explicitly.
-    form.querySelectorAll('.matrix-radio').forEach(label => {
-      const input = label.querySelector('input[type="radio"]');
-      if (!input) return;
-      label.addEventListener('pointerdown', function () {
-        input.dataset.wasChecked = input.checked ? '1' : '0';
-      });
-      label.addEventListener('click', function (event) {
-        if (input.dataset.wasChecked === '1') {
-          event.preventDefault();
-          event.stopPropagation();
-          input.checked = false;
-          input.dataset.wasChecked = '0';
-          saveDraftOnly('');
-        }
-      }, true);
-    });
+    // Radio toggle: if the scorer clicks an already-filled circle again,
+    // immediately cancel that answer and return the circle to blank.
+    // This does not require clicking another score first.
+    let cancelledRadio = null;
+    form.addEventListener('pointerdown', function (event) {
+      const input = findRadioFromEvent(event);
+      if (!input || !input.checked) return;
+      event.preventDefault();
+      event.stopPropagation();
+      input.checked = false;
+      cancelledRadio = input;
+      saveDraftOnly('');
+    }, true);
+
+    form.addEventListener('click', function (event) {
+      const input = findRadioFromEvent(event);
+      if (cancelledRadio && input === cancelledRadio) {
+        event.preventDefault();
+        event.stopPropagation();
+        cancelledRadio = null;
+      }
+    }, true);
+
+    form.addEventListener('keydown', function (event) {
+      if ((event.key !== ' ' && event.key !== 'Spacebar') || !event.target.matches('input[type="radio"]')) return;
+      const input = event.target;
+      if (!input.checked) return;
+      event.preventDefault();
+      input.checked = false;
+      saveDraftOnly('');
+    }, true);
+
     form.addEventListener('change', () => saveDraftOnly(''));
   }
 
