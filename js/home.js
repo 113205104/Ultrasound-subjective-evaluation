@@ -68,11 +68,8 @@ function startSurvey(strategy, dataset, model) {
     return;
   }
 
-  alert(
-    "下一步會進入評分頁：\\n" +
-    reviewer + "\\n" +
-    strategy + " / " + dataset + " / " + model
-  );
+  window.location.href =
+  `survey.html?reviewer=${reviewer}&strategy=${strategy}&dataset=${dataset}&model=${model}`;
 }
 
 loadManifest();
