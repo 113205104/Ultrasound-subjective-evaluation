@@ -1,38 +1,37 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ultrasound Subjective Evaluation</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <main class="container">
-    <section class="hero">
-      <h1>Ultrasound Subjective Evaluation</h1>
-      <p>超音波影像主觀評分平台</p>
-    </section>
-
-    <section class="card">
-      <label for="reviewer">Reviewer</label>
-      <select id="reviewer">
-        <option value="">請選擇評分者</option>
-      </select>
-      <p class="hint">僅開放 Reviewer1 與 Reviewer2。</p>
-    </section>
-
-    <section class="card">
-      <div class="section-title-row">
-        <h2>Available Evaluation Tasks</h2>
-        <button id="refreshBtn" type="button">重新整理進度</button>
-      </div>
-      <div id="taskList" class="task-grid"></div>
-      <p id="emptyMsg" class="muted"></p>
-    </section>
-  </main>
-
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/home.js"></script>
-</body>
-</html>
+(function () {
+  const list = document.getElementById('historyList');
+  const reloadBtn = document.getElementById('reloadBtn');
+  function val(id) { return document.getElementById(id).value.trim(); }
+  function renderRows(rows) {
+    list.innerHTML = '';
+    if (!rows || !rows.length) {
+      list.innerHTML = '<section class="form-card history-card"><p class="muted">目前沒有符合條件的作答紀錄。</p></section>';
+      return;
+    }
+    rows.forEach(r => {
+      const card = document.createElement('section');
+      card.className = 'form-card history-card';
+      card.innerHTML = `
+        <h2>${r.displayModel || USE.displayModel(r.model)}　${r.filename || r.imageId || ''}</h2>
+        <p class="muted">${r.timestamp || ''} / ${r.reviewer || ''} / ${r.strategy || ''} / ${r.dataset || ''} / ${r.model || ''}</p>
+        ${r.imageUrl ? `<img src="${r.imageUrl}" alt="${r.filename || 'Tripanel ultrasound image'}">` : ''}
+        <div class="score-grid">
+          <div class="score-box"><span>Whole image quality</span>${r.whole_quality || ''}</div>
+          <div class="score-box"><span>Noise suppression</span>${r.noise_suppression || ''}</div>
+          <div class="score-box"><span>Contrast</span>${r.contrast || ''}</div>
+          <div class="score-box"><span>Edge sharpness</span>${r.edge_sharpness || ''}</div>
+        </div>`;
+      list.appendChild(card);
+    });
+  }
+  function load() {
+    list.innerHTML = '<section class="form-card history-card"><p class="muted">載入中...</p></section>';
+    USE.jsonp('listResponses', {
+      reviewer: val('reviewerFilter'), strategy: val('strategyFilter'), dataset: val('datasetFilter'), model: val('modelFilter')
+    }).then(data => renderRows(data.rows || [])).catch(err => {
+      list.innerHTML = `<section class="form-card history-card"><div class="error">無法讀取 Google Sheet：${err.message}</div></section>`;
+    });
+  }
+  reloadBtn.addEventListener('click', load);
+  load();
+})();
