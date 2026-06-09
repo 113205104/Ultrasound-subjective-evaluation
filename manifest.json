@@ -1,0 +1,7 @@
+[
+  {
+    "strategy":"Unsupervised",
+    "dataset":"v7-only",
+    "model":"cut"
+  }
+]
