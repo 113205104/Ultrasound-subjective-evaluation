@@ -112,3 +112,20 @@ p { margin: 0 0 10px; line-height: 1.6; }
   .matrix-grid { grid-template-columns: minmax(70px, 1fr) repeat(4, minmax(44px, 1fr)); }
   .matrix-row-label { padding-left: 0; }
 }
+.save-hint {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.missing-card {
+  border-left: 5px solid var(--danger);
+}
+.missing-jump-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.missing-jump {
+  justify-content: flex-start;
+}
