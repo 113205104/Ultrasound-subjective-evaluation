@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Survey | Ultrasound Subjective Evaluation</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="forms-topbar"></div>
+  <main class="page-shell">
+    <section class="form-card form-header compact">
+      <a class="back-link" href="index.html">← 回首頁</a>
+      <h1 id="taskTitle">Loading...</h1>
+      <p id="taskSubtitle"></p>
+      <div class="progress-wrap">
+        <div class="progress-text" id="progressText">0 / 0</div>
+        <div class="progress-bar"><div id="progressBar" class="progress-fill"></div></div>
+      </div>
+    </section>
+
+    <section class="form-card image-card">
+      <div class="image-meta" id="imageMeta"></div>
+      <img id="tripanelImage" class="tripanel" alt="Tripanel ultrasound image" />
+      <div class="nav-row">
+        <button id="prevBtn" class="ghost-button" type="button">上一張</button>
+        <button id="nextBtn" class="primary-button" type="button">下一張</button>
+      </div>
+    </section>
+
+    <form id="ratingForm" class="rating-form" aria-label="Tripanel rating form"></form>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/survey.js"></script>
+</body>
+</html>
