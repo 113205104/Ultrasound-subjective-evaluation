@@ -49,19 +49,25 @@
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
-    form.querySelectorAll('input[type="radio"]').forEach(input => {
-      input.addEventListener('pointerdown', function () {
-        this.dataset.wasChecked = this.checked ? '1' : '0';
+    // Custom radio behavior: clicking an already selected score cancels it.
+    // Native radio buttons cannot uncheck themselves, so we handle the label click explicitly.
+    form.querySelectorAll('.matrix-radio').forEach(label => {
+      const input = label.querySelector('input[type="radio"]');
+      if (!input) return;
+      label.addEventListener('pointerdown', function () {
+        input.dataset.wasChecked = input.checked ? '1' : '0';
       });
-      input.addEventListener('click', function (event) {
-        if (this.dataset.wasChecked === '1') {
+      label.addEventListener('click', function (event) {
+        if (input.dataset.wasChecked === '1') {
           event.preventDefault();
-          this.checked = false;
-          saveDraftOnly('已取消此格作答，狀態已暫存；正式作答紀錄不會被刪除或覆蓋。');
+          event.stopPropagation();
+          input.checked = false;
+          input.dataset.wasChecked = '0';
+          saveDraftOnly('');
         }
-      });
+      }, true);
     });
-    form.addEventListener('change', () => saveDraftOnly('已暫存於此瀏覽器；按「下一張」或「確認完成並送出」才會寫入正式作答紀錄。'));
+    form.addEventListener('change', () => saveDraftOnly(''));
   }
 
   function currentImage() { return task.images[current]; }
@@ -107,7 +113,8 @@
   }
 
   function showHint(message) {
-    if (saveHint) saveHint.textContent = message;
+    // Status hints are intentionally hidden from the UI to keep the form clean.
+    if (saveHint) saveHint.textContent = '';
   }
 
   function saveDraftOnly(message) {
