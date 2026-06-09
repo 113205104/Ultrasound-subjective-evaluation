@@ -60,10 +60,14 @@
     // Radio toggle is handled manually instead of relying on the browser's
     // native radio behavior. This guarantees:
     // 1) clicking an empty circle selects it;
-    // 2) clicking the same filled circle again immediately clears it;
+    // 2) clicking the same filled circle again immediately clears it — no
+    //    precondition required, works regardless of which row was last touched;
     // 3) only one score in the same row can be selected.
-    let pointerRadio = null;
-    let pointerWasChecked = false;
+    //
+    // Key insight: the browser mutates radio.checked between pointerdown and
+    // click, so we must snapshot "was it checked" at pointerdown time by
+    // storing it in a data attribute on the element itself. The click handler
+    // then reads that attribute, which is immune to the native mutation.
 
     function radiosInSameRow(input) {
       return Array.prototype.filter.call(
@@ -73,7 +77,10 @@
     }
 
     function applyToggle(input, wasChecked) {
-      radiosInSameRow(input).forEach(el => { el.checked = false; });
+      radiosInSameRow(input).forEach(el => {
+        el.checked = false;
+        delete el.dataset.preclick;
+      });
       if (!wasChecked) input.checked = true;
       saveDraftOnly('');
     }
@@ -81,8 +88,8 @@
     form.addEventListener('pointerdown', function (event) {
       const input = findRadioFromEvent(event);
       if (!input) return;
-      pointerRadio = input;
-      pointerWasChecked = input.checked;
+      // Snapshot the pre-click state before the browser can touch it.
+      input.dataset.preclick = input.checked ? '1' : '0';
     }, true);
 
     form.addEventListener('click', function (event) {
@@ -92,11 +99,12 @@
       event.preventDefault();
       event.stopPropagation();
 
-      const wasChecked = (input === pointerRadio) ? pointerWasChecked : input.checked;
-      applyToggle(input, wasChecked);
+      // Read the snapshot; fall back to current state if pointer never fired.
+      const wasChecked = input.dataset.preclick !== undefined
+        ? input.dataset.preclick === '1'
+        : input.checked;
 
-      pointerRadio = null;
-      pointerWasChecked = false;
+      applyToggle(input, wasChecked);
     }, true);
 
     form.addEventListener('keydown', function (event) {
@@ -160,12 +168,34 @@
     if (saveHint) saveHint.textContent = '';
   }
 
+  // Count completed images for the current task.
+  // For the image currently on screen we read the live DOM so that deselecting
+  // a radio is reflected instantly, without waiting for localStorage to settle.
+  // For all other images we rely on the stored ratings as before.
+  function countCompletedLive() {
+    let count = 0;
+    for (let i = 0; i < task.images.length; i++) {
+      if (i === current) {
+        if (USE.isCompleteRating(readFormValues())) count++;
+      } else {
+        if (USE.isCompleteRating(USE.readRating(reviewer, ratingKeyFor(i)))) count++;
+      }
+    }
+    return count;
+  }
+
   function saveDraftOnly(message) {
     const values = readFormValues();
     const payload = makePayloadForImage(current, values);
     payload.action = 'draftOnly';
     payload.updatedAt = new Date().toISOString();
-    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
+    // Full overwrite (not merge) so that cleared radio fields (value='') do not
+    // retain previously stored numbers from admin.js's Object.assign merge.
+    const localKey = 'use_ratings_' + reviewer;
+    let allLocal = {};
+    try { allLocal = JSON.parse(localStorage.getItem(localKey)) || {}; } catch (_) {}
+    allLocal[currentRatingKey()] = payload;
+    localStorage.setItem(localKey, JSON.stringify(allLocal));
     saveProgressToLocalAndSheet();
     renderProgressOnly();
     showHint(message || '已暫存於此瀏覽器。');
@@ -262,7 +292,7 @@
 
   function renderProgressOnly() {
     const total = task.images.length;
-    const completed = USE.countCompleted(reviewer, task);
+    const completed = countCompletedLive();
     progressText.textContent = `${completed} / ${total}`;
     progressBar.style.width = total ? Math.round(completed * 100 / total) + '%' : '0%';
   }
