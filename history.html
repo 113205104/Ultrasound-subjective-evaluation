@@ -2,26 +2,30 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>History</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="container wide">
-  <button onclick="goHome()">← 回首頁</button>
+<main class="container wide">
+  <button class="link-button" onclick="goHome()">← 回首頁</button>
 
-  <h1 id="taskTitle">作答紀錄</h1>
-  <p id="taskInfo"></p>
+  <section class="card">
+    <h1 id="taskTitle">作答紀錄</h1>
+    <p id="taskInfo" class="muted"></p>
+  </section>
 
-  <div id="historyArea"></div>
+  <section id="historyArea" class="card"></section>
 
-  <div class="pager">
-    <button id="prevBtn">上一頁</button>
+  <nav class="pager card">
+    <button id="prevBtn" type="button">上一張</button>
     <span id="pageInfo"></span>
-    <button id="nextBtn">下一頁</button>
-  </div>
-</div>
+    <button id="nextBtn" type="button">下一張</button>
+  </nav>
+</main>
 
 <script src="js/config.js"></script>
+<script src="js/api.js"></script>
 <script src="js/history.js"></script>
 </body>
 </html>

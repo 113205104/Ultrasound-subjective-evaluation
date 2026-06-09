@@ -2,23 +2,37 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ultrasound Subjective Evaluation</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Ultrasound Subjective Evaluation</h1>
+  <main class="container">
+    <section class="hero">
+      <h1>Ultrasound Subjective Evaluation</h1>
+      <p>超音波影像主觀評分平台</p>
+    </section>
 
-    <label for="reviewer">Reviewer</label>
-    <select id="reviewer">
-      <option value="">請選擇評分者</option>
-    </select>
+    <section class="card">
+      <label for="reviewer">Reviewer</label>
+      <select id="reviewer">
+        <option value="">請選擇評分者</option>
+      </select>
+      <p class="hint">僅開放 Reviewer1 與 Reviewer2。</p>
+    </section>
 
-    <h2>Available Evaluation Tasks</h2>
-    <div id="taskList"></div>
-  </div>
+    <section class="card">
+      <div class="section-title-row">
+        <h2>Available Evaluation Tasks</h2>
+        <button id="refreshBtn" type="button">重新整理進度</button>
+      </div>
+      <div id="taskList" class="task-grid"></div>
+      <p id="emptyMsg" class="muted"></p>
+    </section>
+  </main>
 
   <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>
