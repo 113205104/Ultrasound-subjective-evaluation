@@ -1,27 +1,5042 @@
 [
   {
-    "strategy":"Supervised",
-    "dataset":"v7-only",
-    "model":"cut"
+    "strategy": "Supervised",
+    "dataset": "v7-only",
+    "model": "cut",
+    "displayModel": "Model A",
+    "images": [
+      {
+        "id": "cut-v7-carotid_001",
+        "filename": "cut-v7-carotid_001.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_001.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "001"
+      },
+      {
+        "id": "cut-v7-carotid_002",
+        "filename": "cut-v7-carotid_002.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_002.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "002"
+      },
+      {
+        "id": "cut-v7-carotid_003",
+        "filename": "cut-v7-carotid_003.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_003.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "003"
+      },
+      {
+        "id": "cut-v7-carotid_004",
+        "filename": "cut-v7-carotid_004.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_004.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "004"
+      },
+      {
+        "id": "cut-v7-carotid_005",
+        "filename": "cut-v7-carotid_005.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_005.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "005"
+      },
+      {
+        "id": "cut-v7-carotid_006",
+        "filename": "cut-v7-carotid_006.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_006.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "006"
+      },
+      {
+        "id": "cut-v7-carotid_007",
+        "filename": "cut-v7-carotid_007.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_007.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "007"
+      },
+      {
+        "id": "cut-v7-carotid_008",
+        "filename": "cut-v7-carotid_008.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_008.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "008"
+      },
+      {
+        "id": "cut-v7-carotid_009",
+        "filename": "cut-v7-carotid_009.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_009.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "009"
+      },
+      {
+        "id": "cut-v7-carotid_010",
+        "filename": "cut-v7-carotid_010.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_010.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "010"
+      },
+      {
+        "id": "cut-v7-carotid_011",
+        "filename": "cut-v7-carotid_011.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_011.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "011"
+      },
+      {
+        "id": "cut-v7-carotid_012",
+        "filename": "cut-v7-carotid_012.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_012.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "012"
+      },
+      {
+        "id": "cut-v7-carotid_013",
+        "filename": "cut-v7-carotid_013.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_013.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "013"
+      },
+      {
+        "id": "cut-v7-carotid_014",
+        "filename": "cut-v7-carotid_014.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_014.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "014"
+      },
+      {
+        "id": "cut-v7-carotid_015",
+        "filename": "cut-v7-carotid_015.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_015.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "015"
+      },
+      {
+        "id": "cut-v7-carotid_016",
+        "filename": "cut-v7-carotid_016.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_016.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "016"
+      },
+      {
+        "id": "cut-v7-carotid_017",
+        "filename": "cut-v7-carotid_017.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_017.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "017"
+      },
+      {
+        "id": "cut-v7-carotid_018",
+        "filename": "cut-v7-carotid_018.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_018.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "018"
+      },
+      {
+        "id": "cut-v7-carotid_019",
+        "filename": "cut-v7-carotid_019.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_019.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "019"
+      },
+      {
+        "id": "cut-v7-carotid_020",
+        "filename": "cut-v7-carotid_020.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_020.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "020"
+      },
+      {
+        "id": "cut-v7-carotid_021",
+        "filename": "cut-v7-carotid_021.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_021.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "021"
+      },
+      {
+        "id": "cut-v7-carotid_022",
+        "filename": "cut-v7-carotid_022.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_022.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "022"
+      },
+      {
+        "id": "cut-v7-carotid_023",
+        "filename": "cut-v7-carotid_023.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_023.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "023"
+      },
+      {
+        "id": "cut-v7-carotid_024",
+        "filename": "cut-v7-carotid_024.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_024.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "024"
+      },
+      {
+        "id": "cut-v7-carotid_025",
+        "filename": "cut-v7-carotid_025.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_025.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "025"
+      },
+      {
+        "id": "cut-v7-carotid_026",
+        "filename": "cut-v7-carotid_026.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_026.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "026"
+      },
+      {
+        "id": "cut-v7-carotid_027",
+        "filename": "cut-v7-carotid_027.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_027.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "027"
+      },
+      {
+        "id": "cut-v7-carotid_028",
+        "filename": "cut-v7-carotid_028.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_028.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "028"
+      },
+      {
+        "id": "cut-v7-carotid_029",
+        "filename": "cut-v7-carotid_029.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_029.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "029"
+      },
+      {
+        "id": "cut-v7-carotid_030",
+        "filename": "cut-v7-carotid_030.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_030.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "030"
+      },
+      {
+        "id": "cut-v7-carotid_031",
+        "filename": "cut-v7-carotid_031.png",
+        "url": "Supervised/v7-only/cut/cut-v7-carotid_031.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "031"
+      },
+      {
+        "id": "cut-v7-kidney_032",
+        "filename": "cut-v7-kidney_032.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_032.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "032"
+      },
+      {
+        "id": "cut-v7-kidney_033",
+        "filename": "cut-v7-kidney_033.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_033.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "033"
+      },
+      {
+        "id": "cut-v7-kidney_034",
+        "filename": "cut-v7-kidney_034.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_034.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "034"
+      },
+      {
+        "id": "cut-v7-kidney_035",
+        "filename": "cut-v7-kidney_035.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_035.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "035"
+      },
+      {
+        "id": "cut-v7-kidney_036",
+        "filename": "cut-v7-kidney_036.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_036.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "036"
+      },
+      {
+        "id": "cut-v7-kidney_037",
+        "filename": "cut-v7-kidney_037.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_037.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "037"
+      },
+      {
+        "id": "cut-v7-kidney_038",
+        "filename": "cut-v7-kidney_038.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_038.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "038"
+      },
+      {
+        "id": "cut-v7-kidney_039",
+        "filename": "cut-v7-kidney_039.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_039.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "039"
+      },
+      {
+        "id": "cut-v7-kidney_040",
+        "filename": "cut-v7-kidney_040.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_040.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "040"
+      },
+      {
+        "id": "cut-v7-kidney_041",
+        "filename": "cut-v7-kidney_041.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_041.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "041"
+      },
+      {
+        "id": "cut-v7-kidney_042",
+        "filename": "cut-v7-kidney_042.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_042.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "042"
+      },
+      {
+        "id": "cut-v7-kidney_043",
+        "filename": "cut-v7-kidney_043.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_043.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "043"
+      },
+      {
+        "id": "cut-v7-kidney_044",
+        "filename": "cut-v7-kidney_044.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_044.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "044"
+      },
+      {
+        "id": "cut-v7-kidney_045",
+        "filename": "cut-v7-kidney_045.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_045.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "045"
+      },
+      {
+        "id": "cut-v7-kidney_046",
+        "filename": "cut-v7-kidney_046.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_046.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "046"
+      },
+      {
+        "id": "cut-v7-kidney_047",
+        "filename": "cut-v7-kidney_047.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_047.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "047"
+      },
+      {
+        "id": "cut-v7-kidney_048",
+        "filename": "cut-v7-kidney_048.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_048.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "048"
+      },
+      {
+        "id": "cut-v7-kidney_049",
+        "filename": "cut-v7-kidney_049.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_049.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "049"
+      },
+      {
+        "id": "cut-v7-kidney_050",
+        "filename": "cut-v7-kidney_050.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_050.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "050"
+      },
+      {
+        "id": "cut-v7-kidney_051",
+        "filename": "cut-v7-kidney_051.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_051.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "051"
+      },
+      {
+        "id": "cut-v7-kidney_052",
+        "filename": "cut-v7-kidney_052.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_052.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "052"
+      },
+      {
+        "id": "cut-v7-kidney_053",
+        "filename": "cut-v7-kidney_053.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_053.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "053"
+      },
+      {
+        "id": "cut-v7-kidney_054",
+        "filename": "cut-v7-kidney_054.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_054.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "054"
+      },
+      {
+        "id": "cut-v7-kidney_055",
+        "filename": "cut-v7-kidney_055.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_055.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "055"
+      },
+      {
+        "id": "cut-v7-kidney_056",
+        "filename": "cut-v7-kidney_056.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_056.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "056"
+      },
+      {
+        "id": "cut-v7-kidney_057",
+        "filename": "cut-v7-kidney_057.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_057.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "057"
+      },
+      {
+        "id": "cut-v7-kidney_058",
+        "filename": "cut-v7-kidney_058.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_058.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "058"
+      },
+      {
+        "id": "cut-v7-kidney_059",
+        "filename": "cut-v7-kidney_059.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_059.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "059"
+      },
+      {
+        "id": "cut-v7-kidney_060",
+        "filename": "cut-v7-kidney_060.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_060.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "060"
+      },
+      {
+        "id": "cut-v7-kidney_061",
+        "filename": "cut-v7-kidney_061.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_061.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "061"
+      },
+      {
+        "id": "cut-v7-kidney_062",
+        "filename": "cut-v7-kidney_062.png",
+        "url": "Supervised/v7-only/cut/cut-v7-kidney_062.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "062"
+      },
+      {
+        "id": "cut-v7-liver_063",
+        "filename": "cut-v7-liver_063.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_063.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "063"
+      },
+      {
+        "id": "cut-v7-liver_064",
+        "filename": "cut-v7-liver_064.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_064.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "064"
+      },
+      {
+        "id": "cut-v7-liver_065",
+        "filename": "cut-v7-liver_065.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_065.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "065"
+      },
+      {
+        "id": "cut-v7-liver_066",
+        "filename": "cut-v7-liver_066.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_066.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "066"
+      },
+      {
+        "id": "cut-v7-liver_067",
+        "filename": "cut-v7-liver_067.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_067.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "067"
+      },
+      {
+        "id": "cut-v7-liver_068",
+        "filename": "cut-v7-liver_068.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_068.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "068"
+      },
+      {
+        "id": "cut-v7-liver_069",
+        "filename": "cut-v7-liver_069.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_069.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "069"
+      },
+      {
+        "id": "cut-v7-liver_070",
+        "filename": "cut-v7-liver_070.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_070.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "070"
+      },
+      {
+        "id": "cut-v7-liver_071",
+        "filename": "cut-v7-liver_071.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_071.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "071"
+      },
+      {
+        "id": "cut-v7-liver_072",
+        "filename": "cut-v7-liver_072.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_072.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "072"
+      },
+      {
+        "id": "cut-v7-liver_073",
+        "filename": "cut-v7-liver_073.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_073.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "073"
+      },
+      {
+        "id": "cut-v7-liver_074",
+        "filename": "cut-v7-liver_074.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_074.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "074"
+      },
+      {
+        "id": "cut-v7-liver_075",
+        "filename": "cut-v7-liver_075.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_075.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "075"
+      },
+      {
+        "id": "cut-v7-liver_076",
+        "filename": "cut-v7-liver_076.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_076.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "076"
+      },
+      {
+        "id": "cut-v7-liver_077",
+        "filename": "cut-v7-liver_077.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_077.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "077"
+      },
+      {
+        "id": "cut-v7-liver_078",
+        "filename": "cut-v7-liver_078.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_078.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "078"
+      },
+      {
+        "id": "cut-v7-liver_079",
+        "filename": "cut-v7-liver_079.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_079.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "079"
+      },
+      {
+        "id": "cut-v7-liver_080",
+        "filename": "cut-v7-liver_080.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_080.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "080"
+      },
+      {
+        "id": "cut-v7-liver_081",
+        "filename": "cut-v7-liver_081.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_081.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "081"
+      },
+      {
+        "id": "cut-v7-liver_082",
+        "filename": "cut-v7-liver_082.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_082.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "082"
+      },
+      {
+        "id": "cut-v7-liver_083",
+        "filename": "cut-v7-liver_083.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_083.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "083"
+      },
+      {
+        "id": "cut-v7-liver_084",
+        "filename": "cut-v7-liver_084.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_084.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "084"
+      },
+      {
+        "id": "cut-v7-liver_085",
+        "filename": "cut-v7-liver_085.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_085.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "085"
+      },
+      {
+        "id": "cut-v7-liver_086",
+        "filename": "cut-v7-liver_086.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_086.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "086"
+      },
+      {
+        "id": "cut-v7-liver_087",
+        "filename": "cut-v7-liver_087.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_087.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "087"
+      },
+      {
+        "id": "cut-v7-liver_088",
+        "filename": "cut-v7-liver_088.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_088.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "088"
+      },
+      {
+        "id": "cut-v7-liver_089",
+        "filename": "cut-v7-liver_089.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_089.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "089"
+      },
+      {
+        "id": "cut-v7-liver_090",
+        "filename": "cut-v7-liver_090.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_090.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "090"
+      },
+      {
+        "id": "cut-v7-liver_091",
+        "filename": "cut-v7-liver_091.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_091.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "091"
+      },
+      {
+        "id": "cut-v7-liver_092",
+        "filename": "cut-v7-liver_092.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_092.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "092"
+      },
+      {
+        "id": "cut-v7-liver_093",
+        "filename": "cut-v7-liver_093.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_093.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "093"
+      },
+      {
+        "id": "cut-v7-liver_094",
+        "filename": "cut-v7-liver_094.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_094.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "094"
+      },
+      {
+        "id": "cut-v7-liver_095",
+        "filename": "cut-v7-liver_095.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_095.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "095"
+      },
+      {
+        "id": "cut-v7-liver_096",
+        "filename": "cut-v7-liver_096.png",
+        "url": "Supervised/v7-only/cut/cut-v7-liver_096.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "096"
+      },
+      {
+        "id": "cut-v7-thyroid_097",
+        "filename": "cut-v7-thyroid_097.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_097.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "097"
+      },
+      {
+        "id": "cut-v7-thyroid_098",
+        "filename": "cut-v7-thyroid_098.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_098.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "098"
+      },
+      {
+        "id": "cut-v7-thyroid_099",
+        "filename": "cut-v7-thyroid_099.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_099.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "099"
+      },
+      {
+        "id": "cut-v7-thyroid_100",
+        "filename": "cut-v7-thyroid_100.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_100.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "100"
+      },
+      {
+        "id": "cut-v7-thyroid_101",
+        "filename": "cut-v7-thyroid_101.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_101.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "101"
+      },
+      {
+        "id": "cut-v7-thyroid_102",
+        "filename": "cut-v7-thyroid_102.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_102.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "102"
+      },
+      {
+        "id": "cut-v7-thyroid_103",
+        "filename": "cut-v7-thyroid_103.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_103.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "103"
+      },
+      {
+        "id": "cut-v7-thyroid_104",
+        "filename": "cut-v7-thyroid_104.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_104.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "104"
+      },
+      {
+        "id": "cut-v7-thyroid_105",
+        "filename": "cut-v7-thyroid_105.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_105.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "105"
+      },
+      {
+        "id": "cut-v7-thyroid_106",
+        "filename": "cut-v7-thyroid_106.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_106.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "106"
+      },
+      {
+        "id": "cut-v7-thyroid_107",
+        "filename": "cut-v7-thyroid_107.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_107.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "107"
+      },
+      {
+        "id": "cut-v7-thyroid_108",
+        "filename": "cut-v7-thyroid_108.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_108.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "108"
+      },
+      {
+        "id": "cut-v7-thyroid_109",
+        "filename": "cut-v7-thyroid_109.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_109.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "109"
+      },
+      {
+        "id": "cut-v7-thyroid_110",
+        "filename": "cut-v7-thyroid_110.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_110.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "110"
+      },
+      {
+        "id": "cut-v7-thyroid_111",
+        "filename": "cut-v7-thyroid_111.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_111.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "111"
+      },
+      {
+        "id": "cut-v7-thyroid_112",
+        "filename": "cut-v7-thyroid_112.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_112.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "112"
+      },
+      {
+        "id": "cut-v7-thyroid_113",
+        "filename": "cut-v7-thyroid_113.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_113.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "113"
+      },
+      {
+        "id": "cut-v7-thyroid_114",
+        "filename": "cut-v7-thyroid_114.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_114.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "114"
+      },
+      {
+        "id": "cut-v7-thyroid_115",
+        "filename": "cut-v7-thyroid_115.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_115.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "115"
+      },
+      {
+        "id": "cut-v7-thyroid_116",
+        "filename": "cut-v7-thyroid_116.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_116.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "116"
+      },
+      {
+        "id": "cut-v7-thyroid_117",
+        "filename": "cut-v7-thyroid_117.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_117.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "117"
+      },
+      {
+        "id": "cut-v7-thyroid_118",
+        "filename": "cut-v7-thyroid_118.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_118.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "118"
+      },
+      {
+        "id": "cut-v7-thyroid_119",
+        "filename": "cut-v7-thyroid_119.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_119.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "119"
+      },
+      {
+        "id": "cut-v7-thyroid_120",
+        "filename": "cut-v7-thyroid_120.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_120.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "120"
+      },
+      {
+        "id": "cut-v7-thyroid_121",
+        "filename": "cut-v7-thyroid_121.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_121.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "121"
+      },
+      {
+        "id": "cut-v7-thyroid_122",
+        "filename": "cut-v7-thyroid_122.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_122.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "122"
+      },
+      {
+        "id": "cut-v7-thyroid_123",
+        "filename": "cut-v7-thyroid_123.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_123.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "123"
+      },
+      {
+        "id": "cut-v7-thyroid_124",
+        "filename": "cut-v7-thyroid_124.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_124.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "124"
+      },
+      {
+        "id": "cut-v7-thyroid_125",
+        "filename": "cut-v7-thyroid_125.png",
+        "url": "Supervised/v7-only/cut/cut-v7-thyroid_125.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "125"
+      }
+    ]
   },
   {
-    "strategy":"Supervised",
-    "dataset":"v7-only",
-    "model":"cyc"
+    "strategy": "Supervised",
+    "dataset": "v7-only",
+    "model": "cyc",
+    "displayModel": "Model B",
+    "images": [
+      {
+        "id": "cyc-v7-carotid_001",
+        "filename": "cyc-v7-carotid_001.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_001.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "001"
+      },
+      {
+        "id": "cyc-v7-carotid_002",
+        "filename": "cyc-v7-carotid_002.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_002.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "002"
+      },
+      {
+        "id": "cyc-v7-carotid_003",
+        "filename": "cyc-v7-carotid_003.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_003.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "003"
+      },
+      {
+        "id": "cyc-v7-carotid_004",
+        "filename": "cyc-v7-carotid_004.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_004.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "004"
+      },
+      {
+        "id": "cyc-v7-carotid_005",
+        "filename": "cyc-v7-carotid_005.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_005.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "005"
+      },
+      {
+        "id": "cyc-v7-carotid_006",
+        "filename": "cyc-v7-carotid_006.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_006.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "006"
+      },
+      {
+        "id": "cyc-v7-carotid_007",
+        "filename": "cyc-v7-carotid_007.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_007.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "007"
+      },
+      {
+        "id": "cyc-v7-carotid_008",
+        "filename": "cyc-v7-carotid_008.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_008.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "008"
+      },
+      {
+        "id": "cyc-v7-carotid_009",
+        "filename": "cyc-v7-carotid_009.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_009.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "009"
+      },
+      {
+        "id": "cyc-v7-carotid_010",
+        "filename": "cyc-v7-carotid_010.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_010.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "010"
+      },
+      {
+        "id": "cyc-v7-carotid_011",
+        "filename": "cyc-v7-carotid_011.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_011.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "011"
+      },
+      {
+        "id": "cyc-v7-carotid_012",
+        "filename": "cyc-v7-carotid_012.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_012.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "012"
+      },
+      {
+        "id": "cyc-v7-carotid_013",
+        "filename": "cyc-v7-carotid_013.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_013.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "013"
+      },
+      {
+        "id": "cyc-v7-carotid_014",
+        "filename": "cyc-v7-carotid_014.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_014.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "014"
+      },
+      {
+        "id": "cyc-v7-carotid_015",
+        "filename": "cyc-v7-carotid_015.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_015.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "015"
+      },
+      {
+        "id": "cyc-v7-carotid_016",
+        "filename": "cyc-v7-carotid_016.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_016.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "016"
+      },
+      {
+        "id": "cyc-v7-carotid_017",
+        "filename": "cyc-v7-carotid_017.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_017.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "017"
+      },
+      {
+        "id": "cyc-v7-carotid_018",
+        "filename": "cyc-v7-carotid_018.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_018.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "018"
+      },
+      {
+        "id": "cyc-v7-carotid_019",
+        "filename": "cyc-v7-carotid_019.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_019.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "019"
+      },
+      {
+        "id": "cyc-v7-carotid_020",
+        "filename": "cyc-v7-carotid_020.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_020.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "020"
+      },
+      {
+        "id": "cyc-v7-carotid_021",
+        "filename": "cyc-v7-carotid_021.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_021.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "021"
+      },
+      {
+        "id": "cyc-v7-carotid_022",
+        "filename": "cyc-v7-carotid_022.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_022.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "022"
+      },
+      {
+        "id": "cyc-v7-carotid_023",
+        "filename": "cyc-v7-carotid_023.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_023.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "023"
+      },
+      {
+        "id": "cyc-v7-carotid_024",
+        "filename": "cyc-v7-carotid_024.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_024.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "024"
+      },
+      {
+        "id": "cyc-v7-carotid_025",
+        "filename": "cyc-v7-carotid_025.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_025.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "025"
+      },
+      {
+        "id": "cyc-v7-carotid_026",
+        "filename": "cyc-v7-carotid_026.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_026.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "026"
+      },
+      {
+        "id": "cyc-v7-carotid_027",
+        "filename": "cyc-v7-carotid_027.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_027.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "027"
+      },
+      {
+        "id": "cyc-v7-carotid_028",
+        "filename": "cyc-v7-carotid_028.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_028.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "028"
+      },
+      {
+        "id": "cyc-v7-carotid_029",
+        "filename": "cyc-v7-carotid_029.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_029.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "029"
+      },
+      {
+        "id": "cyc-v7-carotid_030",
+        "filename": "cyc-v7-carotid_030.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_030.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "030"
+      },
+      {
+        "id": "cyc-v7-carotid_031",
+        "filename": "cyc-v7-carotid_031.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-carotid_031.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "031"
+      },
+      {
+        "id": "cyc-v7-kidney_032",
+        "filename": "cyc-v7-kidney_032.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_032.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "032"
+      },
+      {
+        "id": "cyc-v7-kidney_033",
+        "filename": "cyc-v7-kidney_033.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_033.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "033"
+      },
+      {
+        "id": "cyc-v7-kidney_034",
+        "filename": "cyc-v7-kidney_034.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_034.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "034"
+      },
+      {
+        "id": "cyc-v7-kidney_035",
+        "filename": "cyc-v7-kidney_035.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_035.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "035"
+      },
+      {
+        "id": "cyc-v7-kidney_036",
+        "filename": "cyc-v7-kidney_036.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_036.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "036"
+      },
+      {
+        "id": "cyc-v7-kidney_037",
+        "filename": "cyc-v7-kidney_037.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_037.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "037"
+      },
+      {
+        "id": "cyc-v7-kidney_038",
+        "filename": "cyc-v7-kidney_038.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_038.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "038"
+      },
+      {
+        "id": "cyc-v7-kidney_039",
+        "filename": "cyc-v7-kidney_039.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_039.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "039"
+      },
+      {
+        "id": "cyc-v7-kidney_040",
+        "filename": "cyc-v7-kidney_040.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_040.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "040"
+      },
+      {
+        "id": "cyc-v7-kidney_041",
+        "filename": "cyc-v7-kidney_041.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_041.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "041"
+      },
+      {
+        "id": "cyc-v7-kidney_042",
+        "filename": "cyc-v7-kidney_042.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_042.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "042"
+      },
+      {
+        "id": "cyc-v7-kidney_043",
+        "filename": "cyc-v7-kidney_043.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_043.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "043"
+      },
+      {
+        "id": "cyc-v7-kidney_044",
+        "filename": "cyc-v7-kidney_044.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_044.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "044"
+      },
+      {
+        "id": "cyc-v7-kidney_045",
+        "filename": "cyc-v7-kidney_045.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_045.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "045"
+      },
+      {
+        "id": "cyc-v7-kidney_046",
+        "filename": "cyc-v7-kidney_046.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_046.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "046"
+      },
+      {
+        "id": "cyc-v7-kidney_047",
+        "filename": "cyc-v7-kidney_047.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_047.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "047"
+      },
+      {
+        "id": "cyc-v7-kidney_048",
+        "filename": "cyc-v7-kidney_048.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_048.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "048"
+      },
+      {
+        "id": "cyc-v7-kidney_049",
+        "filename": "cyc-v7-kidney_049.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_049.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "049"
+      },
+      {
+        "id": "cyc-v7-kidney_050",
+        "filename": "cyc-v7-kidney_050.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_050.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "050"
+      },
+      {
+        "id": "cyc-v7-kidney_051",
+        "filename": "cyc-v7-kidney_051.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_051.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "051"
+      },
+      {
+        "id": "cyc-v7-kidney_052",
+        "filename": "cyc-v7-kidney_052.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_052.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "052"
+      },
+      {
+        "id": "cyc-v7-kidney_053",
+        "filename": "cyc-v7-kidney_053.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_053.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "053"
+      },
+      {
+        "id": "cyc-v7-kidney_054",
+        "filename": "cyc-v7-kidney_054.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_054.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "054"
+      },
+      {
+        "id": "cyc-v7-kidney_055",
+        "filename": "cyc-v7-kidney_055.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_055.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "055"
+      },
+      {
+        "id": "cyc-v7-kidney_056",
+        "filename": "cyc-v7-kidney_056.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_056.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "056"
+      },
+      {
+        "id": "cyc-v7-kidney_057",
+        "filename": "cyc-v7-kidney_057.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_057.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "057"
+      },
+      {
+        "id": "cyc-v7-kidney_058",
+        "filename": "cyc-v7-kidney_058.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_058.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "058"
+      },
+      {
+        "id": "cyc-v7-kidney_059",
+        "filename": "cyc-v7-kidney_059.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_059.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "059"
+      },
+      {
+        "id": "cyc-v7-kidney_060",
+        "filename": "cyc-v7-kidney_060.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_060.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "060"
+      },
+      {
+        "id": "cyc-v7-kidney_061",
+        "filename": "cyc-v7-kidney_061.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_061.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "061"
+      },
+      {
+        "id": "cyc-v7-kidney_062",
+        "filename": "cyc-v7-kidney_062.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-kidney_062.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "062"
+      },
+      {
+        "id": "cyc-v7-liver_063",
+        "filename": "cyc-v7-liver_063.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_063.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "063"
+      },
+      {
+        "id": "cyc-v7-liver_064",
+        "filename": "cyc-v7-liver_064.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_064.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "064"
+      },
+      {
+        "id": "cyc-v7-liver_065",
+        "filename": "cyc-v7-liver_065.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_065.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "065"
+      },
+      {
+        "id": "cyc-v7-liver_066",
+        "filename": "cyc-v7-liver_066.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_066.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "066"
+      },
+      {
+        "id": "cyc-v7-liver_067",
+        "filename": "cyc-v7-liver_067.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_067.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "067"
+      },
+      {
+        "id": "cyc-v7-liver_068",
+        "filename": "cyc-v7-liver_068.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_068.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "068"
+      },
+      {
+        "id": "cyc-v7-liver_069",
+        "filename": "cyc-v7-liver_069.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_069.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "069"
+      },
+      {
+        "id": "cyc-v7-liver_070",
+        "filename": "cyc-v7-liver_070.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_070.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "070"
+      },
+      {
+        "id": "cyc-v7-liver_071",
+        "filename": "cyc-v7-liver_071.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_071.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "071"
+      },
+      {
+        "id": "cyc-v7-liver_072",
+        "filename": "cyc-v7-liver_072.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_072.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "072"
+      },
+      {
+        "id": "cyc-v7-liver_073",
+        "filename": "cyc-v7-liver_073.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_073.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "073"
+      },
+      {
+        "id": "cyc-v7-liver_074",
+        "filename": "cyc-v7-liver_074.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_074.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "074"
+      },
+      {
+        "id": "cyc-v7-liver_075",
+        "filename": "cyc-v7-liver_075.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_075.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "075"
+      },
+      {
+        "id": "cyc-v7-liver_076",
+        "filename": "cyc-v7-liver_076.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_076.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "076"
+      },
+      {
+        "id": "cyc-v7-liver_077",
+        "filename": "cyc-v7-liver_077.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_077.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "077"
+      },
+      {
+        "id": "cyc-v7-liver_078",
+        "filename": "cyc-v7-liver_078.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_078.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "078"
+      },
+      {
+        "id": "cyc-v7-liver_079",
+        "filename": "cyc-v7-liver_079.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_079.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "079"
+      },
+      {
+        "id": "cyc-v7-liver_080",
+        "filename": "cyc-v7-liver_080.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_080.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "080"
+      },
+      {
+        "id": "cyc-v7-liver_081",
+        "filename": "cyc-v7-liver_081.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_081.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "081"
+      },
+      {
+        "id": "cyc-v7-liver_082",
+        "filename": "cyc-v7-liver_082.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_082.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "082"
+      },
+      {
+        "id": "cyc-v7-liver_083",
+        "filename": "cyc-v7-liver_083.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_083.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "083"
+      },
+      {
+        "id": "cyc-v7-liver_084",
+        "filename": "cyc-v7-liver_084.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_084.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "084"
+      },
+      {
+        "id": "cyc-v7-liver_085",
+        "filename": "cyc-v7-liver_085.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_085.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "085"
+      },
+      {
+        "id": "cyc-v7-liver_086",
+        "filename": "cyc-v7-liver_086.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_086.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "086"
+      },
+      {
+        "id": "cyc-v7-liver_087",
+        "filename": "cyc-v7-liver_087.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_087.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "087"
+      },
+      {
+        "id": "cyc-v7-liver_088",
+        "filename": "cyc-v7-liver_088.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_088.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "088"
+      },
+      {
+        "id": "cyc-v7-liver_089",
+        "filename": "cyc-v7-liver_089.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_089.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "089"
+      },
+      {
+        "id": "cyc-v7-liver_090",
+        "filename": "cyc-v7-liver_090.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_090.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "090"
+      },
+      {
+        "id": "cyc-v7-liver_091",
+        "filename": "cyc-v7-liver_091.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_091.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "091"
+      },
+      {
+        "id": "cyc-v7-liver_092",
+        "filename": "cyc-v7-liver_092.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_092.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "092"
+      },
+      {
+        "id": "cyc-v7-liver_093",
+        "filename": "cyc-v7-liver_093.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_093.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "093"
+      },
+      {
+        "id": "cyc-v7-liver_094",
+        "filename": "cyc-v7-liver_094.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_094.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "094"
+      },
+      {
+        "id": "cyc-v7-liver_095",
+        "filename": "cyc-v7-liver_095.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_095.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "095"
+      },
+      {
+        "id": "cyc-v7-liver_096",
+        "filename": "cyc-v7-liver_096.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-liver_096.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "096"
+      },
+      {
+        "id": "cyc-v7-thyroid_097",
+        "filename": "cyc-v7-thyroid_097.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_097.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "097"
+      },
+      {
+        "id": "cyc-v7-thyroid_098",
+        "filename": "cyc-v7-thyroid_098.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_098.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "098"
+      },
+      {
+        "id": "cyc-v7-thyroid_099",
+        "filename": "cyc-v7-thyroid_099.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_099.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "099"
+      },
+      {
+        "id": "cyc-v7-thyroid_100",
+        "filename": "cyc-v7-thyroid_100.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_100.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "100"
+      },
+      {
+        "id": "cyc-v7-thyroid_101",
+        "filename": "cyc-v7-thyroid_101.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_101.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "101"
+      },
+      {
+        "id": "cyc-v7-thyroid_102",
+        "filename": "cyc-v7-thyroid_102.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_102.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "102"
+      },
+      {
+        "id": "cyc-v7-thyroid_103",
+        "filename": "cyc-v7-thyroid_103.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_103.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "103"
+      },
+      {
+        "id": "cyc-v7-thyroid_104",
+        "filename": "cyc-v7-thyroid_104.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_104.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "104"
+      },
+      {
+        "id": "cyc-v7-thyroid_105",
+        "filename": "cyc-v7-thyroid_105.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_105.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "105"
+      },
+      {
+        "id": "cyc-v7-thyroid_106",
+        "filename": "cyc-v7-thyroid_106.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_106.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "106"
+      },
+      {
+        "id": "cyc-v7-thyroid_107",
+        "filename": "cyc-v7-thyroid_107.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_107.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "107"
+      },
+      {
+        "id": "cyc-v7-thyroid_108",
+        "filename": "cyc-v7-thyroid_108.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_108.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "108"
+      },
+      {
+        "id": "cyc-v7-thyroid_109",
+        "filename": "cyc-v7-thyroid_109.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_109.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "109"
+      },
+      {
+        "id": "cyc-v7-thyroid_110",
+        "filename": "cyc-v7-thyroid_110.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_110.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "110"
+      },
+      {
+        "id": "cyc-v7-thyroid_111",
+        "filename": "cyc-v7-thyroid_111.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_111.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "111"
+      },
+      {
+        "id": "cyc-v7-thyroid_112",
+        "filename": "cyc-v7-thyroid_112.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_112.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "112"
+      },
+      {
+        "id": "cyc-v7-thyroid_113",
+        "filename": "cyc-v7-thyroid_113.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_113.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "113"
+      },
+      {
+        "id": "cyc-v7-thyroid_114",
+        "filename": "cyc-v7-thyroid_114.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_114.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "114"
+      },
+      {
+        "id": "cyc-v7-thyroid_115",
+        "filename": "cyc-v7-thyroid_115.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_115.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "115"
+      },
+      {
+        "id": "cyc-v7-thyroid_116",
+        "filename": "cyc-v7-thyroid_116.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_116.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "116"
+      },
+      {
+        "id": "cyc-v7-thyroid_117",
+        "filename": "cyc-v7-thyroid_117.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_117.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "117"
+      },
+      {
+        "id": "cyc-v7-thyroid_118",
+        "filename": "cyc-v7-thyroid_118.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_118.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "118"
+      },
+      {
+        "id": "cyc-v7-thyroid_119",
+        "filename": "cyc-v7-thyroid_119.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_119.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "119"
+      },
+      {
+        "id": "cyc-v7-thyroid_120",
+        "filename": "cyc-v7-thyroid_120.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_120.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "120"
+      },
+      {
+        "id": "cyc-v7-thyroid_121",
+        "filename": "cyc-v7-thyroid_121.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_121.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "121"
+      },
+      {
+        "id": "cyc-v7-thyroid_122",
+        "filename": "cyc-v7-thyroid_122.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_122.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "122"
+      },
+      {
+        "id": "cyc-v7-thyroid_123",
+        "filename": "cyc-v7-thyroid_123.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_123.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "123"
+      },
+      {
+        "id": "cyc-v7-thyroid_124",
+        "filename": "cyc-v7-thyroid_124.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_124.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "124"
+      },
+      {
+        "id": "cyc-v7-thyroid_125",
+        "filename": "cyc-v7-thyroid_125.png",
+        "url": "Supervised/v7-only/cyc/cyc-v7-thyroid_125.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "125"
+      }
+    ]
   },
   {
-    "strategy":"Supervised",
-    "dataset":"v7-only",
-    "model":"fast"
+    "strategy": "Supervised",
+    "dataset": "v7-only",
+    "model": "fast",
+    "displayModel": "Model C",
+    "images": [
+      {
+        "id": "fast-v7-carotid_001",
+        "filename": "fast-v7-carotid_001.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_001.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "001"
+      },
+      {
+        "id": "fast-v7-carotid_002",
+        "filename": "fast-v7-carotid_002.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_002.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "002"
+      },
+      {
+        "id": "fast-v7-carotid_003",
+        "filename": "fast-v7-carotid_003.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_003.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "003"
+      },
+      {
+        "id": "fast-v7-carotid_004",
+        "filename": "fast-v7-carotid_004.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_004.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "004"
+      },
+      {
+        "id": "fast-v7-carotid_005",
+        "filename": "fast-v7-carotid_005.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_005.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "005"
+      },
+      {
+        "id": "fast-v7-carotid_006",
+        "filename": "fast-v7-carotid_006.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_006.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "006"
+      },
+      {
+        "id": "fast-v7-carotid_007",
+        "filename": "fast-v7-carotid_007.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_007.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "007"
+      },
+      {
+        "id": "fast-v7-carotid_008",
+        "filename": "fast-v7-carotid_008.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_008.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "008"
+      },
+      {
+        "id": "fast-v7-carotid_009",
+        "filename": "fast-v7-carotid_009.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_009.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "009"
+      },
+      {
+        "id": "fast-v7-carotid_010",
+        "filename": "fast-v7-carotid_010.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_010.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "010"
+      },
+      {
+        "id": "fast-v7-carotid_011",
+        "filename": "fast-v7-carotid_011.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_011.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "011"
+      },
+      {
+        "id": "fast-v7-carotid_012",
+        "filename": "fast-v7-carotid_012.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_012.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "012"
+      },
+      {
+        "id": "fast-v7-carotid_013",
+        "filename": "fast-v7-carotid_013.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_013.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "013"
+      },
+      {
+        "id": "fast-v7-carotid_014",
+        "filename": "fast-v7-carotid_014.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_014.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "014"
+      },
+      {
+        "id": "fast-v7-carotid_015",
+        "filename": "fast-v7-carotid_015.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_015.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "015"
+      },
+      {
+        "id": "fast-v7-carotid_016",
+        "filename": "fast-v7-carotid_016.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_016.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "016"
+      },
+      {
+        "id": "fast-v7-carotid_017",
+        "filename": "fast-v7-carotid_017.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_017.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "017"
+      },
+      {
+        "id": "fast-v7-carotid_018",
+        "filename": "fast-v7-carotid_018.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_018.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "018"
+      },
+      {
+        "id": "fast-v7-carotid_019",
+        "filename": "fast-v7-carotid_019.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_019.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "019"
+      },
+      {
+        "id": "fast-v7-carotid_020",
+        "filename": "fast-v7-carotid_020.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_020.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "020"
+      },
+      {
+        "id": "fast-v7-carotid_021",
+        "filename": "fast-v7-carotid_021.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_021.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "021"
+      },
+      {
+        "id": "fast-v7-carotid_022",
+        "filename": "fast-v7-carotid_022.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_022.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "022"
+      },
+      {
+        "id": "fast-v7-carotid_023",
+        "filename": "fast-v7-carotid_023.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_023.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "023"
+      },
+      {
+        "id": "fast-v7-carotid_024",
+        "filename": "fast-v7-carotid_024.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_024.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "024"
+      },
+      {
+        "id": "fast-v7-carotid_025",
+        "filename": "fast-v7-carotid_025.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_025.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "025"
+      },
+      {
+        "id": "fast-v7-carotid_026",
+        "filename": "fast-v7-carotid_026.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_026.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "026"
+      },
+      {
+        "id": "fast-v7-carotid_027",
+        "filename": "fast-v7-carotid_027.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_027.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "027"
+      },
+      {
+        "id": "fast-v7-carotid_028",
+        "filename": "fast-v7-carotid_028.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_028.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "028"
+      },
+      {
+        "id": "fast-v7-carotid_029",
+        "filename": "fast-v7-carotid_029.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_029.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "029"
+      },
+      {
+        "id": "fast-v7-carotid_030",
+        "filename": "fast-v7-carotid_030.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_030.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "030"
+      },
+      {
+        "id": "fast-v7-carotid_031",
+        "filename": "fast-v7-carotid_031.png",
+        "url": "Supervised/v7-only/fast/fast-v7-carotid_031.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "031"
+      },
+      {
+        "id": "fast-v7-kidney_032",
+        "filename": "fast-v7-kidney_032.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_032.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "032"
+      },
+      {
+        "id": "fast-v7-kidney_033",
+        "filename": "fast-v7-kidney_033.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_033.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "033"
+      },
+      {
+        "id": "fast-v7-kidney_034",
+        "filename": "fast-v7-kidney_034.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_034.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "034"
+      },
+      {
+        "id": "fast-v7-kidney_035",
+        "filename": "fast-v7-kidney_035.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_035.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "035"
+      },
+      {
+        "id": "fast-v7-kidney_036",
+        "filename": "fast-v7-kidney_036.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_036.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "036"
+      },
+      {
+        "id": "fast-v7-kidney_037",
+        "filename": "fast-v7-kidney_037.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_037.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "037"
+      },
+      {
+        "id": "fast-v7-kidney_038",
+        "filename": "fast-v7-kidney_038.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_038.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "038"
+      },
+      {
+        "id": "fast-v7-kidney_039",
+        "filename": "fast-v7-kidney_039.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_039.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "039"
+      },
+      {
+        "id": "fast-v7-kidney_040",
+        "filename": "fast-v7-kidney_040.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_040.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "040"
+      },
+      {
+        "id": "fast-v7-kidney_041",
+        "filename": "fast-v7-kidney_041.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_041.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "041"
+      },
+      {
+        "id": "fast-v7-kidney_042",
+        "filename": "fast-v7-kidney_042.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_042.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "042"
+      },
+      {
+        "id": "fast-v7-kidney_043",
+        "filename": "fast-v7-kidney_043.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_043.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "043"
+      },
+      {
+        "id": "fast-v7-kidney_044",
+        "filename": "fast-v7-kidney_044.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_044.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "044"
+      },
+      {
+        "id": "fast-v7-kidney_045",
+        "filename": "fast-v7-kidney_045.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_045.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "045"
+      },
+      {
+        "id": "fast-v7-kidney_046",
+        "filename": "fast-v7-kidney_046.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_046.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "046"
+      },
+      {
+        "id": "fast-v7-kidney_047",
+        "filename": "fast-v7-kidney_047.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_047.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "047"
+      },
+      {
+        "id": "fast-v7-kidney_048",
+        "filename": "fast-v7-kidney_048.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_048.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "048"
+      },
+      {
+        "id": "fast-v7-kidney_049",
+        "filename": "fast-v7-kidney_049.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_049.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "049"
+      },
+      {
+        "id": "fast-v7-kidney_050",
+        "filename": "fast-v7-kidney_050.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_050.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "050"
+      },
+      {
+        "id": "fast-v7-kidney_051",
+        "filename": "fast-v7-kidney_051.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_051.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "051"
+      },
+      {
+        "id": "fast-v7-kidney_052",
+        "filename": "fast-v7-kidney_052.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_052.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "052"
+      },
+      {
+        "id": "fast-v7-kidney_053",
+        "filename": "fast-v7-kidney_053.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_053.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "053"
+      },
+      {
+        "id": "fast-v7-kidney_054",
+        "filename": "fast-v7-kidney_054.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_054.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "054"
+      },
+      {
+        "id": "fast-v7-kidney_055",
+        "filename": "fast-v7-kidney_055.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_055.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "055"
+      },
+      {
+        "id": "fast-v7-kidney_056",
+        "filename": "fast-v7-kidney_056.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_056.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "056"
+      },
+      {
+        "id": "fast-v7-kidney_057",
+        "filename": "fast-v7-kidney_057.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_057.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "057"
+      },
+      {
+        "id": "fast-v7-kidney_058",
+        "filename": "fast-v7-kidney_058.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_058.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "058"
+      },
+      {
+        "id": "fast-v7-kidney_059",
+        "filename": "fast-v7-kidney_059.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_059.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "059"
+      },
+      {
+        "id": "fast-v7-kidney_060",
+        "filename": "fast-v7-kidney_060.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_060.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "060"
+      },
+      {
+        "id": "fast-v7-kidney_061",
+        "filename": "fast-v7-kidney_061.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_061.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "061"
+      },
+      {
+        "id": "fast-v7-kidney_062",
+        "filename": "fast-v7-kidney_062.png",
+        "url": "Supervised/v7-only/fast/fast-v7-kidney_062.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "062"
+      },
+      {
+        "id": "fast-v7-liver_063",
+        "filename": "fast-v7-liver_063.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_063.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "063"
+      },
+      {
+        "id": "fast-v7-liver_064",
+        "filename": "fast-v7-liver_064.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_064.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "064"
+      },
+      {
+        "id": "fast-v7-liver_065",
+        "filename": "fast-v7-liver_065.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_065.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "065"
+      },
+      {
+        "id": "fast-v7-liver_066",
+        "filename": "fast-v7-liver_066.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_066.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "066"
+      },
+      {
+        "id": "fast-v7-liver_067",
+        "filename": "fast-v7-liver_067.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_067.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "067"
+      },
+      {
+        "id": "fast-v7-liver_068",
+        "filename": "fast-v7-liver_068.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_068.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "068"
+      },
+      {
+        "id": "fast-v7-liver_069",
+        "filename": "fast-v7-liver_069.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_069.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "069"
+      },
+      {
+        "id": "fast-v7-liver_070",
+        "filename": "fast-v7-liver_070.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_070.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "070"
+      },
+      {
+        "id": "fast-v7-liver_071",
+        "filename": "fast-v7-liver_071.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_071.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "071"
+      },
+      {
+        "id": "fast-v7-liver_072",
+        "filename": "fast-v7-liver_072.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_072.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "072"
+      },
+      {
+        "id": "fast-v7-liver_073",
+        "filename": "fast-v7-liver_073.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_073.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "073"
+      },
+      {
+        "id": "fast-v7-liver_074",
+        "filename": "fast-v7-liver_074.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_074.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "074"
+      },
+      {
+        "id": "fast-v7-liver_075",
+        "filename": "fast-v7-liver_075.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_075.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "075"
+      },
+      {
+        "id": "fast-v7-liver_076",
+        "filename": "fast-v7-liver_076.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_076.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "076"
+      },
+      {
+        "id": "fast-v7-liver_077",
+        "filename": "fast-v7-liver_077.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_077.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "077"
+      },
+      {
+        "id": "fast-v7-liver_078",
+        "filename": "fast-v7-liver_078.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_078.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "078"
+      },
+      {
+        "id": "fast-v7-liver_079",
+        "filename": "fast-v7-liver_079.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_079.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "079"
+      },
+      {
+        "id": "fast-v7-liver_080",
+        "filename": "fast-v7-liver_080.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_080.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "080"
+      },
+      {
+        "id": "fast-v7-liver_081",
+        "filename": "fast-v7-liver_081.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_081.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "081"
+      },
+      {
+        "id": "fast-v7-liver_082",
+        "filename": "fast-v7-liver_082.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_082.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "082"
+      },
+      {
+        "id": "fast-v7-liver_083",
+        "filename": "fast-v7-liver_083.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_083.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "083"
+      },
+      {
+        "id": "fast-v7-liver_084",
+        "filename": "fast-v7-liver_084.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_084.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "084"
+      },
+      {
+        "id": "fast-v7-liver_085",
+        "filename": "fast-v7-liver_085.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_085.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "085"
+      },
+      {
+        "id": "fast-v7-liver_086",
+        "filename": "fast-v7-liver_086.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_086.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "086"
+      },
+      {
+        "id": "fast-v7-liver_087",
+        "filename": "fast-v7-liver_087.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_087.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "087"
+      },
+      {
+        "id": "fast-v7-liver_088",
+        "filename": "fast-v7-liver_088.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_088.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "088"
+      },
+      {
+        "id": "fast-v7-liver_089",
+        "filename": "fast-v7-liver_089.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_089.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "089"
+      },
+      {
+        "id": "fast-v7-liver_090",
+        "filename": "fast-v7-liver_090.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_090.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "090"
+      },
+      {
+        "id": "fast-v7-liver_091",
+        "filename": "fast-v7-liver_091.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_091.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "091"
+      },
+      {
+        "id": "fast-v7-liver_092",
+        "filename": "fast-v7-liver_092.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_092.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "092"
+      },
+      {
+        "id": "fast-v7-liver_093",
+        "filename": "fast-v7-liver_093.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_093.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "093"
+      },
+      {
+        "id": "fast-v7-liver_094",
+        "filename": "fast-v7-liver_094.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_094.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "094"
+      },
+      {
+        "id": "fast-v7-liver_095",
+        "filename": "fast-v7-liver_095.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_095.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "095"
+      },
+      {
+        "id": "fast-v7-liver_096",
+        "filename": "fast-v7-liver_096.png",
+        "url": "Supervised/v7-only/fast/fast-v7-liver_096.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "096"
+      },
+      {
+        "id": "fast-v7-thyroid_097",
+        "filename": "fast-v7-thyroid_097.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_097.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "097"
+      },
+      {
+        "id": "fast-v7-thyroid_098",
+        "filename": "fast-v7-thyroid_098.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_098.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "098"
+      },
+      {
+        "id": "fast-v7-thyroid_099",
+        "filename": "fast-v7-thyroid_099.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_099.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "099"
+      },
+      {
+        "id": "fast-v7-thyroid_100",
+        "filename": "fast-v7-thyroid_100.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_100.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "100"
+      },
+      {
+        "id": "fast-v7-thyroid_101",
+        "filename": "fast-v7-thyroid_101.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_101.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "101"
+      },
+      {
+        "id": "fast-v7-thyroid_102",
+        "filename": "fast-v7-thyroid_102.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_102.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "102"
+      },
+      {
+        "id": "fast-v7-thyroid_103",
+        "filename": "fast-v7-thyroid_103.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_103.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "103"
+      },
+      {
+        "id": "fast-v7-thyroid_104",
+        "filename": "fast-v7-thyroid_104.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_104.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "104"
+      },
+      {
+        "id": "fast-v7-thyroid_105",
+        "filename": "fast-v7-thyroid_105.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_105.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "105"
+      },
+      {
+        "id": "fast-v7-thyroid_106",
+        "filename": "fast-v7-thyroid_106.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_106.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "106"
+      },
+      {
+        "id": "fast-v7-thyroid_107",
+        "filename": "fast-v7-thyroid_107.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_107.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "107"
+      },
+      {
+        "id": "fast-v7-thyroid_108",
+        "filename": "fast-v7-thyroid_108.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_108.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "108"
+      },
+      {
+        "id": "fast-v7-thyroid_109",
+        "filename": "fast-v7-thyroid_109.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_109.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "109"
+      },
+      {
+        "id": "fast-v7-thyroid_110",
+        "filename": "fast-v7-thyroid_110.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_110.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "110"
+      },
+      {
+        "id": "fast-v7-thyroid_111",
+        "filename": "fast-v7-thyroid_111.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_111.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "111"
+      },
+      {
+        "id": "fast-v7-thyroid_112",
+        "filename": "fast-v7-thyroid_112.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_112.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "112"
+      },
+      {
+        "id": "fast-v7-thyroid_113",
+        "filename": "fast-v7-thyroid_113.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_113.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "113"
+      },
+      {
+        "id": "fast-v7-thyroid_114",
+        "filename": "fast-v7-thyroid_114.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_114.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "114"
+      },
+      {
+        "id": "fast-v7-thyroid_115",
+        "filename": "fast-v7-thyroid_115.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_115.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "115"
+      },
+      {
+        "id": "fast-v7-thyroid_116",
+        "filename": "fast-v7-thyroid_116.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_116.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "116"
+      },
+      {
+        "id": "fast-v7-thyroid_117",
+        "filename": "fast-v7-thyroid_117.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_117.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "117"
+      },
+      {
+        "id": "fast-v7-thyroid_118",
+        "filename": "fast-v7-thyroid_118.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_118.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "118"
+      },
+      {
+        "id": "fast-v7-thyroid_119",
+        "filename": "fast-v7-thyroid_119.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_119.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "119"
+      },
+      {
+        "id": "fast-v7-thyroid_120",
+        "filename": "fast-v7-thyroid_120.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_120.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "120"
+      },
+      {
+        "id": "fast-v7-thyroid_121",
+        "filename": "fast-v7-thyroid_121.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_121.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "121"
+      },
+      {
+        "id": "fast-v7-thyroid_122",
+        "filename": "fast-v7-thyroid_122.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_122.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "122"
+      },
+      {
+        "id": "fast-v7-thyroid_123",
+        "filename": "fast-v7-thyroid_123.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_123.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "123"
+      },
+      {
+        "id": "fast-v7-thyroid_124",
+        "filename": "fast-v7-thyroid_124.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_124.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "124"
+      },
+      {
+        "id": "fast-v7-thyroid_125",
+        "filename": "fast-v7-thyroid_125.png",
+        "url": "Supervised/v7-only/fast/fast-v7-thyroid_125.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "125"
+      }
+    ]
   },
   {
-    "strategy":"Supervised",
-    "dataset":"v7-only",
-    "model":"p2p"
+    "strategy": "Supervised",
+    "dataset": "v7-only",
+    "model": "p2p",
+    "displayModel": "Model D",
+    "images": [
+      {
+        "id": "p2p-v7-carotid_001",
+        "filename": "p2p-v7-carotid_001.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_001.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "001"
+      },
+      {
+        "id": "p2p-v7-carotid_002",
+        "filename": "p2p-v7-carotid_002.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_002.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "002"
+      },
+      {
+        "id": "p2p-v7-carotid_003",
+        "filename": "p2p-v7-carotid_003.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_003.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "003"
+      },
+      {
+        "id": "p2p-v7-carotid_004",
+        "filename": "p2p-v7-carotid_004.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_004.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "004"
+      },
+      {
+        "id": "p2p-v7-carotid_005",
+        "filename": "p2p-v7-carotid_005.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_005.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "005"
+      },
+      {
+        "id": "p2p-v7-carotid_006",
+        "filename": "p2p-v7-carotid_006.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_006.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "006"
+      },
+      {
+        "id": "p2p-v7-carotid_007",
+        "filename": "p2p-v7-carotid_007.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_007.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "007"
+      },
+      {
+        "id": "p2p-v7-carotid_008",
+        "filename": "p2p-v7-carotid_008.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_008.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "008"
+      },
+      {
+        "id": "p2p-v7-carotid_009",
+        "filename": "p2p-v7-carotid_009.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_009.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "009"
+      },
+      {
+        "id": "p2p-v7-carotid_010",
+        "filename": "p2p-v7-carotid_010.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_010.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "010"
+      },
+      {
+        "id": "p2p-v7-carotid_011",
+        "filename": "p2p-v7-carotid_011.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_011.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "011"
+      },
+      {
+        "id": "p2p-v7-carotid_012",
+        "filename": "p2p-v7-carotid_012.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_012.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "012"
+      },
+      {
+        "id": "p2p-v7-carotid_013",
+        "filename": "p2p-v7-carotid_013.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_013.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "013"
+      },
+      {
+        "id": "p2p-v7-carotid_014",
+        "filename": "p2p-v7-carotid_014.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_014.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "014"
+      },
+      {
+        "id": "p2p-v7-carotid_015",
+        "filename": "p2p-v7-carotid_015.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_015.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "015"
+      },
+      {
+        "id": "p2p-v7-carotid_016",
+        "filename": "p2p-v7-carotid_016.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_016.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "016"
+      },
+      {
+        "id": "p2p-v7-carotid_017",
+        "filename": "p2p-v7-carotid_017.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_017.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "017"
+      },
+      {
+        "id": "p2p-v7-carotid_018",
+        "filename": "p2p-v7-carotid_018.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_018.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "018"
+      },
+      {
+        "id": "p2p-v7-carotid_019",
+        "filename": "p2p-v7-carotid_019.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_019.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "019"
+      },
+      {
+        "id": "p2p-v7-carotid_020",
+        "filename": "p2p-v7-carotid_020.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_020.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "020"
+      },
+      {
+        "id": "p2p-v7-carotid_021",
+        "filename": "p2p-v7-carotid_021.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_021.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "021"
+      },
+      {
+        "id": "p2p-v7-carotid_022",
+        "filename": "p2p-v7-carotid_022.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_022.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "022"
+      },
+      {
+        "id": "p2p-v7-carotid_023",
+        "filename": "p2p-v7-carotid_023.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_023.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "023"
+      },
+      {
+        "id": "p2p-v7-carotid_024",
+        "filename": "p2p-v7-carotid_024.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_024.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "024"
+      },
+      {
+        "id": "p2p-v7-carotid_025",
+        "filename": "p2p-v7-carotid_025.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_025.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "025"
+      },
+      {
+        "id": "p2p-v7-carotid_026",
+        "filename": "p2p-v7-carotid_026.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_026.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "026"
+      },
+      {
+        "id": "p2p-v7-carotid_027",
+        "filename": "p2p-v7-carotid_027.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_027.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "027"
+      },
+      {
+        "id": "p2p-v7-carotid_028",
+        "filename": "p2p-v7-carotid_028.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_028.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "028"
+      },
+      {
+        "id": "p2p-v7-carotid_029",
+        "filename": "p2p-v7-carotid_029.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_029.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "029"
+      },
+      {
+        "id": "p2p-v7-carotid_030",
+        "filename": "p2p-v7-carotid_030.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_030.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "030"
+      },
+      {
+        "id": "p2p-v7-carotid_031",
+        "filename": "p2p-v7-carotid_031.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-carotid_031.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "031"
+      },
+      {
+        "id": "p2p-v7-kidney_032",
+        "filename": "p2p-v7-kidney_032.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_032.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "032"
+      },
+      {
+        "id": "p2p-v7-kidney_033",
+        "filename": "p2p-v7-kidney_033.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_033.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "033"
+      },
+      {
+        "id": "p2p-v7-kidney_034",
+        "filename": "p2p-v7-kidney_034.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_034.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "034"
+      },
+      {
+        "id": "p2p-v7-kidney_035",
+        "filename": "p2p-v7-kidney_035.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_035.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "035"
+      },
+      {
+        "id": "p2p-v7-kidney_036",
+        "filename": "p2p-v7-kidney_036.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_036.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "036"
+      },
+      {
+        "id": "p2p-v7-kidney_037",
+        "filename": "p2p-v7-kidney_037.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_037.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "037"
+      },
+      {
+        "id": "p2p-v7-kidney_038",
+        "filename": "p2p-v7-kidney_038.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_038.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "038"
+      },
+      {
+        "id": "p2p-v7-kidney_039",
+        "filename": "p2p-v7-kidney_039.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_039.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "039"
+      },
+      {
+        "id": "p2p-v7-kidney_040",
+        "filename": "p2p-v7-kidney_040.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_040.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "040"
+      },
+      {
+        "id": "p2p-v7-kidney_041",
+        "filename": "p2p-v7-kidney_041.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_041.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "041"
+      },
+      {
+        "id": "p2p-v7-kidney_042",
+        "filename": "p2p-v7-kidney_042.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_042.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "042"
+      },
+      {
+        "id": "p2p-v7-kidney_043",
+        "filename": "p2p-v7-kidney_043.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_043.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "043"
+      },
+      {
+        "id": "p2p-v7-kidney_044",
+        "filename": "p2p-v7-kidney_044.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_044.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "044"
+      },
+      {
+        "id": "p2p-v7-kidney_045",
+        "filename": "p2p-v7-kidney_045.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_045.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "045"
+      },
+      {
+        "id": "p2p-v7-kidney_046",
+        "filename": "p2p-v7-kidney_046.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_046.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "046"
+      },
+      {
+        "id": "p2p-v7-kidney_047",
+        "filename": "p2p-v7-kidney_047.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_047.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "047"
+      },
+      {
+        "id": "p2p-v7-kidney_048",
+        "filename": "p2p-v7-kidney_048.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_048.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "048"
+      },
+      {
+        "id": "p2p-v7-kidney_049",
+        "filename": "p2p-v7-kidney_049.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_049.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "049"
+      },
+      {
+        "id": "p2p-v7-kidney_050",
+        "filename": "p2p-v7-kidney_050.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_050.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "050"
+      },
+      {
+        "id": "p2p-v7-kidney_051",
+        "filename": "p2p-v7-kidney_051.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_051.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "051"
+      },
+      {
+        "id": "p2p-v7-kidney_052",
+        "filename": "p2p-v7-kidney_052.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_052.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "052"
+      },
+      {
+        "id": "p2p-v7-kidney_053",
+        "filename": "p2p-v7-kidney_053.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_053.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "053"
+      },
+      {
+        "id": "p2p-v7-kidney_054",
+        "filename": "p2p-v7-kidney_054.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_054.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "054"
+      },
+      {
+        "id": "p2p-v7-kidney_055",
+        "filename": "p2p-v7-kidney_055.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_055.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "055"
+      },
+      {
+        "id": "p2p-v7-kidney_056",
+        "filename": "p2p-v7-kidney_056.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_056.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "056"
+      },
+      {
+        "id": "p2p-v7-kidney_057",
+        "filename": "p2p-v7-kidney_057.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_057.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "057"
+      },
+      {
+        "id": "p2p-v7-kidney_058",
+        "filename": "p2p-v7-kidney_058.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_058.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "058"
+      },
+      {
+        "id": "p2p-v7-kidney_059",
+        "filename": "p2p-v7-kidney_059.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_059.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "059"
+      },
+      {
+        "id": "p2p-v7-kidney_060",
+        "filename": "p2p-v7-kidney_060.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_060.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "060"
+      },
+      {
+        "id": "p2p-v7-kidney_061",
+        "filename": "p2p-v7-kidney_061.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_061.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "061"
+      },
+      {
+        "id": "p2p-v7-kidney_062",
+        "filename": "p2p-v7-kidney_062.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-kidney_062.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "062"
+      },
+      {
+        "id": "p2p-v7-liver_063",
+        "filename": "p2p-v7-liver_063.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_063.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "063"
+      },
+      {
+        "id": "p2p-v7-liver_064",
+        "filename": "p2p-v7-liver_064.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_064.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "064"
+      },
+      {
+        "id": "p2p-v7-liver_065",
+        "filename": "p2p-v7-liver_065.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_065.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "065"
+      },
+      {
+        "id": "p2p-v7-liver_066",
+        "filename": "p2p-v7-liver_066.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_066.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "066"
+      },
+      {
+        "id": "p2p-v7-liver_067",
+        "filename": "p2p-v7-liver_067.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_067.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "067"
+      },
+      {
+        "id": "p2p-v7-liver_068",
+        "filename": "p2p-v7-liver_068.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_068.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "068"
+      },
+      {
+        "id": "p2p-v7-liver_069",
+        "filename": "p2p-v7-liver_069.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_069.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "069"
+      },
+      {
+        "id": "p2p-v7-liver_070",
+        "filename": "p2p-v7-liver_070.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_070.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "070"
+      },
+      {
+        "id": "p2p-v7-liver_071",
+        "filename": "p2p-v7-liver_071.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_071.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "071"
+      },
+      {
+        "id": "p2p-v7-liver_072",
+        "filename": "p2p-v7-liver_072.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_072.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "072"
+      },
+      {
+        "id": "p2p-v7-liver_073",
+        "filename": "p2p-v7-liver_073.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_073.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "073"
+      },
+      {
+        "id": "p2p-v7-liver_074",
+        "filename": "p2p-v7-liver_074.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_074.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "074"
+      },
+      {
+        "id": "p2p-v7-liver_075",
+        "filename": "p2p-v7-liver_075.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_075.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "075"
+      },
+      {
+        "id": "p2p-v7-liver_076",
+        "filename": "p2p-v7-liver_076.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_076.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "076"
+      },
+      {
+        "id": "p2p-v7-liver_077",
+        "filename": "p2p-v7-liver_077.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_077.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "077"
+      },
+      {
+        "id": "p2p-v7-liver_078",
+        "filename": "p2p-v7-liver_078.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_078.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "078"
+      },
+      {
+        "id": "p2p-v7-liver_079",
+        "filename": "p2p-v7-liver_079.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_079.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "079"
+      },
+      {
+        "id": "p2p-v7-liver_080",
+        "filename": "p2p-v7-liver_080.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_080.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "080"
+      },
+      {
+        "id": "p2p-v7-liver_081",
+        "filename": "p2p-v7-liver_081.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_081.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "081"
+      },
+      {
+        "id": "p2p-v7-liver_082",
+        "filename": "p2p-v7-liver_082.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_082.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "082"
+      },
+      {
+        "id": "p2p-v7-liver_083",
+        "filename": "p2p-v7-liver_083.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_083.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "083"
+      },
+      {
+        "id": "p2p-v7-liver_084",
+        "filename": "p2p-v7-liver_084.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_084.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "084"
+      },
+      {
+        "id": "p2p-v7-liver_085",
+        "filename": "p2p-v7-liver_085.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_085.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "085"
+      },
+      {
+        "id": "p2p-v7-liver_086",
+        "filename": "p2p-v7-liver_086.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_086.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "086"
+      },
+      {
+        "id": "p2p-v7-liver_087",
+        "filename": "p2p-v7-liver_087.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_087.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "087"
+      },
+      {
+        "id": "p2p-v7-liver_088",
+        "filename": "p2p-v7-liver_088.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_088.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "088"
+      },
+      {
+        "id": "p2p-v7-liver_089",
+        "filename": "p2p-v7-liver_089.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_089.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "089"
+      },
+      {
+        "id": "p2p-v7-liver_090",
+        "filename": "p2p-v7-liver_090.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_090.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "090"
+      },
+      {
+        "id": "p2p-v7-liver_091",
+        "filename": "p2p-v7-liver_091.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_091.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "091"
+      },
+      {
+        "id": "p2p-v7-liver_092",
+        "filename": "p2p-v7-liver_092.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_092.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "092"
+      },
+      {
+        "id": "p2p-v7-liver_093",
+        "filename": "p2p-v7-liver_093.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_093.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "093"
+      },
+      {
+        "id": "p2p-v7-liver_094",
+        "filename": "p2p-v7-liver_094.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_094.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "094"
+      },
+      {
+        "id": "p2p-v7-liver_095",
+        "filename": "p2p-v7-liver_095.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_095.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "095"
+      },
+      {
+        "id": "p2p-v7-liver_096",
+        "filename": "p2p-v7-liver_096.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-liver_096.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "096"
+      },
+      {
+        "id": "p2p-v7-thyroid_097",
+        "filename": "p2p-v7-thyroid_097.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_097.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "097"
+      },
+      {
+        "id": "p2p-v7-thyroid_098",
+        "filename": "p2p-v7-thyroid_098.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_098.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "098"
+      },
+      {
+        "id": "p2p-v7-thyroid_099",
+        "filename": "p2p-v7-thyroid_099.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_099.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "099"
+      },
+      {
+        "id": "p2p-v7-thyroid_100",
+        "filename": "p2p-v7-thyroid_100.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_100.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "100"
+      },
+      {
+        "id": "p2p-v7-thyroid_101",
+        "filename": "p2p-v7-thyroid_101.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_101.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "101"
+      },
+      {
+        "id": "p2p-v7-thyroid_102",
+        "filename": "p2p-v7-thyroid_102.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_102.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "102"
+      },
+      {
+        "id": "p2p-v7-thyroid_103",
+        "filename": "p2p-v7-thyroid_103.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_103.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "103"
+      },
+      {
+        "id": "p2p-v7-thyroid_104",
+        "filename": "p2p-v7-thyroid_104.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_104.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "104"
+      },
+      {
+        "id": "p2p-v7-thyroid_105",
+        "filename": "p2p-v7-thyroid_105.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_105.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "105"
+      },
+      {
+        "id": "p2p-v7-thyroid_106",
+        "filename": "p2p-v7-thyroid_106.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_106.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "106"
+      },
+      {
+        "id": "p2p-v7-thyroid_107",
+        "filename": "p2p-v7-thyroid_107.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_107.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "107"
+      },
+      {
+        "id": "p2p-v7-thyroid_108",
+        "filename": "p2p-v7-thyroid_108.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_108.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "108"
+      },
+      {
+        "id": "p2p-v7-thyroid_109",
+        "filename": "p2p-v7-thyroid_109.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_109.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "109"
+      },
+      {
+        "id": "p2p-v7-thyroid_110",
+        "filename": "p2p-v7-thyroid_110.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_110.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "110"
+      },
+      {
+        "id": "p2p-v7-thyroid_111",
+        "filename": "p2p-v7-thyroid_111.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_111.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "111"
+      },
+      {
+        "id": "p2p-v7-thyroid_112",
+        "filename": "p2p-v7-thyroid_112.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_112.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "112"
+      },
+      {
+        "id": "p2p-v7-thyroid_113",
+        "filename": "p2p-v7-thyroid_113.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_113.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "113"
+      },
+      {
+        "id": "p2p-v7-thyroid_114",
+        "filename": "p2p-v7-thyroid_114.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_114.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "114"
+      },
+      {
+        "id": "p2p-v7-thyroid_115",
+        "filename": "p2p-v7-thyroid_115.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_115.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "115"
+      },
+      {
+        "id": "p2p-v7-thyroid_116",
+        "filename": "p2p-v7-thyroid_116.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_116.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "116"
+      },
+      {
+        "id": "p2p-v7-thyroid_117",
+        "filename": "p2p-v7-thyroid_117.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_117.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "117"
+      },
+      {
+        "id": "p2p-v7-thyroid_118",
+        "filename": "p2p-v7-thyroid_118.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_118.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "118"
+      },
+      {
+        "id": "p2p-v7-thyroid_119",
+        "filename": "p2p-v7-thyroid_119.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_119.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "119"
+      },
+      {
+        "id": "p2p-v7-thyroid_120",
+        "filename": "p2p-v7-thyroid_120.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_120.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "120"
+      },
+      {
+        "id": "p2p-v7-thyroid_121",
+        "filename": "p2p-v7-thyroid_121.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_121.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "121"
+      },
+      {
+        "id": "p2p-v7-thyroid_122",
+        "filename": "p2p-v7-thyroid_122.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_122.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "122"
+      },
+      {
+        "id": "p2p-v7-thyroid_123",
+        "filename": "p2p-v7-thyroid_123.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_123.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "123"
+      },
+      {
+        "id": "p2p-v7-thyroid_124",
+        "filename": "p2p-v7-thyroid_124.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_124.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "124"
+      },
+      {
+        "id": "p2p-v7-thyroid_125",
+        "filename": "p2p-v7-thyroid_125.png",
+        "url": "Supervised/v7-only/p2p/p2p-v7-thyroid_125.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "125"
+      }
+    ]
   },
   {
-    "strategy":"Supervised",
-    "dataset":"v7-only",
-    "model":"reg"
+    "strategy": "Supervised",
+    "dataset": "v7-only",
+    "model": "reg",
+    "displayModel": "Model E",
+    "images": [
+      {
+        "id": "reg-v7-carotid_001",
+        "filename": "reg-v7-carotid_001.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_001.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "001"
+      },
+      {
+        "id": "reg-v7-carotid_002",
+        "filename": "reg-v7-carotid_002.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_002.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "002"
+      },
+      {
+        "id": "reg-v7-carotid_003",
+        "filename": "reg-v7-carotid_003.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_003.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "003"
+      },
+      {
+        "id": "reg-v7-carotid_004",
+        "filename": "reg-v7-carotid_004.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_004.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "004"
+      },
+      {
+        "id": "reg-v7-carotid_005",
+        "filename": "reg-v7-carotid_005.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_005.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "005"
+      },
+      {
+        "id": "reg-v7-carotid_006",
+        "filename": "reg-v7-carotid_006.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_006.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "006"
+      },
+      {
+        "id": "reg-v7-carotid_007",
+        "filename": "reg-v7-carotid_007.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_007.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "007"
+      },
+      {
+        "id": "reg-v7-carotid_008",
+        "filename": "reg-v7-carotid_008.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_008.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "008"
+      },
+      {
+        "id": "reg-v7-carotid_009",
+        "filename": "reg-v7-carotid_009.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_009.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "009"
+      },
+      {
+        "id": "reg-v7-carotid_010",
+        "filename": "reg-v7-carotid_010.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_010.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "010"
+      },
+      {
+        "id": "reg-v7-carotid_011",
+        "filename": "reg-v7-carotid_011.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_011.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "011"
+      },
+      {
+        "id": "reg-v7-carotid_012",
+        "filename": "reg-v7-carotid_012.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_012.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "012"
+      },
+      {
+        "id": "reg-v7-carotid_013",
+        "filename": "reg-v7-carotid_013.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_013.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "013"
+      },
+      {
+        "id": "reg-v7-carotid_014",
+        "filename": "reg-v7-carotid_014.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_014.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "014"
+      },
+      {
+        "id": "reg-v7-carotid_015",
+        "filename": "reg-v7-carotid_015.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_015.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "015"
+      },
+      {
+        "id": "reg-v7-carotid_016",
+        "filename": "reg-v7-carotid_016.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_016.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "016"
+      },
+      {
+        "id": "reg-v7-carotid_017",
+        "filename": "reg-v7-carotid_017.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_017.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "017"
+      },
+      {
+        "id": "reg-v7-carotid_018",
+        "filename": "reg-v7-carotid_018.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_018.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "018"
+      },
+      {
+        "id": "reg-v7-carotid_019",
+        "filename": "reg-v7-carotid_019.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_019.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "019"
+      },
+      {
+        "id": "reg-v7-carotid_020",
+        "filename": "reg-v7-carotid_020.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_020.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "020"
+      },
+      {
+        "id": "reg-v7-carotid_021",
+        "filename": "reg-v7-carotid_021.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_021.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "021"
+      },
+      {
+        "id": "reg-v7-carotid_022",
+        "filename": "reg-v7-carotid_022.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_022.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "022"
+      },
+      {
+        "id": "reg-v7-carotid_023",
+        "filename": "reg-v7-carotid_023.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_023.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "023"
+      },
+      {
+        "id": "reg-v7-carotid_024",
+        "filename": "reg-v7-carotid_024.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_024.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "024"
+      },
+      {
+        "id": "reg-v7-carotid_025",
+        "filename": "reg-v7-carotid_025.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_025.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "025"
+      },
+      {
+        "id": "reg-v7-carotid_026",
+        "filename": "reg-v7-carotid_026.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_026.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "026"
+      },
+      {
+        "id": "reg-v7-carotid_027",
+        "filename": "reg-v7-carotid_027.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_027.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "027"
+      },
+      {
+        "id": "reg-v7-carotid_028",
+        "filename": "reg-v7-carotid_028.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_028.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "028"
+      },
+      {
+        "id": "reg-v7-carotid_029",
+        "filename": "reg-v7-carotid_029.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_029.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "029"
+      },
+      {
+        "id": "reg-v7-carotid_030",
+        "filename": "reg-v7-carotid_030.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_030.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "030"
+      },
+      {
+        "id": "reg-v7-carotid_031",
+        "filename": "reg-v7-carotid_031.png",
+        "url": "Supervised/v7-only/reg/reg-v7-carotid_031.png",
+        "machine_group": "v7",
+        "organ": "carotid",
+        "number": "031"
+      },
+      {
+        "id": "reg-v7-kidney_032",
+        "filename": "reg-v7-kidney_032.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_032.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "032"
+      },
+      {
+        "id": "reg-v7-kidney_033",
+        "filename": "reg-v7-kidney_033.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_033.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "033"
+      },
+      {
+        "id": "reg-v7-kidney_034",
+        "filename": "reg-v7-kidney_034.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_034.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "034"
+      },
+      {
+        "id": "reg-v7-kidney_035",
+        "filename": "reg-v7-kidney_035.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_035.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "035"
+      },
+      {
+        "id": "reg-v7-kidney_036",
+        "filename": "reg-v7-kidney_036.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_036.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "036"
+      },
+      {
+        "id": "reg-v7-kidney_037",
+        "filename": "reg-v7-kidney_037.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_037.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "037"
+      },
+      {
+        "id": "reg-v7-kidney_038",
+        "filename": "reg-v7-kidney_038.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_038.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "038"
+      },
+      {
+        "id": "reg-v7-kidney_039",
+        "filename": "reg-v7-kidney_039.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_039.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "039"
+      },
+      {
+        "id": "reg-v7-kidney_040",
+        "filename": "reg-v7-kidney_040.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_040.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "040"
+      },
+      {
+        "id": "reg-v7-kidney_041",
+        "filename": "reg-v7-kidney_041.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_041.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "041"
+      },
+      {
+        "id": "reg-v7-kidney_042",
+        "filename": "reg-v7-kidney_042.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_042.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "042"
+      },
+      {
+        "id": "reg-v7-kidney_043",
+        "filename": "reg-v7-kidney_043.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_043.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "043"
+      },
+      {
+        "id": "reg-v7-kidney_044",
+        "filename": "reg-v7-kidney_044.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_044.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "044"
+      },
+      {
+        "id": "reg-v7-kidney_045",
+        "filename": "reg-v7-kidney_045.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_045.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "045"
+      },
+      {
+        "id": "reg-v7-kidney_046",
+        "filename": "reg-v7-kidney_046.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_046.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "046"
+      },
+      {
+        "id": "reg-v7-kidney_047",
+        "filename": "reg-v7-kidney_047.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_047.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "047"
+      },
+      {
+        "id": "reg-v7-kidney_048",
+        "filename": "reg-v7-kidney_048.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_048.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "048"
+      },
+      {
+        "id": "reg-v7-kidney_049",
+        "filename": "reg-v7-kidney_049.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_049.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "049"
+      },
+      {
+        "id": "reg-v7-kidney_050",
+        "filename": "reg-v7-kidney_050.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_050.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "050"
+      },
+      {
+        "id": "reg-v7-kidney_051",
+        "filename": "reg-v7-kidney_051.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_051.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "051"
+      },
+      {
+        "id": "reg-v7-kidney_052",
+        "filename": "reg-v7-kidney_052.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_052.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "052"
+      },
+      {
+        "id": "reg-v7-kidney_053",
+        "filename": "reg-v7-kidney_053.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_053.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "053"
+      },
+      {
+        "id": "reg-v7-kidney_054",
+        "filename": "reg-v7-kidney_054.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_054.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "054"
+      },
+      {
+        "id": "reg-v7-kidney_055",
+        "filename": "reg-v7-kidney_055.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_055.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "055"
+      },
+      {
+        "id": "reg-v7-kidney_056",
+        "filename": "reg-v7-kidney_056.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_056.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "056"
+      },
+      {
+        "id": "reg-v7-kidney_057",
+        "filename": "reg-v7-kidney_057.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_057.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "057"
+      },
+      {
+        "id": "reg-v7-kidney_058",
+        "filename": "reg-v7-kidney_058.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_058.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "058"
+      },
+      {
+        "id": "reg-v7-kidney_059",
+        "filename": "reg-v7-kidney_059.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_059.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "059"
+      },
+      {
+        "id": "reg-v7-kidney_060",
+        "filename": "reg-v7-kidney_060.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_060.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "060"
+      },
+      {
+        "id": "reg-v7-kidney_061",
+        "filename": "reg-v7-kidney_061.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_061.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "061"
+      },
+      {
+        "id": "reg-v7-kidney_062",
+        "filename": "reg-v7-kidney_062.png",
+        "url": "Supervised/v7-only/reg/reg-v7-kidney_062.png",
+        "machine_group": "v7",
+        "organ": "kidney",
+        "number": "062"
+      },
+      {
+        "id": "reg-v7-liver_063",
+        "filename": "reg-v7-liver_063.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_063.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "063"
+      },
+      {
+        "id": "reg-v7-liver_064",
+        "filename": "reg-v7-liver_064.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_064.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "064"
+      },
+      {
+        "id": "reg-v7-liver_065",
+        "filename": "reg-v7-liver_065.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_065.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "065"
+      },
+      {
+        "id": "reg-v7-liver_066",
+        "filename": "reg-v7-liver_066.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_066.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "066"
+      },
+      {
+        "id": "reg-v7-liver_067",
+        "filename": "reg-v7-liver_067.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_067.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "067"
+      },
+      {
+        "id": "reg-v7-liver_068",
+        "filename": "reg-v7-liver_068.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_068.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "068"
+      },
+      {
+        "id": "reg-v7-liver_069",
+        "filename": "reg-v7-liver_069.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_069.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "069"
+      },
+      {
+        "id": "reg-v7-liver_070",
+        "filename": "reg-v7-liver_070.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_070.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "070"
+      },
+      {
+        "id": "reg-v7-liver_071",
+        "filename": "reg-v7-liver_071.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_071.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "071"
+      },
+      {
+        "id": "reg-v7-liver_072",
+        "filename": "reg-v7-liver_072.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_072.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "072"
+      },
+      {
+        "id": "reg-v7-liver_073",
+        "filename": "reg-v7-liver_073.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_073.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "073"
+      },
+      {
+        "id": "reg-v7-liver_074",
+        "filename": "reg-v7-liver_074.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_074.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "074"
+      },
+      {
+        "id": "reg-v7-liver_075",
+        "filename": "reg-v7-liver_075.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_075.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "075"
+      },
+      {
+        "id": "reg-v7-liver_076",
+        "filename": "reg-v7-liver_076.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_076.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "076"
+      },
+      {
+        "id": "reg-v7-liver_077",
+        "filename": "reg-v7-liver_077.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_077.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "077"
+      },
+      {
+        "id": "reg-v7-liver_078",
+        "filename": "reg-v7-liver_078.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_078.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "078"
+      },
+      {
+        "id": "reg-v7-liver_079",
+        "filename": "reg-v7-liver_079.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_079.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "079"
+      },
+      {
+        "id": "reg-v7-liver_080",
+        "filename": "reg-v7-liver_080.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_080.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "080"
+      },
+      {
+        "id": "reg-v7-liver_081",
+        "filename": "reg-v7-liver_081.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_081.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "081"
+      },
+      {
+        "id": "reg-v7-liver_082",
+        "filename": "reg-v7-liver_082.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_082.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "082"
+      },
+      {
+        "id": "reg-v7-liver_083",
+        "filename": "reg-v7-liver_083.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_083.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "083"
+      },
+      {
+        "id": "reg-v7-liver_084",
+        "filename": "reg-v7-liver_084.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_084.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "084"
+      },
+      {
+        "id": "reg-v7-liver_085",
+        "filename": "reg-v7-liver_085.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_085.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "085"
+      },
+      {
+        "id": "reg-v7-liver_086",
+        "filename": "reg-v7-liver_086.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_086.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "086"
+      },
+      {
+        "id": "reg-v7-liver_087",
+        "filename": "reg-v7-liver_087.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_087.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "087"
+      },
+      {
+        "id": "reg-v7-liver_088",
+        "filename": "reg-v7-liver_088.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_088.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "088"
+      },
+      {
+        "id": "reg-v7-liver_089",
+        "filename": "reg-v7-liver_089.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_089.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "089"
+      },
+      {
+        "id": "reg-v7-liver_090",
+        "filename": "reg-v7-liver_090.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_090.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "090"
+      },
+      {
+        "id": "reg-v7-liver_091",
+        "filename": "reg-v7-liver_091.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_091.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "091"
+      },
+      {
+        "id": "reg-v7-liver_092",
+        "filename": "reg-v7-liver_092.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_092.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "092"
+      },
+      {
+        "id": "reg-v7-liver_093",
+        "filename": "reg-v7-liver_093.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_093.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "093"
+      },
+      {
+        "id": "reg-v7-liver_094",
+        "filename": "reg-v7-liver_094.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_094.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "094"
+      },
+      {
+        "id": "reg-v7-liver_095",
+        "filename": "reg-v7-liver_095.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_095.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "095"
+      },
+      {
+        "id": "reg-v7-liver_096",
+        "filename": "reg-v7-liver_096.png",
+        "url": "Supervised/v7-only/reg/reg-v7-liver_096.png",
+        "machine_group": "v7",
+        "organ": "liver",
+        "number": "096"
+      },
+      {
+        "id": "reg-v7-thyroid_097",
+        "filename": "reg-v7-thyroid_097.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_097.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "097"
+      },
+      {
+        "id": "reg-v7-thyroid_098",
+        "filename": "reg-v7-thyroid_098.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_098.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "098"
+      },
+      {
+        "id": "reg-v7-thyroid_099",
+        "filename": "reg-v7-thyroid_099.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_099.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "099"
+      },
+      {
+        "id": "reg-v7-thyroid_100",
+        "filename": "reg-v7-thyroid_100.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_100.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "100"
+      },
+      {
+        "id": "reg-v7-thyroid_101",
+        "filename": "reg-v7-thyroid_101.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_101.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "101"
+      },
+      {
+        "id": "reg-v7-thyroid_102",
+        "filename": "reg-v7-thyroid_102.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_102.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "102"
+      },
+      {
+        "id": "reg-v7-thyroid_103",
+        "filename": "reg-v7-thyroid_103.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_103.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "103"
+      },
+      {
+        "id": "reg-v7-thyroid_104",
+        "filename": "reg-v7-thyroid_104.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_104.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "104"
+      },
+      {
+        "id": "reg-v7-thyroid_105",
+        "filename": "reg-v7-thyroid_105.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_105.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "105"
+      },
+      {
+        "id": "reg-v7-thyroid_106",
+        "filename": "reg-v7-thyroid_106.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_106.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "106"
+      },
+      {
+        "id": "reg-v7-thyroid_107",
+        "filename": "reg-v7-thyroid_107.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_107.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "107"
+      },
+      {
+        "id": "reg-v7-thyroid_108",
+        "filename": "reg-v7-thyroid_108.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_108.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "108"
+      },
+      {
+        "id": "reg-v7-thyroid_109",
+        "filename": "reg-v7-thyroid_109.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_109.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "109"
+      },
+      {
+        "id": "reg-v7-thyroid_110",
+        "filename": "reg-v7-thyroid_110.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_110.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "110"
+      },
+      {
+        "id": "reg-v7-thyroid_111",
+        "filename": "reg-v7-thyroid_111.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_111.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "111"
+      },
+      {
+        "id": "reg-v7-thyroid_112",
+        "filename": "reg-v7-thyroid_112.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_112.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "112"
+      },
+      {
+        "id": "reg-v7-thyroid_113",
+        "filename": "reg-v7-thyroid_113.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_113.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "113"
+      },
+      {
+        "id": "reg-v7-thyroid_114",
+        "filename": "reg-v7-thyroid_114.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_114.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "114"
+      },
+      {
+        "id": "reg-v7-thyroid_115",
+        "filename": "reg-v7-thyroid_115.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_115.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "115"
+      },
+      {
+        "id": "reg-v7-thyroid_116",
+        "filename": "reg-v7-thyroid_116.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_116.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "116"
+      },
+      {
+        "id": "reg-v7-thyroid_117",
+        "filename": "reg-v7-thyroid_117.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_117.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "117"
+      },
+      {
+        "id": "reg-v7-thyroid_118",
+        "filename": "reg-v7-thyroid_118.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_118.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "118"
+      },
+      {
+        "id": "reg-v7-thyroid_119",
+        "filename": "reg-v7-thyroid_119.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_119.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "119"
+      },
+      {
+        "id": "reg-v7-thyroid_120",
+        "filename": "reg-v7-thyroid_120.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_120.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "120"
+      },
+      {
+        "id": "reg-v7-thyroid_121",
+        "filename": "reg-v7-thyroid_121.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_121.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "121"
+      },
+      {
+        "id": "reg-v7-thyroid_122",
+        "filename": "reg-v7-thyroid_122.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_122.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "122"
+      },
+      {
+        "id": "reg-v7-thyroid_123",
+        "filename": "reg-v7-thyroid_123.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_123.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "123"
+      },
+      {
+        "id": "reg-v7-thyroid_124",
+        "filename": "reg-v7-thyroid_124.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_124.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "124"
+      },
+      {
+        "id": "reg-v7-thyroid_125",
+        "filename": "reg-v7-thyroid_125.png",
+        "url": "Supervised/v7-only/reg/reg-v7-thyroid_125.png",
+        "machine_group": "v7",
+        "organ": "thyroid",
+        "number": "125"
+      }
+    ]
   }
 ]
