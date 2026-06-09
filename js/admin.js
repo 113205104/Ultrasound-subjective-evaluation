@@ -8,24 +8,29 @@
       .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
       .join('&');
   }
+
   function taskKey(task) { return [task.strategy, task.dataset, task.model].join('||'); }
   function imageStableId(image) { return image.id || image.fileId || image.filename || image.url; }
   function imageKey(task, image) { return [taskKey(task), imageStableId(image)].join('||'); }
-  function displayModel(model) { return cfg.modelDisplayMap[model] || model; }
+  function displayModel(model) { return (cfg.modelDisplayMap && cfg.modelDisplayMap[model]) || model; }
+
   function ratingKeys() {
     const rows = cfg.tripanelRows || [{ key: '1' }, { key: '2' }, { key: '3' }];
-    return cfg.ratingFields.flatMap(f => rows.map(r => `${f.key}_${r.key}`));
+    return (cfg.ratingFields || []).flatMap(f => rows.map(r => `${f.key}_${r.key}`));
   }
+
   function localRatingsKey(reviewer) { return 'use_ratings_' + reviewer; }
   function localProgressKey(reviewer) { return 'use_progress_' + reviewer; }
   function getJson(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (_) { return fallback; } }
   function setJson(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+
   function saveLocalRating(reviewer, key, data) {
     const all = getJson(localRatingsKey(reviewer), {});
-    all[key] = data;
+    all[key] = Object.assign({}, all[key] || {}, data, { draftUpdatedAt: new Date().toISOString() });
     setJson(localRatingsKey(reviewer), all);
   }
   function readLocalRating(reviewer, key) { return getJson(localRatingsKey(reviewer), {})[key] || {}; }
+
   function saveLocalProgress(reviewer, task, currentIndex, total) {
     const all = getJson(localProgressKey(reviewer), {});
     const completed = countCompleted(reviewer, task);
@@ -33,28 +38,36 @@
     setJson(localProgressKey(reviewer), all);
   }
   function readLocalProgress(reviewer, task) { return getJson(localProgressKey(reviewer), {})[taskKey(task)] || null; }
-  function isCompleteRating(r) { return ratingKeys().every(k => Number(r && r[k]) >= 1 && Number(r && r[k]) <= 4); }
+
+  function isCompleteRating(r) {
+    return ratingKeys().every(k => Number(r && r[k]) >= 1 && Number(r && r[k]) <= 4);
+  }
+
+  // Draft progress merges official server responses with local unfinished edits.
+  // Local draft intentionally wins so canceling a radio can reduce progress without deleting official history.
   function mergedRatings(reviewer) {
     return Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
   }
-  function readRating(reviewer, key) {
-    return mergedRatings(reviewer)[key] || {};
-  }
+  function readRating(reviewer, key) { return mergedRatings(reviewer)[key] || {}; }
+
   function countCompleted(reviewer, task) {
     const all = mergedRatings(reviewer);
     return Object.keys(all).filter(k => k.startsWith(taskKey(task) + '||') && isCompleteRating(all[k])).length;
   }
+
   function firstIncompleteIndex(reviewer, task) {
     for (let i = 0; i < task.images.length; i++) {
       if (!isCompleteRating(readRating(reviewer, imageKey(task, task.images[i])))) return i;
     }
     return Math.max(task.images.length - 1, 0);
   }
+
   function postToSheet(payload) {
     if (!cfg.appsScriptUrl) return Promise.resolve(false);
     const body = new URLSearchParams(payload);
     return fetch(cfg.appsScriptUrl, { method: 'POST', mode: 'no-cors', body }).then(() => true).catch(() => false);
   }
+
   function jsonp(action, params) {
     return new Promise((resolve, reject) => {
       if (!cfg.appsScriptUrl) return reject(new Error('Apps Script URL 未設定'));
@@ -69,20 +82,23 @@
       document.body.appendChild(script);
     });
   }
+
   function normalizeManifest(raw) {
     if (!Array.isArray(raw)) return [];
     return raw.map(task => Object.assign({}, task, { images: Array.isArray(task.images) ? task.images : [] }));
   }
+
   async function loadManifest() {
     if (cfg.manifestSource === 'drive') {
       const data = await jsonp('getManifest', {});
       if (!data.ok) throw new Error(data.error || 'Google Drive manifest 載入失敗');
       return normalizeManifest(data.manifest || []);
     }
-    const res = await fetch(cfg.manifestPath + '?v=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch((cfg.manifestPath || 'manifest.json') + '?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('manifest.json 載入失敗');
     return normalizeManifest(await res.json());
   }
+
   async function loadServerRatings(reviewer, task) {
     const params = { reviewer };
     if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
@@ -93,15 +109,37 @@
       map[key] = r;
     });
     serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
-    // Also restore to localStorage so progress remains visible even if Apps Script is temporarily unreachable later.
+    // Restore server records locally, but preserve unfinished local drafts over server answers.
     const local = getJson(localRatingsKey(reviewer), {});
     setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
     return map;
   }
+
+  function populateReviewerSelect(select, includeAll) {
+    if (!select) return;
+    const oldValue = select.value;
+    const reviewers = Array.isArray(cfg.reviewers) && cfg.reviewers.length ? cfg.reviewers : ['Reviewer1', 'Reviewer2'];
+    select.innerHTML = '';
+    if (includeAll) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'All';
+      select.appendChild(opt);
+    }
+    reviewers.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+    if ([...select.options].some(o => o.value === oldValue)) select.value = oldValue;
+  }
+
   window.USE = {
     taskKey, imageKey, imageStableId, displayModel, ratingKeys,
     saveLocalRating, readLocalRating, readRating,
     saveLocalProgress, readLocalProgress, countCompleted, firstIncompleteIndex,
-    isCompleteRating, postToSheet, jsonp, loadManifest, loadServerRatings
+    isCompleteRating, postToSheet, jsonp, loadManifest, loadServerRatings,
+    populateReviewerSelect
   };
 })();

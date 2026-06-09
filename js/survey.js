@@ -1,6 +1,7 @@
 (function () {
   const params = new URLSearchParams(location.search);
-  const reviewer = params.get('reviewer') || 'Reviewer1';
+  const defaultReviewer = (APP_CONFIG.reviewers && APP_CONFIG.reviewers[0]) || 'Reviewer1';
+  const reviewer = params.get('reviewer') || defaultReviewer;
   const taskIndex = Number(params.get('task') || 0);
   let manifest = [], task = null, current = 0;
 
@@ -12,6 +13,9 @@
   const image = document.getElementById('tripanelImage');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
+  const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+  const saveHint = document.getElementById('saveHint');
+  const missingPanel = document.getElementById('missingPanel');
   const form = document.getElementById('ratingForm');
 
   function escapeHtml(s) {
@@ -44,11 +48,25 @@
   function buildForm() {
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
-    form.addEventListener('change', saveCurrent);
+
+    form.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('pointerdown', function () {
+        this.dataset.wasChecked = this.checked ? '1' : '0';
+      });
+      input.addEventListener('click', function (event) {
+        if (this.dataset.wasChecked === '1') {
+          event.preventDefault();
+          this.checked = false;
+          saveDraftOnly('已取消此格作答，狀態已暫存；正式作答紀錄不會被刪除或覆蓋。');
+        }
+      });
+    });
+    form.addEventListener('change', () => saveDraftOnly('已暫存於此瀏覽器；按「下一張」或「確認完成並送出」才會寫入正式作答紀錄。'));
   }
 
   function currentImage() { return task.images[current]; }
-  function currentRatingKey() { return USE.imageKey(task, currentImage()); }
+  function ratingKeyFor(index) { return USE.imageKey(task, task.images[index]); }
+  function currentRatingKey() { return ratingKeyFor(current); }
   function getCurrentRating() { return USE.readRating(reviewer, currentRatingKey()); }
 
   function setFormValues(rating) {
@@ -56,6 +74,7 @@
       document.querySelectorAll(`input[name="${k}"]`).forEach(el => { el.checked = String(rating[k] || '') === el.value; });
     });
   }
+
   function readFormValues() {
     const out = {};
     USE.ratingKeys().forEach(k => {
@@ -64,20 +83,20 @@
     });
     return out;
   }
-  function render() {
-    const img = currentImage();
+
+  function makePayloadForImage(index, values) {
+    const img = task.images[index];
+    return Object.assign({
+      action: 'saveRating', reviewer,
+      strategy: task.strategy, dataset: task.dataset, model: task.model,
+      displayModel: USE.displayModel(task.model),
+      imageId: img.id || '', fileId: img.fileId || '', filename: img.filename || '', imageUrl: img.url || img.path || ''
+    }, values);
+  }
+
+  function saveProgressToLocalAndSheet() {
     const total = task.images.length;
     const completed = USE.countCompleted(reviewer, task);
-    title.textContent = USE.displayModel(task.model);
-    subtitle.textContent = `${reviewer}`;
-    progressText.textContent = `${completed} / ${total}`;
-    progressBar.style.width = total ? Math.round(completed * 100 / total) + '%' : '0%';
-    imageMeta.textContent = `${current + 1} / ${total}　${img.filename || img.id || ''}`;
-    image.src = img.url || img.path || '';
-    image.alt = img.filename || 'Tripanel ultrasound image';
-    prevBtn.disabled = current <= 0;
-    nextBtn.disabled = current >= total - 1;
-    setFormValues(getCurrentRating());
     USE.saveLocalProgress(reviewer, task, current, total);
     USE.postToSheet({
       action: 'saveProgress', reviewer,
@@ -86,21 +105,142 @@
       completed, completedStatus: completed >= total ? 'Completed' : 'In Progress'
     });
   }
-  function saveCurrent() {
-    const img = currentImage();
-    const values = readFormValues();
-    const payload = Object.assign({
-      action: 'saveRating', reviewer,
-      strategy: task.strategy, dataset: task.dataset, model: task.model,
-      displayModel: USE.displayModel(task.model),
-      imageId: img.id || '', fileId: img.fileId || '', filename: img.filename || '', imageUrl: img.url || img.path || ''
-    }, values);
-    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
-    USE.postToSheet(payload);
-    render();
+
+  function showHint(message) {
+    if (saveHint) saveHint.textContent = message;
   }
-  prevBtn.addEventListener('click', () => { if (current > 0) { current--; render(); } });
-  nextBtn.addEventListener('click', () => { if (current < task.images.length - 1) { current++; render(); } });
+
+  function saveDraftOnly(message) {
+    const values = readFormValues();
+    const payload = makePayloadForImage(current, values);
+    payload.action = 'draftOnly';
+    payload.updatedAt = new Date().toISOString();
+    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
+    saveProgressToLocalAndSheet();
+    renderProgressOnly();
+    showHint(message || '已暫存於此瀏覽器。');
+  }
+
+  function submitImageIfComplete(index, options) {
+    const opts = options || {};
+    let values;
+    if (index === current && opts.fromForm) {
+      values = readFormValues();
+    } else {
+      values = USE.readRating(reviewer, ratingKeyFor(index));
+    }
+    const payload = makePayloadForImage(index, values || {});
+    USE.saveLocalRating(reviewer, ratingKeyFor(index), payload);
+    if (USE.isCompleteRating(payload)) {
+      USE.postToSheet(payload);
+      return true;
+    }
+    return false;
+  }
+
+  function saveCurrentDraftAndSubmitIfComplete(messageIfComplete, messageIfIncomplete) {
+    saveDraftOnly('');
+    const ok = submitImageIfComplete(current, { fromForm: true });
+    saveProgressToLocalAndSheet();
+    showHint(ok ? (messageIfComplete || '此張已寫入正式作答紀錄。') : (messageIfIncomplete || '此張尚未完成，已暫存但未寫入正式作答紀錄。'));
+    return ok;
+  }
+
+  function missingIndices() {
+    const missing = [];
+    for (let i = 0; i < task.images.length; i++) {
+      const key = USE.imageKey(task, task.images[i]);
+      if (!USE.isCompleteRating(USE.readRating(reviewer, key))) missing.push(i);
+    }
+    return missing;
+  }
+
+  function renderMissingPanel(missing) {
+    if (!missingPanel) return;
+    if (!missing.length) {
+      missingPanel.innerHTML = '';
+      missingPanel.hidden = true;
+      return;
+    }
+    missingPanel.hidden = false;
+    missingPanel.innerHTML = `
+      <section class="form-card question-card missing-card">
+        <h2>尚有 ${missing.length} 張未完成</h2>
+        <p class="muted">點選下方項目可直接跳到漏題，不必反覆按上一張/下一張。補完後可直接按「確認完成並送出」。</p>
+        <div class="missing-jump-list">
+          ${missing.map(i => {
+            const img = task.images[i] || {};
+            return `<button type="button" class="ghost-button missing-jump" data-index="${i}">第 ${i + 1} 張　${escapeHtml(img.filename || img.id || '')}</button>`;
+          }).join('')}
+        </div>
+      </section>`;
+    missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
+      btn.addEventListener('click', () => {
+        saveDraftOnly('已保留目前頁面的暫存狀態。');
+        current = Number(btn.dataset.index);
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  }
+
+  function finalizeAll() {
+    saveDraftOnly('');
+    const missingBeforeSubmit = missingIndices();
+    if (missingBeforeSubmit.length) {
+      renderMissingPanel(missingBeforeSubmit);
+      showHint(`尚有 ${missingBeforeSubmit.length} 張未完成，請補齊後再送出。`);
+      return;
+    }
+
+    renderMissingPanel([]);
+    let submitted = 0;
+    for (let i = 0; i < task.images.length; i++) {
+      if (submitImageIfComplete(i, { fromForm: i === current })) submitted += 1;
+    }
+    const total = task.images.length;
+    USE.saveLocalProgress(reviewer, task, current, total);
+    USE.postToSheet({
+      action: 'saveProgress', reviewer,
+      strategy: task.strategy, dataset: task.dataset, model: task.model,
+      displayModel: USE.displayModel(task.model), currentIndex: current, total,
+      completed: total, completedStatus: 'Completed'
+    });
+    renderProgressOnly();
+    showHint(`確認完成：已送出 ${submitted} / ${total} 張正式作答紀錄。`);
+  }
+
+  function renderProgressOnly() {
+    const total = task.images.length;
+    const completed = USE.countCompleted(reviewer, task);
+    progressText.textContent = `${completed} / ${total}`;
+    progressBar.style.width = total ? Math.round(completed * 100 / total) + '%' : '0%';
+  }
+
+  function render() {
+    const img = currentImage();
+    const total = task.images.length;
+    title.textContent = USE.displayModel(task.model);
+    subtitle.textContent = `${reviewer}`;
+    imageMeta.textContent = `${current + 1} / ${total}　${img.filename || img.id || ''}`;
+    image.src = img.url || img.path || '';
+    image.alt = img.filename || 'Tripanel ultrasound image';
+    prevBtn.disabled = current <= 0;
+    nextBtn.disabled = current >= total - 1;
+    setFormValues(getCurrentRating());
+    renderProgressOnly();
+    saveProgressToLocalAndSheet();
+  }
+
+  prevBtn.addEventListener('click', () => {
+    saveDraftOnly('已保留目前頁面的暫存狀態。');
+    if (current > 0) { current--; render(); }
+  });
+  nextBtn.addEventListener('click', () => {
+    saveCurrentDraftAndSubmitIfComplete('此張已寫入正式作答紀錄，並移至下一張。', '此張尚未完成，已暫存但未寫入正式作答紀錄，並移至下一張。');
+    if (current < task.images.length - 1) { current++; render(); }
+  });
+  if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', finalizeAll);
 
   buildForm();
   USE.loadManifest().then(async m => {
@@ -111,7 +251,6 @@
     const saved = USE.readLocalProgress(reviewer, task);
     const suggested = USE.firstIncompleteIndex(reviewer, task);
     current = saved && Number.isInteger(saved.currentIndex) ? Math.min(saved.currentIndex, task.images.length - 1) : suggested;
-    if (USE.isCompleteRating(getCurrentRating())) current = suggested;
     render();
   }).catch(err => {
     title.textContent = '載入失敗';

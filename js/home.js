@@ -2,6 +2,7 @@
   const reviewerSelect = document.getElementById('reviewerSelect');
   const taskList = document.getElementById('taskList');
   let manifest = [];
+  USE.populateReviewerSelect(reviewerSelect, false);
 
   function render() {
     const reviewer = reviewerSelect.value;

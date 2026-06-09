@@ -1,6 +1,7 @@
 (function () {
   const list = document.getElementById('historyList');
   const reloadBtn = document.getElementById('reloadBtn');
+  USE.populateReviewerSelect(document.getElementById('reviewerFilter'), true);
   function val(id) { return document.getElementById(id).value.trim(); }
   function escapeHtml(s) {
     return String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
