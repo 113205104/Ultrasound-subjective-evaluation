@@ -1,3 +1,69 @@
-body{
-    font-family: Arial, sans-serif;
+body {
+  font-family: Arial, "Microsoft JhengHei", sans-serif;
+  background: #f5f6f8;
+  margin: 0;
+  padding: 0;
+  color: #222;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: white;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+h1 {
+  margin-top: 0;
+}
+
+label {
+  font-weight: bold;
+}
+
+select {
+  display: block;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  padding: 10px;
+  width: 240px;
+  font-size: 16px;
+}
+
+.task-section {
+  margin-top: 24px;
+}
+
+.task-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 12px 0;
+  background: #fafafa;
+}
+
+.task-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.task-meta {
+  color: #666;
+  margin-top: 6px;
+}
+
+button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #eee;
 }
