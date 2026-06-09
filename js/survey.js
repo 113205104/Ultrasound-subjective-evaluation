@@ -45,72 +45,29 @@
     return section;
   }
 
-  function findRadioFromEvent(event) {
-    const target = event.target;
-    if (!target) return null;
-    if (target.matches && target.matches('input[type="radio"]')) return target;
-    const label = target.closest ? target.closest('label.matrix-radio') : null;
-    return label ? label.querySelector('input[type="radio"]') : null;
-  }
-
   function buildForm() {
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
-    // Radio toggle is handled manually instead of relying on the browser's
-    // native radio behavior. This guarantees:
-    // 1) clicking an empty circle selects it;
-    // 2) clicking the same filled circle again immediately clears it;
-    // 3) only one score in the same row can be selected.
-    let pointerRadio = null;
-    let pointerWasChecked = false;
-
-    function radiosInSameRow(input) {
-      return Array.prototype.filter.call(
-        document.getElementsByName(input.name),
-        el => form.contains(el) && el.type === 'radio'
-      );
-    }
-
-    function applyToggle(input, wasChecked) {
-      radiosInSameRow(input).forEach(el => { el.checked = false; });
-      if (!wasChecked) input.checked = true;
-      saveDraftOnly('');
-    }
-
-    form.addEventListener('pointerdown', function (event) {
-      const input = findRadioFromEvent(event);
+    // Custom radio behavior: clicking an already selected score cancels it.
+    // Native radio buttons cannot uncheck themselves, so we handle the label click explicitly.
+    form.querySelectorAll('.matrix-radio').forEach(label => {
+      const input = label.querySelector('input[type="radio"]');
       if (!input) return;
-      pointerRadio = input;
-      pointerWasChecked = input.checked;
-    }, true);
-
-    form.addEventListener('click', function (event) {
-      const input = findRadioFromEvent(event);
-      if (!input) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const wasChecked = (input === pointerRadio) ? pointerWasChecked : input.checked;
-      applyToggle(input, wasChecked);
-
-      pointerRadio = null;
-      pointerWasChecked = false;
-    }, true);
-
-    form.addEventListener('keydown', function (event) {
-      if ((event.key !== ' ' && event.key !== 'Spacebar' && event.key !== 'Enter') ||
-          !event.target.matches('input[type="radio"]')) return;
-
-      const input = event.target;
-      const wasChecked = input.checked;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      applyToggle(input, wasChecked);
-    }, true);
+      label.addEventListener('pointerdown', function () {
+        input.dataset.wasChecked = input.checked ? '1' : '0';
+      });
+      label.addEventListener('click', function (event) {
+        if (input.dataset.wasChecked === '1') {
+          event.preventDefault();
+          event.stopPropagation();
+          input.checked = false;
+          input.dataset.wasChecked = '0';
+          saveDraftOnly('');
+        }
+      }, true);
+    });
+    form.addEventListener('change', () => saveDraftOnly(''));
   }
 
   function currentImage() { return task.images[current]; }
