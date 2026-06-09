@@ -43,27 +43,16 @@
     return ratingKeys().every(k => Number(r && r[k]) >= 1 && Number(r && r[k]) <= 4);
   }
 
-  // Draft progress must reflect the scorer's current local state.
-  // If a local draft exists for an image, it wins even when it contains blank values.
-  // This lets canceling one radio immediately reduce progress without deleting official history.
+  // Draft progress merges official server responses with local unfinished edits.
+  // Local draft intentionally wins so canceling a radio can reduce progress without deleting official history.
   function mergedRatings(reviewer) {
     return Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
   }
-
-  function readRating(reviewer, key) {
-    const local = getJson(localRatingsKey(reviewer), {});
-    if (Object.prototype.hasOwnProperty.call(local, key)) return local[key] || {};
-    return (serverRatings[reviewer] || {})[key] || {};
-  }
+  function readRating(reviewer, key) { return mergedRatings(reviewer)[key] || {}; }
 
   function countCompleted(reviewer, task) {
-    if (!task || !Array.isArray(task.images)) return 0;
-    let completed = 0;
-    task.images.forEach(img => {
-      const key = imageKey(task, img);
-      if (isCompleteRating(readRating(reviewer, key))) completed += 1;
-    });
-    return completed;
+    const all = mergedRatings(reviewer);
+    return Object.keys(all).filter(k => k.startsWith(taskKey(task) + '||') && isCompleteRating(all[k])).length;
   }
 
   function firstIncompleteIndex(reviewer, task) {

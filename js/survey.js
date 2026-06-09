@@ -57,35 +57,39 @@
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
-    // Manual radio control: clicking an already-selected filled circle cancels it immediately.
-    // We do not rely on the browser's native radio toggle behavior because native radios
-    // cannot be unchecked by clicking the same option again.
-    form.addEventListener('click', function (event) {
+    // Radio toggle: if the scorer clicks an already-filled circle again,
+    // immediately cancel that answer and return the circle to blank.
+    // This does not require clicking another score first.
+    let cancelledRadio = null;
+    form.addEventListener('pointerdown', function (event) {
       const input = findRadioFromEvent(event);
-      if (!input) return;
-
+      if (!input || !input.checked) return;
       event.preventDefault();
       event.stopPropagation();
-      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-
-      const wasChecked = input.checked;
-      const group = Array.from(form.querySelectorAll(`input[type="radio"][name="${input.name}"]`));
-      group.forEach(r => { r.checked = false; });
-      if (!wasChecked) input.checked = true;
-
+      input.checked = false;
+      cancelledRadio = input;
       saveDraftOnly('');
+    }, true);
+
+    form.addEventListener('click', function (event) {
+      const input = findRadioFromEvent(event);
+      if (cancelledRadio && input === cancelledRadio) {
+        event.preventDefault();
+        event.stopPropagation();
+        cancelledRadio = null;
+      }
     }, true);
 
     form.addEventListener('keydown', function (event) {
-      if ((event.key !== ' ' && event.key !== 'Spacebar' && event.key !== 'Enter') || !event.target.matches('input[type="radio"]')) return;
+      if ((event.key !== ' ' && event.key !== 'Spacebar') || !event.target.matches('input[type="radio"]')) return;
       const input = event.target;
+      if (!input.checked) return;
       event.preventDefault();
-      const wasChecked = input.checked;
-      const group = Array.from(form.querySelectorAll(`input[type="radio"][name="${input.name}"]`));
-      group.forEach(r => { r.checked = false; });
-      if (!wasChecked) input.checked = true;
+      input.checked = false;
       saveDraftOnly('');
     }, true);
+
+    form.addEventListener('change', () => saveDraftOnly(''));
   }
 
   function currentImage() { return task.images[current]; }
