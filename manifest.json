@@ -1,26 +1,26 @@
 [
   {
-    "strategy":"Unsupervised",
+    "strategy":"Supervised",
     "dataset":"v7-only",
     "model":"cut"
   },
   {
-    "strategy":"Unsupervised",
+    "strategy":"Supervised",
     "dataset":"v7-only",
     "model":"cyc"
   },
   {
-    "strategy":"Unsupervised",
+    "strategy":"Supervised",
     "dataset":"v7-only",
     "model":"fast"
   },
   {
-    "strategy":"Unsupervised",
+    "strategy":"Supervised",
     "dataset":"v7-only",
     "model":"p2p"
   },
   {
-    "strategy":"Unsupervised",
+    "strategy":"Supervised",
     "dataset":"v7-only",
     "model":"reg"
   }
