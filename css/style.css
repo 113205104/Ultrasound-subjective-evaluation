@@ -129,3 +129,4 @@ p { margin: 0 0 10px; line-height: 1.6; }
 .missing-jump {
   justify-content: flex-start;
 }
+.save-hint[hidden] { display: none !important; }
