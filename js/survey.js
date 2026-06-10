@@ -57,13 +57,13 @@
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
-    // Radio toggle is handled manually instead of relying on the browser's
-    // native radio behavior. This guarantees:
-    // 1) clicking an empty circle selects it;
-    // 2) clicking the same filled circle again immediately clears it;
-    // 3) only one score in the same row can be selected.
-    let pointerRadio = null;
-    let pointerWasChecked = false;
+    // 手動控制矩陣 radio：
+    // 1) 空心點一下 → 實心
+    // 2) 同一顆實心再點一下 → 空心，取消該列作答
+    // 3) 同列改選其他分數 → 舊分數立刻空心，新分數立刻實心
+    // 不在 pointerdown preventDefault，避免部分瀏覽器/label 點擊被吃掉而造成卡頓或無反應。
+    let pressedRadio = null;
+    let pressedWasChecked = false;
 
     function radiosInSameRow(input) {
       return Array.prototype.filter.call(
@@ -75,18 +75,14 @@
     function applyToggle(input, wasChecked) {
       radiosInSameRow(input).forEach(el => { el.checked = false; });
       if (!wasChecked) input.checked = true;
-      saveDraftOnly('');
+      saveDraftOnly('', { syncSheet: false });
     }
 
     form.addEventListener('pointerdown', function (event) {
       const input = findRadioFromEvent(event);
       if (!input) return;
-      // Prevent the browser from mutating input.checked before our click handler
-      // runs. With this, input.checked in the click handler still holds the
-      // *pre*-click state, so we can reliably detect "was already checked → deselect".
-      event.preventDefault();
-      pointerRadio = input;
-      pointerWasChecked = input.checked;
+      pressedRadio = input;
+      pressedWasChecked = input.checked;
     }, true);
 
     form.addEventListener('click', function (event) {
@@ -96,13 +92,11 @@
       event.preventDefault();
       event.stopPropagation();
 
-      // Because pointerdown already called preventDefault, the browser never
-      // changed input.checked, so pointerWasChecked is always accurate here.
-      const wasChecked = (input === pointerRadio) ? pointerWasChecked : input.checked;
+      const wasChecked = (input === pressedRadio) ? pressedWasChecked : input.checked;
       applyToggle(input, wasChecked);
 
-      pointerRadio = null;
-      pointerWasChecked = false;
+      pressedRadio = null;
+      pressedWasChecked = false;
     }, true);
 
     form.addEventListener('keydown', function (event) {
@@ -149,10 +143,12 @@
     }, values);
   }
 
-  function saveProgressToLocalAndSheet() {
+  function saveProgressToLocalAndSheet(options) {
+    const opts = options || {};
     const total = task.images.length;
     const completed = USE.countCompleted(reviewer, task);
     USE.saveLocalProgress(reviewer, task, current, total);
+    if (opts.syncSheet === false) return;
     USE.postToSheet({
       action: 'saveProgress', reviewer,
       strategy: task.strategy, dataset: task.dataset, model: task.model,
@@ -166,13 +162,14 @@
     if (saveHint) saveHint.textContent = '';
   }
 
-  function saveDraftOnly(message) {
+  function saveDraftOnly(message, options) {
+    const opts = options || {};
     const values = readFormValues();
     const payload = makePayloadForImage(current, values);
     payload.action = 'draftOnly';
     payload.updatedAt = new Date().toISOString();
     USE.saveLocalRating(reviewer, currentRatingKey(), payload);
-    saveProgressToLocalAndSheet();
+    saveProgressToLocalAndSheet({ syncSheet: opts.syncSheet !== false });
     renderProgressOnly();
     showHint(message || '已暫存於此瀏覽器。');
   }
@@ -195,7 +192,7 @@
   }
 
   function saveCurrentDraftAndSubmitIfComplete(messageIfComplete, messageIfIncomplete) {
-    saveDraftOnly('');
+    saveDraftOnly('', { syncSheet: false });
     const ok = submitImageIfComplete(current, { fromForm: true });
     saveProgressToLocalAndSheet();
     showHint(ok ? (messageIfComplete || '此張已寫入正式作答紀錄。') : (messageIfIncomplete || '此張尚未完成，已暫存但未寫入正式作答紀錄。'));
@@ -241,7 +238,7 @@
   }
 
   function finalizeAll() {
-    saveDraftOnly('');
+    saveDraftOnly('', { syncSheet: false });
     const missingBeforeSubmit = missingIndices();
     if (missingBeforeSubmit.length) {
       renderMissingPanel(missingBeforeSubmit);
@@ -285,7 +282,7 @@
     nextBtn.disabled = current >= total - 1;
     setFormValues(getCurrentRating());
     renderProgressOnly();
-    saveProgressToLocalAndSheet();
+    saveProgressToLocalAndSheet({ syncSheet: false });
   }
 
   prevBtn.addEventListener('click', () => {
