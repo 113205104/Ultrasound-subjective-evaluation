@@ -57,13 +57,13 @@
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
-    // 手動控制矩陣 radio：
-    // 1) 空心點一下 → 實心
-    // 2) 同一顆實心再點一下 → 空心，取消該列作答
-    // 3) 同列改選其他分數 → 舊分數立刻空心，新分數立刻實心
-    // 不在 pointerdown preventDefault，避免部分瀏覽器/label 點擊被吃掉而造成卡頓或無反應。
-    let pressedRadio = null;
-    let pressedWasChecked = false;
+    // Do not let a radio click write to Google Sheet.
+    // Click only changes the current page UI. The answer is persisted only when
+    // the user presses「儲存作答進度」or「確認完成並送出」.
+    let pointerRadio = null;
+    let pointerWasChecked = false;
+    let lastAppliedRadio = null;
+    let lastAppliedAt = 0;
 
     function radiosInSameRow(input) {
       return Array.prototype.filter.call(
@@ -75,14 +75,15 @@
     function applyToggle(input, wasChecked) {
       radiosInSameRow(input).forEach(el => { el.checked = false; });
       if (!wasChecked) input.checked = true;
-      saveDraftOnly('', { syncSheet: false });
+      renderActionButton();
+      showHint('尚未儲存；請按「儲存作答進度」才會保留目前作答。');
     }
 
     form.addEventListener('pointerdown', function (event) {
       const input = findRadioFromEvent(event);
       if (!input) return;
-      pressedRadio = input;
-      pressedWasChecked = input.checked;
+      pointerRadio = input;
+      pointerWasChecked = input.checked;
     }, true);
 
     form.addEventListener('click', function (event) {
@@ -92,11 +93,22 @@
       event.preventDefault();
       event.stopPropagation();
 
-      const wasChecked = (input === pressedRadio) ? pressedWasChecked : input.checked;
+      // Label clicks may create a second synthetic click on the input.
+      // Ignore the duplicate so same-circle deselect does not flicker back.
+      const now = Date.now();
+      if (lastAppliedRadio === input && now - lastAppliedAt < 120) {
+        pointerRadio = null;
+        pointerWasChecked = false;
+        return;
+      }
+
+      const wasChecked = (input === pointerRadio) ? pointerWasChecked : input.checked;
       applyToggle(input, wasChecked);
 
-      pressedRadio = null;
-      pressedWasChecked = false;
+      lastAppliedRadio = input;
+      lastAppliedAt = now;
+      pointerRadio = null;
+      pointerWasChecked = false;
     }, true);
 
     form.addEventListener('keydown', function (event) {
@@ -143,12 +155,14 @@
     }, values);
   }
 
-  function saveProgressToLocalAndSheet(options) {
-    const opts = options || {};
+  function saveProgressToLocalOnly() {
+    const total = task.images.length;
+    USE.saveLocalProgress(reviewer, task, current, total);
+  }
+
+  function saveProgressToSheet() {
     const total = task.images.length;
     const completed = USE.countCompleted(reviewer, task);
-    USE.saveLocalProgress(reviewer, task, current, total);
-    if (opts.syncSheet === false) return;
     USE.postToSheet({
       action: 'saveProgress', reviewer,
       strategy: task.strategy, dataset: task.dataset, model: task.model,
@@ -158,20 +172,22 @@
   }
 
   function showHint(message) {
-    // Status hints are intentionally hidden from the UI to keep the form clean.
-    if (saveHint) saveHint.textContent = '';
+    if (!saveHint) return;
+    saveHint.hidden = !message;
+    saveHint.textContent = message || '';
   }
 
-  function saveDraftOnly(message, options) {
-    const opts = options || {};
+  function saveCurrentDraft(message) {
     const values = readFormValues();
     const payload = makePayloadForImage(current, values);
     payload.action = 'draftOnly';
     payload.updatedAt = new Date().toISOString();
     USE.saveLocalRating(reviewer, currentRatingKey(), payload);
-    saveProgressToLocalAndSheet({ syncSheet: opts.syncSheet !== false });
+    saveProgressToLocalOnly();
+    saveProgressToSheet();
     renderProgressOnly();
-    showHint(message || '已暫存於此瀏覽器。');
+    renderActionButton();
+    showHint(message || '已儲存目前作答進度；尚未寫入正式作答紀錄。');
   }
 
   function submitImageIfComplete(index, options) {
@@ -191,21 +207,33 @@
     return false;
   }
 
-  function saveCurrentDraftAndSubmitIfComplete(messageIfComplete, messageIfIncomplete) {
-    saveDraftOnly('', { syncSheet: false });
-    const ok = submitImageIfComplete(current, { fromForm: true });
-    saveProgressToLocalAndSheet();
-    showHint(ok ? (messageIfComplete || '此張已寫入正式作答紀錄。') : (messageIfIncomplete || '此張尚未完成，已暫存但未寫入正式作答紀錄。'));
-    return ok;
-  }
-
-  function missingIndices() {
+  function missingIndices(options) {
+    const opts = options || {};
     const missing = [];
     for (let i = 0; i < task.images.length; i++) {
       const key = USE.imageKey(task, task.images[i]);
-      if (!USE.isCompleteRating(USE.readRating(reviewer, key))) missing.push(i);
+      let rating = USE.readRating(reviewer, key);
+      if (opts.includeCurrentForm && i === current) {
+        rating = makePayloadForImage(i, readFormValues());
+      }
+      if (!USE.isCompleteRating(rating)) missing.push(i);
     }
     return missing;
+  }
+
+  function allCompleteWithCurrentForm() {
+    return task && task.images && task.images.length > 0 && missingIndices({ includeCurrentForm: true }).length === 0;
+  }
+
+  function renderActionButton() {
+    if (!finalSubmitBtn || !task) return;
+    if (allCompleteWithCurrentForm()) {
+      finalSubmitBtn.textContent = '確認完成並送出';
+      finalSubmitBtn.className = 'primary-button';
+    } else {
+      finalSubmitBtn.textContent = '儲存作答進度';
+      finalSubmitBtn.className = 'primary-button';
+    }
   }
 
   function renderMissingPanel(missing) {
@@ -229,7 +257,7 @@
       </section>`;
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
-        saveDraftOnly('已保留目前頁面的暫存狀態。');
+        showHint('已跳轉；未按「儲存作答進度」的變更不會保留。');
         current = Number(btn.dataset.index);
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -238,10 +266,20 @@
   }
 
   function finalizeAll() {
-    saveDraftOnly('', { syncSheet: false });
+    // Final button also saves the current page first.
+    const values = readFormValues();
+    const payload = makePayloadForImage(current, values);
+    payload.action = 'draftOnly';
+    payload.updatedAt = new Date().toISOString();
+    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
+    saveProgressToLocalOnly();
+
     const missingBeforeSubmit = missingIndices();
     if (missingBeforeSubmit.length) {
       renderMissingPanel(missingBeforeSubmit);
+      renderProgressOnly();
+      renderActionButton();
+      saveProgressToSheet();
       showHint(`尚有 ${missingBeforeSubmit.length} 張未完成，請補齊後再送出。`);
       return;
     }
@@ -260,6 +298,7 @@
       completed: total, completedStatus: 'Completed'
     });
     renderProgressOnly();
+    renderActionButton();
     showHint(`確認完成：已送出 ${submitted} / ${total} 張正式作答紀錄。`);
   }
 
@@ -282,18 +321,21 @@
     nextBtn.disabled = current >= total - 1;
     setFormValues(getCurrentRating());
     renderProgressOnly();
-    saveProgressToLocalAndSheet({ syncSheet: false });
+    renderActionButton();
   }
 
   prevBtn.addEventListener('click', () => {
-    saveDraftOnly('已保留目前頁面的暫存狀態。');
+    showHint('已切換頁面；未按「儲存作答進度」的變更不會保留。');
     if (current > 0) { current--; render(); }
   });
   nextBtn.addEventListener('click', () => {
-    saveCurrentDraftAndSubmitIfComplete('此張已寫入正式作答紀錄，並移至下一張。', '此張尚未完成，已暫存但未寫入正式作答紀錄，並移至下一張。');
+    showHint('已切換頁面；未按「儲存作答進度」的變更不會保留。');
     if (current < task.images.length - 1) { current++; render(); }
   });
-  if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', finalizeAll);
+  if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', () => {
+    if (allCompleteWithCurrentForm()) finalizeAll();
+    else saveCurrentDraft('已儲存目前作答進度；尚未寫入正式作答紀錄。');
+  });
 
   buildForm();
   USE.loadManifest().then(async m => {
