@@ -13,7 +13,10 @@
       .join('&');
   }
 
-  function taskKey(task) { return [task.strategy, task.dataset, task.model].join('||'); }
+  function taskKey(task) { 
+    if (!task) return 'UNKNOWN';
+    return [task.strategy, task.dataset, task.model].join('||'); 
+  }
   function imageStableId(image) { return image.id || image.fileId || image.filename || image.url; }
   function imageKey(task, image) { return [taskKey(task), imageStableId(image)].join('||'); }
   function displayModel(model) { return (cfg.modelDisplayMap && cfg.modelDisplayMap[model]) || model; }
@@ -47,11 +50,8 @@
   }
   function readLocalProgress(reviewer, task) { return getJson(localProgressKey(reviewer), {})[taskKey(task)] || null; }
 
-  // ─── 【重要修正 1】鬆綁草稿驗證 ───
-  // 以前限定 1~4 分才算有效；現在只要有資料（不管是草稿還是滿分），
-  // 在讀取與還原階段一律放行，允許前端將草稿撈出來
+  // 🟢 修正 1：放行所有草稿與未選滿項目
   function isCompleteRating(r) {
-    if (!r) return false;
     return true; 
   }
 
@@ -63,20 +63,18 @@
   }
   function readRating(reviewer, key) { return mergedRatings(reviewer)[key] || {}; }
 
-  // 計算完美填滿 12 格的圖片數量 (用來展示給進度條看)
+  // 計算完美填滿 12 格的圖片數量 (用來展示給主頁面/進度條看)
   function countCompleted(reviewer, task) {
     const all = mergedRatings(reviewer);
-    return Object.keys(all).filter(k => {
-      if (!k.startsWith(taskKey(task) + '||')) return false;
-      const r = all[k];
-      // 只有在 12 格都有填值的情況下，進度條數字才會往前進
+    return task.images.filter(img => {
+      const key = imageKey(task, img);
+      const r = all[key];
+      if (!r) return false;
       return ratingKeys().every(keyName => r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '');
     }).length;
   }
 
-  // ─── 【重要修正 2】解決不同電腦進度問題 ───
-  // 進網頁時，不要自作聰明去抓前面沒選滿的格子來干擾
-  // 優先遵守在 survey.js 中由雲端 progress 所推薦回傳的最新 currentIndex 位置
+  // 🟢 修正 2：初始化定位由本地和雲端 progress 接口雙重保護，不強制抓前面未滿格
   function firstIncompleteIndex(reviewer, task) {
     return 0; 
   }
@@ -107,8 +105,6 @@
     return raw.map(task => Object.assign({}, task, { images: Array.isArray(task.images) ? task.images : [] }));
   }
 
-  // ─── 【重要修正 3】修正動作名稱衝突 ───
-  // 原本呼叫 'getManifest'，但新版 Code.gs 裡面的實作叫 'loadManifest'，在這裡將其拉回一致
   async function loadManifest() {
     if (cfg.manifestSource === 'drive') {
       const data = await jsonp('loadManifest', {});
@@ -120,34 +116,46 @@
     return normalizeManifest(await res.json());
   }
 
+  // 🟢 修正 3：徹底解決首頁載入崩潰（相容不傳送 task 參數的舊版首頁呼叫方式）
   async function loadServerRatings(reviewer, task) {
     const params = { reviewer };
-    if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
-    
-    // 呼叫雲端一鍵載入進度與評分的新接口
-    const data = await jsonp('loadProgressAndRatings', params);
-    const map = {};
-    
-    if (data.success && data.data) {
-      (data.data.ratings || []).forEach(r => {
-        const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
-        map[key] = r;
-      });
-      serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
-      
-      // 將雲端最新的 progress 暫存在 localStorage 供初始定位讀取
-      if (data.data.progress) {
-        const progKey = 'use_progress_' + reviewer;
-        const allProg = getJson(progKey, {});
-        allProg[taskKey(task)] = data.data.progress;
-        setJson(progKey, allProg);
+    if (task) {
+      Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
+      // 如果有傳任務進來，代表在作答頁，改走一鍵雙拿進度的最新優化接口
+      const data = await jsonp('loadProgressAndRatings', params);
+      const map = {};
+      if (data.success && data.data) {
+        (data.data.ratings || []).forEach(r => {
+          const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
+          map[key] = r;
+        });
+        serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+        if (data.data.progress) {
+          const allProg = getJson('use_progress_' + reviewer, {});
+          allProg[taskKey(task)] = data.data.progress;
+          setJson('use_progress_' + reviewer, allProg);
+        }
       }
+      const local = getJson(localRatingsKey(reviewer), {});
+      setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
+      invalidateMergedCache(reviewer);
+      return map;
+    } else {
+      // ➔ 這是首頁（index.html）在呼叫的！此處必須使用傳統的 listResponses 盲載，避免 task 遺失而崩潰
+      const data = await jsonp('listResponses', params);
+      const map = {};
+      if (data.success && data.data && data.data.rows) {
+        data.data.rows.forEach(r => {
+          const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
+          map[key] = r;
+        });
+        serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+      }
+      const local = getJson(localRatingsKey(reviewer), {});
+      setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
+      invalidateMergedCache(reviewer);
+      return map;
     }
-    
-    const local = getJson(localRatingsKey(reviewer), {});
-    setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
-    invalidateMergedCache(reviewer);
-    return map;
   }
 
   function populateReviewerSelect(select, includeAll) {
