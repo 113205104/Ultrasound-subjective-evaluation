@@ -1,35 +1,43 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Ultrasound Survey</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Survey | Ultrasound Subjective Evaluation</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <main class="wrap">
-    <section class="card top">
-      <p><a href="index.html">← 回首頁</a>　<a id="historyLink" href="#">查看作答記錄</a></p>
-      <h1 id="title">Loading...</h1>
-      <p id="meta" class="muted"></p>
-      <p><span id="count">0 / 0</span></p>
-      <div class="bar"><div id="bar"></div></div>
-    </section>
-
-    <section class="card">
-      <p id="imageTitle" class="muted"></p>
-      <div class="imgbox"><img id="img" alt="Ultrasound image"></div>
-      <div class="nav">
-        <button id="prev">上一張</button>
-        <button id="save" class="primary">💾 儲存目前進度</button>
-        <button id="next" class="purple">下一張</button>
+  <div class="forms-topbar"></div>
+  <main class="page-shell">
+    <section class="form-card form-header compact">
+      <a class="back-link" href="index.html">← 回首頁</a>
+      <h1 id="taskTitle">Loading...</h1>
+      <p id="taskSubtitle"></p>
+      <div class="progress-wrap">
+        <div class="progress-text" id="progressText">0 / 0</div>
+        <div class="progress-bar"><div id="progressBar" class="progress-fill"></div></div>
       </div>
     </section>
 
-    <form id="form"></form>
+    <section class="form-card image-card">
+      <div class="image-meta" id="imageMeta"></div>
+      <img id="tripanelImage" class="tripanel" alt="Tripanel ultrasound image" />
+      <div class="nav-row">
+        <button id="prevBtn" class="ghost-button" type="button">上一張</button>
+        <button id="saveProgressBtn" class="primary-button" style="background-color: #2196F3;" type="button">💾 儲存目前進度</button>
+        <button id="finalSubmitBtn" class="primary-button" style="background-color: #4CAF50; display: none;" type="button">🚀 確認完成並送出</button>
+        <button id="nextBtn" class="primary-button" type="button">下一張</button>
+      </div>
+      <p id="saveHint" class="save-hint" hidden></p>
+    </section>
+
+    <div id="missingPanel" hidden></div>
+
+    <form id="ratingForm" onsubmit="return false;"></form>
   </main>
+
   <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/survey.js"></script>
 </body>
 </html>
