@@ -46,7 +46,6 @@
       const cells = APP_CONFIG.ratingScale.map(score => {
         const name = `${field.key}_${row.key}`;
         const id   = `${name}_${score}`;
-        // 恢復原生的 Google Forms 精美 radio 圓圈
         return `<label class="matrix-radio">
           <input id="${id}" type="radio" name="${name}" value="${score}"
             aria-label="${escapeHtml(field.label)} ${escapeHtml(row.label)} ${score}">
@@ -69,27 +68,10 @@
     attachRadioToggle();
   }
 
-  // ── 【安全隔離對策】點擊選項時，背後 0 程式碼執行，徹底繞過 admin.js 炸彈 ──
+  // ── 【效能優化】移除二次點擊取消與任何 change 監聽，回歸原生單選鈕效能 ──
   function attachRadioToggle() {
-    // 💡 這裡就是關鍵！我們不再監聽 change 事件去呼叫任何 saveLocalRating()。
-    // 這讓作答者在同一頁勾選分數時，背後絕對不會去執行 admin.js 的清空快取程序。
-
-    // 輕量級實作：點選第二次可以取消勾選
-    let lastCheckedRadio = null;
-    form.addEventListener('mousedown', function (e) {
-      const radio = e.target.closest('input[type="radio"]');
-      if (!radio) return;
-      lastCheckedRadio = radio.checked ? radio : null;
-    });
-
-    form.addEventListener('click', function (e) {
-      const radio = e.target.closest('input[type="radio"]');
-      if (!radio) return;
-      if (lastCheckedRadio === radio) {
-        radio.checked = false; // 取消選取
-        lastCheckedRadio = null;
-      }
-    });
+    // 刪除原有的 mousedown 與 click 取消選取邏輯。
+    // 當前點選時背後無任何運算，徹底消滅卡頓。
   }
 
   // ── 畫面值與答案物件轉換 ─────────────────────────────────────────────────
@@ -124,7 +106,7 @@
     }, values);
   }
 
-  // ── 【Word 手動儲存】只有觸發此處時，才允許去執行 admin.js 寫入 ──
+  // ── 【Word 式存檔】僅在切換頁面或手動點擊按鈕時，才將當前頁面資料寫入暫存 ──
 
   function commitToLocal(targetIndex) {
     const values = readFormValues();
@@ -137,7 +119,7 @@
     USE.saveLocalProgress(reviewer, task, targetIndex, task.images.length);
   }
 
-  // 只有按大按鈕時，才跑一次的 324 次全量掃描
+  // 掃描所有題目的未完成清單（改為僅在提交或點擊特定按鈕時觸發）
   function missingIndices() {
     const missing = [];
     if (!task) return missing;
@@ -149,21 +131,6 @@
       }
     }
     return missing;
-  }
-
-  function allCompleteWithCurrentForm() {
-    if (!task || task.images.length === 0) return false;
-    return missingIndices().length === 0;
-  }
-
-  function renderActionButton() {
-    if (!finalSubmitBtn || !task) return;
-    if (allCompleteWithCurrentForm()) {
-      finalSubmitBtn.textContent = '確認完成並送出';
-    } else {
-      finalSubmitBtn.textContent = '儲存作答進度';
-    }
-    finalSubmitBtn.className = 'primary-button';
   }
 
   function renderMissingPanel(missing) {
@@ -190,7 +157,7 @@
       
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
-        commitToLocal(current); // 跳轉前一次性打包這頁
+        commitToLocal(current); // 跳轉前儲存當前頁面
         current = Number(btn.dataset.index);
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -198,80 +165,60 @@
     });
   }
 
-  // 點擊「儲存作答進度」大按鈕
-  function saveCurrentDraft() {
-    commitToLocal(current); // 只有此時才允許引爆/執行快取重置
+  // ── 【主動觸發：儲存與送出】 ──────────────────────────────────────────────
 
-    const total = task.images.length;
-    const completed = USE.countCompleted(reviewer, task);
-    
-    progressText.textContent = `${completed} / ${total}`;
-    progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
-
-    USE.postToSheet({
-      action: 'saveProgress', reviewer,
-      strategy: task.strategy, dataset: task.dataset, model: task.model,
-      displayModel: USE.displayModel(task.model),
-      currentIndex: current, total, completed,
-      completedStatus: completed >= total ? 'Completed' : 'In Progress'
-    });
-    renderActionButton();
-    showHint('已儲存目前進度到雲端系統中。');
-  }
-
-  function submitImageIfComplete(index) {
-    const key     = USE.imageKey(task, task.images[index]);
-    const rating  = USE.readRating(reviewer, key);
-    const payload = makePayloadForImage(index, rating || {});
-    USE.saveLocalRating(reviewer, key, payload);
-    if (USE.isCompleteRating(payload)) {
-      USE.postToSheet(payload);
-      return true;
-    }
-    return false;
-  }
-
-  // 點擊「確認完成並送出」大按鈕
-  function finalizeAll() {
+  function handleFinalSubmitAction() {
+    // 1. 動作前，先儲存當前這張圖的最新填寫狀態 (如同 Word 存檔)
     commitToLocal(current);
 
+    // 2. 執行全量掃描以判斷是否全部完成
     const missing = missingIndices();
-    if (missing.length) {
-      renderMissingPanel(missing);
+
+    if (missing.length > 0) {
+      // 有漏題 -> 執行【儲存目前進度到雲端】邏輯
+      const total = task.images.length;
       const completed = USE.countCompleted(reviewer, task);
-      progressText.textContent = `${completed} / ${task.images.length}`;
-      progressBar.style.width  = Math.round(completed * 100 / task.images.length) + '%';
-      renderActionButton();
+      
+      progressText.textContent = `${completed} / ${total}`;
+      progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
+
       USE.postToSheet({
         action: 'saveProgress', reviewer,
         strategy: task.strategy, dataset: task.dataset, model: task.model,
         displayModel: USE.displayModel(task.model),
-        currentIndex: current, total: task.images.length,
-        completed: completed,
+        currentIndex: current, total, completed,
         completedStatus: 'In Progress'
       });
-      showHint(`尚有 ${missing.length} 張未完成，請補齊後再送出。`);
-      return;
-    }
 
-    renderMissingPanel([]);
-    let submitted = 0;
-    for (let i = 0; i < task.images.length; i++) {
-      if (submitImageIfComplete(i)) submitted += 1;
+      renderMissingPanel(missing);
+      showHint(`進度已儲存。但尚有 ${missing.length} 張未完成，請補齊後再送出。`);
+    } else {
+      // 全數完成 -> 執行【正式確認送出】邏輯
+      renderMissingPanel([]);
+      let submitted = 0;
+      for (let i = 0; i < task.images.length; i++) {
+        const key = USE.imageKey(task, task.images[i]);
+        const rating = USE.readRating(reviewer, key);
+        const payload = makePayloadForImage(i, rating || {});
+        USE.saveLocalRating(reviewer, key, payload);
+        if (USE.isCompleteRating(payload)) {
+          USE.postToSheet(payload);
+          submitted += 1;
+        }
+      }
+      const total = task.images.length;
+      USE.saveLocalProgress(reviewer, task, current, total);
+      USE.postToSheet({
+        action: 'saveProgress', reviewer,
+        strategy: task.strategy, dataset: task.dataset, model: task.model,
+        displayModel: USE.displayModel(task.model),
+        currentIndex: current, total, completed: total, completedStatus: 'Completed'
+      });
+      
+      progressText.textContent = `${total} / ${total}`;
+      progressBar.style.width  = '100%';
+      showHint(`確認完成：已正式送出 ${submitted} / ${total} 張作答紀錄！`);
     }
-    const total = task.images.length;
-    USE.saveLocalProgress(reviewer, task, current, total);
-    USE.postToSheet({
-      action: 'saveProgress', reviewer,
-      strategy: task.strategy, dataset: task.dataset, model: task.model,
-      displayModel: USE.displayModel(task.model),
-      currentIndex: current, total, completed: total, completedStatus: 'Completed'
-    });
-    
-    progressText.textContent = `${total} / ${total}`;
-    progressBar.style.width  = '100%';
-    renderActionButton();
-    showHint(`確認完成：已送出 ${submitted} / ${total} 張正式作答紀錄。`);
   }
 
   // ── Rendering ─────────────────────────────────────────────────────────────
@@ -294,12 +241,12 @@
     prevBtn.disabled = current <= 0;
     nextBtn.disabled = current >= total - 1;
     
-    // 換頁或初始載入時，才讀取一次數值
+    // 僅在換頁載入時，讀取一次該頁面的歷史填寫數值
     const key = USE.imageKey(task, img);
     setFormValues(USE.readRating(reviewer, key));
     
-    // 換頁時維持按鈕固定字樣，不跑完備度大迴圈統計，徹底消滅任何卡頓機率
-    finalSubmitBtn.textContent = '儲存作答進度'; 
+    // 按鈕文字固定為綜合功能鈕，不在此處計算完備度，完全省去迴圈消耗
+    finalSubmitBtn.textContent = '確認完成並送出 / 儲存進度'; 
     finalSubmitBtn.className = 'primary-button';
     showHint('');
   }
@@ -321,13 +268,8 @@
   });
 
   if (finalSubmitBtn) {
-    finalSubmitBtn.addEventListener('click', () => {
-      if (allCompleteWithCurrentForm()) {
-        finalizeAll();
-      } else {
-        saveCurrentDraft();
-      }
-    });
+    // 整合為單一高效觸發入口
+    finalSubmitBtn.addEventListener('click', handleFinalSubmitAction);
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
