@@ -144,7 +144,6 @@
   // 換選項 → 直接選取
   input.checked = !wasChecked;
 
-  renderActionButton();
 }
 
   // ── Rating data helpers ───────────────────────────────────────────────────
