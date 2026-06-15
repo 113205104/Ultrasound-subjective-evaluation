@@ -1,6 +1,7 @@
 const SPREADSHEET_NAME = 'Ultrasound_subjective_evaluation_database';
 const RESPONSES_SHEET = 'responses';
 const PROGRESS_SHEET = 'progress';
+const ANSWER_LOG_SHEET = 'answer_log';
 
 const DRIVE_ROOT_FOLDER_ID = '';
 const DRIVE_ROOT_FOLDER_NAME = 'UltrasoundImages';
@@ -23,6 +24,19 @@ const PROGRESS_HEADERS = [
   'timestamp', 'reviewer', 'strategy', 'dataset', 'model', 'displayModel',
   'currentIndex', 'total', 'completed', 'completedStatus'
 ];
+
+const ANSWER_LOG_HEADERS = [
+  'timestamp', 'reviewer', 'filename', 'imagePosition', 'ratingItem', 'score',
+  'strategy', 'dataset', 'model', 'displayModel', 'imageId', 'fileId', 'imageUrl', 'imageLink'
+];
+
+const RATING_FIELDS = ['whole_quality', 'noise_suppression', 'contrast', 'edge_sharpness'];
+const TRIPANEL_ROWS = [
+  { key: '1', label: '第一張' },
+  { key: '2', label: '第二張' },
+  { key: '3', label: '第三張' }
+];
+
 
 function doGet(e) { return handleRequest_(e); }
 function doPost(e) { return handleRequest_(e); }
@@ -108,6 +122,7 @@ function setup_() {
   const ss = getOrCreateSpreadsheet_();
   getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
   getOrCreateSheet_(ss, PROGRESS_SHEET, PROGRESS_HEADERS);
+  getOrCreateSheet_(ss, ANSWER_LOG_SHEET, ANSWER_LOG_HEADERS);
   return { status: 'SetupComplete', spreadsheetUrl: ss.getUrl() };
 }
 
@@ -153,7 +168,64 @@ function saveRating_(p) {
   } else {
     sheet.appendRow(rowData);
   }
+  saveAnswerLog_(ss, p);
   return { status: 'Saved', imageId: imageId };
+}
+
+function saveAnswerLog_(ss, p) {
+  const sheet = getOrCreateSheet_(ss, ANSWER_LOG_SHEET, ANSWER_LOG_HEADERS);
+  const hm = headerIndexMap_(sheet, ANSWER_LOG_HEADERS);
+
+  const reviewer = p.reviewer || '';
+  const strategy = p.strategy || '';
+  const dataset = p.dataset || '';
+  const model = p.model || '';
+  const displayModel = p.displayModel || '';
+  const imageId = p.imageId || '';
+  const fileId = p.fileId || '';
+  const filename = p.filename || '';
+  const imageUrl = p.imageUrl || '';
+  const imageLink = p.imageLink || '';
+
+  if (!reviewer || !strategy || !dataset || !model || !imageId) {
+    throw new Error('Missing core identification fields for answer_log.');
+  }
+
+  // 先刪除此 reviewer + task + image 的舊簡化紀錄，避免同一題重複累積。
+  const values = sheet.getDataRange().getValues();
+  const idxReviewer = hm.map.reviewer;
+  const idxStrategy = hm.map.strategy;
+  const idxDataset = hm.map.dataset;
+  const idxModel = hm.map.model;
+  const idxImageId = hm.map.imageId;
+  for (let i = values.length - 1; i >= 1; i--) {
+    const r = values[i];
+    if (r[idxReviewer] === reviewer && r[idxStrategy] === strategy && r[idxDataset] === dataset && r[idxModel] === model && r[idxImageId] === imageId) {
+      sheet.deleteRow(i + 1);
+    }
+  }
+
+  const now = new Date();
+  const rows = [];
+  TRIPANEL_ROWS.forEach(row => {
+    RATING_FIELDS.forEach(field => {
+      const key = field + '_' + row.key;
+      const score = p[key];
+      if (score === undefined || score === null || score === '') return;
+      const obj = {
+        timestamp: now, reviewer: reviewer, filename: filename,
+        imagePosition: row.label, ratingItem: field, score: score,
+        strategy: strategy, dataset: dataset, model: model, displayModel: displayModel,
+        imageId: imageId, fileId: fileId, imageUrl: imageUrl, imageLink: imageLink
+      };
+      rows.push(hm.headers.map(h => obj[h] !== undefined ? obj[h] : ''));
+    });
+  });
+
+  if (rows.length) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, hm.headers.length).setValues(rows);
+  }
+  return { status: 'AnswerLogSaved', rows: rows.length };
 }
 
 function saveProgress_(p) {
