@@ -15,22 +15,39 @@
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   }
 
-  function matrixHtml(r) {
-    return '<div class="matrix-history">' + APP_CONFIG.ratingFields.map(f => {
-      const rows = APP_CONFIG.tripanelRows.map(row => {
-        return `<div>${escapeHtml(row.label)}</div><div>${escapeHtml(r[`${f.key}_${row.key}`] || '')}</div>`;
-      }).join('');
+  function scoreValue(r, key) {
+    const v = r[key];
+    if (v === undefined || v === null || v === '') {
+      return '<span class="muted">未填</span>';
+    }
+    return escapeHtml(v);
+  }
 
-      return `
-        <div class="matrix-history-block">
-          <div class="matrix-history-title">${escapeHtml(f.label)}</div>
-          <div class="matrix-history-grid">
-            <div class="head">影像</div>
-            <div class="head">分數</div>
-            ${rows}
-          </div>
-        </div>`;
-    }).join('') + '</div>';
+  function matrixHtml(r) {
+    return `
+      <div class="matrix-history">
+        ${APP_CONFIG.ratingFields.map(f => {
+          const rows = APP_CONFIG.tripanelRows.map(row => {
+            const key = `${f.key}_${row.key}`;
+            return `
+              <div>${escapeHtml(row.label)}</div>
+              <div>${scoreValue(r, key)}</div>
+            `;
+          }).join('');
+
+          return `
+            <div class="matrix-history-block">
+              <div class="matrix-history-title">${escapeHtml(f.label)}</div>
+              <div class="matrix-history-grid">
+                <div class="head">影像</div>
+                <div class="head">分數</div>
+                ${rows}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
 
   function renderRows(rows) {
@@ -40,18 +57,38 @@
       list.innerHTML = `
         <section class="form-card history-card">
           <p class="muted">目前沒有符合條件的作答紀錄。</p>
-        </section>`;
+        </section>
+      `;
       return;
     }
 
-    rows.forEach(r => {
+    rows.forEach((r, index) => {
       const card = document.createElement('section');
       card.className = 'form-card history-card';
 
       card.innerHTML = `
-        <h2>${escapeHtml(r.displayModel || USE.displayModel(r.model))}　${escapeHtml(r.filename || r.imageId || '')}</h2>
-        <p class="muted">${escapeHtml(r.timestamp || '')} / ${escapeHtml(r.reviewer || '')}</p>
-        ${r.imageUrl ? `<img src="${escapeHtml(r.imageUrl)}" alt="${escapeHtml(r.filename || 'Tripanel ultrasound image')}">` : ''}
+        <h2>題號 ${index + 1}　${escapeHtml(r.displayModel || USE.displayModel(r.model))}</h2>
+
+        <p class="muted">
+          Reviewer：${escapeHtml(r.reviewer || '')}
+          ｜ Strategy：${escapeHtml(r.strategy || '')}
+          ｜ Dataset：${escapeHtml(r.dataset || '')}
+          ｜ Model：${escapeHtml(r.model || '')}
+        </p>
+
+        <p class="muted">
+          檔名：${escapeHtml(r.filename || r.imageId || '')}
+        </p>
+
+        <p class="muted">
+          時間：${escapeHtml(r.timestamp || '')}
+        </p>
+
+        ${r.imageUrl ? `
+          <img src="${escapeHtml(r.imageUrl)}"
+               alt="${escapeHtml(r.filename || 'Tripanel ultrasound image')}">
+        ` : ''}
+
         ${matrixHtml(r)}
       `;
 
@@ -65,7 +102,8 @@
     list.innerHTML = `
       <section class="form-card history-card">
         <p class="muted">載入中...</p>
-      </section>`;
+      </section>
+    `;
 
     USE.jsonp('listResponses', {
       reviewer: val('reviewerFilter'),
@@ -78,7 +116,8 @@
       list.innerHTML = `
         <section class="form-card history-card">
           <div class="error">無法讀取 Google Sheet：${escapeHtml(err.message)}</div>
-        </section>`;
+        </section>
+      `;
     });
   }
 
@@ -92,7 +131,11 @@
 
   ['strategyFilter', 'datasetFilter', 'modelFilter'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('change', load);
+    if (!el) return;
+
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') load();
+    });
   });
 
   window.addEventListener('focus', load);
