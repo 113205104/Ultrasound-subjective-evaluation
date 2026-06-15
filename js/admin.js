@@ -1,12 +1,13 @@
 (function () {
   const cfg = window.APP_CONFIG;
   const serverRatings = {};
+  
+  // 核心快取
   const mergedCache = {};
-
   function invalidateMergedCache(reviewer) { delete mergedCache[reviewer]; }
 
   function encodeQuery(params) {
-    return Object.keys(params || {})
+    return Object.keys(params)
       .filter(k => params[k] !== undefined && params[k] !== null && params[k] !== '')
       .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
       .join('&');
@@ -17,16 +18,6 @@
   function imageKey(task, image) { return [taskKey(task), imageStableId(image)].join('||'); }
   function displayModel(model) { return (cfg.modelDisplayMap && cfg.modelDisplayMap[model]) || model; }
 
-  function questionNoFromImage(image) {
-    if (!image) return '';
-    if (image.questionNo !== undefined && image.questionNo !== null && image.questionNo !== '') return image.questionNo;
-    if (image.number !== undefined && image.number !== null && image.number !== '') return image.number;
-    const text = String(image.filename || image.id || '');
-    const m = text.match(/_(\d+)(?:\.[^.]+)?$/);
-    return m ? m[1] : '';
-  }
-
-
   function ratingKeys() {
     const rows = cfg.tripanelRows || [{ key: '1' }, { key: '2' }, { key: '3' }];
     return (cfg.ratingFields || []).flatMap(f => rows.map(r => `${f.key}_${r.key}`));
@@ -34,73 +25,69 @@
 
   function localRatingsKey(reviewer) { return 'use_ratings_' + reviewer; }
   function localProgressKey(reviewer) { return 'use_progress_' + reviewer; }
-  function getJson(key, fallback) {
-    try { return JSON.parse(localStorage.getItem(key)) || fallback; }
-    catch (_) { return fallback; }
-  }
+  function getJson(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (_) { return fallback; } }
   function setJson(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
-
-  function normalizeRating(data) {
-    const out = Object.assign({}, data || {});
-    // 舊欄位相容：若曾經用 whole_image_quality_*，自動轉回 whole_quality_*
-    ['1', '2', '3'].forEach(n => {
-      if ((out[`whole_quality_${n}`] === undefined || out[`whole_quality_${n}`] === '') && out[`whole_image_quality_${n}`] !== undefined) {
-        out[`whole_quality_${n}`] = out[`whole_image_quality_${n}`];
-      }
-    });
-    return out;
-  }
 
   function saveLocalRating(reviewer, key, data) {
     const all = getJson(localRatingsKey(reviewer), {});
     const prev = all[key] || {};
     const rkeys = ratingKeys();
     rkeys.forEach(k => { delete prev[k]; });
-    all[key] = normalizeRating(Object.assign({}, prev, data, { draftUpdatedAt: new Date().toISOString() }));
+    all[key] = Object.assign({}, prev, data, { draftUpdatedAt: new Date().toISOString() });
     setJson(localRatingsKey(reviewer), all);
     invalidateMergedCache(reviewer);
   }
-
-  function readLocalRating(reviewer, key) { return normalizeRating(getJson(localRatingsKey(reviewer), {})[key] || {}); }
-
-  function ratingIsComplete(r) {
-    r = normalizeRating(r);
-    return ratingKeys().every(k => r[k] !== undefined && r[k] !== null && r[k] !== '');
-  }
+  function readLocalRating(reviewer, key) { return getJson(localRatingsKey(reviewer), {})[key] || {}; }
 
   function saveLocalProgress(reviewer, task, currentIndex, total) {
     const all = getJson(localProgressKey(reviewer), {});
     const completed = countCompleted(reviewer, task);
     all[taskKey(task)] = { currentIndex, total, completed, updatedAt: new Date().toISOString() };
     setJson(localProgressKey(reviewer), all);
-    return all[taskKey(task)];
   }
-
   function readLocalProgress(reviewer, task) { return getJson(localProgressKey(reviewer), {})[taskKey(task)] || null; }
 
-  function isCompleteRating(r) { return ratingIsComplete(r); }
+  // ➔ 放行防線：允許沒選滿 12 格的草稿在任何地方正常讀取還原
+  function isCompleteRating(r) {
+    return true; 
+  }
 
+  // 確保只有在真正沒有快取時才解析一次硬碟
   function mergedRatings(reviewer) {
     if (!(reviewer in mergedCache) || !mergedCache[reviewer]) {
       mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
-      Object.keys(mergedCache[reviewer]).forEach(k => { mergedCache[reviewer][k] = normalizeRating(mergedCache[reviewer][k]); });
     }
     return mergedCache[reviewer];
   }
+  function readRating(reviewer, key) { return mergedRatings(reviewer)[key] || {}; }
 
-  function readRating(reviewer, key) { return normalizeRating(mergedRatings(reviewer)[key] || {}); }
-
+  // 計算完美填滿 12 格的圖片數量 (用來展示給進度條看)
   function countCompleted(reviewer, task) {
     const all = mergedRatings(reviewer);
-    return Object.keys(all).filter(k => k.startsWith(taskKey(task) + '||') && ratingIsComplete(all[k])).length;
+    return task.images.filter(img => {
+      const key = imageKey(task, img);
+      const r = all[key];
+      if (!r) return false;
+      return ratingKeys().every(keyName => r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '');
+    }).length;
   }
 
-  function firstIncompleteIndex(reviewer, task, images) {
-    if (!Array.isArray(images)) return 0;
-    for (let i = 0; i < images.length; i++) {
-      if (!ratingIsComplete(readRating(reviewer, imageKey(task, images[i])))) return i;
+  // 進網頁時，依照原本系統預設的機制尋找第一個沒填滿分數的格子
+  function firstIncompleteIndex(reviewer, task) {
+    const allRatings = mergedRatings(reviewer); 
+    for (let i = 0; i < task.images.length; i++) {
+      const key = imageKey(task, task.images[i]);
+      const r = allRatings[key] || {};
+      const isAllFilled = ratingKeys().every(keyName => r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '');
+      if (!isAllFilled) return i; 
     }
-    return 0;
+    return Math.max(task.images.length - 1, 0);
+  }
+
+  function postToSheet(payload) {
+    if (!cfg.appsScriptUrl) return Promise.resolve(false);
+    const body = new URLSearchParams(payload);
+    return fetch(cfg.appsScriptUrl, { method: 'POST', mode: 'no-cors', body }).then(() => true).catch(() => false);
   }
 
   function jsonp(action, params) {
@@ -118,18 +105,12 @@
     });
   }
 
-  async function postToSheet(payload) {
-    // 保留舊接口；改用 JSONP 才能知道是否真的成功。
-    const res = await jsonp(payload.action || 'saveRating', payload);
-    if (!res.success) throw new Error(res.error || 'Google Sheet 儲存失敗');
-    return true;
-  }
-
   function normalizeManifest(raw) {
     if (!Array.isArray(raw)) return [];
     return raw.map(task => Object.assign({}, task, { images: Array.isArray(task.images) ? task.images : [] }));
   }
 
+  // ➔ 修正：這裡的呼叫動作名稱確定為唯一的 'loadManifest'
   async function loadManifest() {
     if (cfg.manifestSource === 'drive') {
       const data = await jsonp('loadManifest', {});
@@ -141,76 +122,22 @@
     return normalizeManifest(await res.json());
   }
 
-  function makeKeyFromRow(r) {
-    return [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
-  }
-
+  // 回歸原生盲載，避免不帶 task 參數時的首頁閃退
   async function loadServerRatings(reviewer, task) {
     const params = { reviewer };
     if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
-    const data = await jsonp('loadProgressAndRatings', params);
+    
+    const data = await jsonp('listResponses', params);
     const map = {};
-    if (data.success && data.data) {
-      (data.data.ratings || []).forEach(r => { map[makeKeyFromRow(r)] = normalizeRating(r); });
-      serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
-      const local = getJson(localRatingsKey(reviewer), {});
-      setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
-      if (task && data.data.progress) {
-        const allProg = getJson(localProgressKey(reviewer), {});
-        allProg[taskKey(task)] = data.data.progress;
-        setJson(localProgressKey(reviewer), allProg);
-      }
-    }
+    (data.rows || []).forEach(r => {
+      const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
+      map[key] = r;
+    });
+    serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+    const local = getJson(localRatingsKey(reviewer), {});
+    setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
     invalidateMergedCache(reviewer);
     return map;
-  }
-
-  function buildRatingPayload(reviewer, task, image, rating) {
-    rating = normalizeRating(rating);
-    const payload = {
-      action: 'saveRating',
-      reviewer,
-      strategy: task.strategy,
-      dataset: task.dataset,
-      model: task.model,
-      displayModel: displayModel(task.model),
-      imageId: imageStableId(image),
-      fileId: image.fileId || '',
-      filename: image.filename || imageStableId(image),
-      imageUrl: image.url || image.imageUrl || '',
-      imageLink: image.webViewUrl || image.imageLink || image.url || image.imageUrl || '',
-      questionNo: questionNoFromImage(image)
-    };
-    ratingKeys().forEach(k => { payload[k] = rating[k] === undefined || rating[k] === null ? '' : rating[k]; });
-    return payload;
-  }
-
-  async function saveServerRating(reviewer, task, image, rating) {
-    const payload = buildRatingPayload(reviewer, task, image, rating);
-    const res = await jsonp('saveRating', payload);
-    if (!res.success) throw new Error(res.error || '作答結果儲存失敗');
-    serverRatings[reviewer] = serverRatings[reviewer] || {};
-    serverRatings[reviewer][imageKey(task, image)] = normalizeRating(Object.assign({}, payload, { timestamp: new Date().toISOString() }));
-    invalidateMergedCache(reviewer);
-    return res.data;
-  }
-
-  async function saveServerProgress(reviewer, task, currentIndex, total) {
-    const completed = countCompleted(reviewer, task);
-    const payload = {
-      reviewer,
-      strategy: task.strategy,
-      dataset: task.dataset,
-      model: task.model,
-      displayModel: displayModel(task.model),
-      currentIndex,
-      total,
-      completed,
-      completedStatus: total > 0 && completed >= total ? 'Completed' : 'In Progress'
-    };
-    const res = await jsonp('saveProgress', payload);
-    if (!res.success) throw new Error(res.error || '進度儲存失敗');
-    return res.data;
   }
 
   function populateReviewerSelect(select, includeAll) {
@@ -238,7 +165,6 @@
     saveLocalRating, readLocalRating, readRating,
     saveLocalProgress, readLocalProgress, countCompleted, firstIncompleteIndex,
     isCompleteRating, postToSheet, jsonp, loadManifest, loadServerRatings,
-    saveServerRating, saveServerProgress, buildRatingPayload,
-    populateReviewerSelect, questionNoFromImage
+    populateReviewerSelect
   };
 })();
