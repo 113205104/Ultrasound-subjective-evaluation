@@ -3,41 +3,55 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Survey | Ultrasound Subjective Evaluation</title>
+  <title>作答紀錄 | Ultrasound Subjective Evaluation</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div class="forms-topbar"></div>
+
   <main class="page-shell">
     <section class="form-card form-header compact">
       <a class="back-link" href="index.html">← 回首頁</a>
-      <h1 id="taskTitle">Loading...</h1>
-      <p id="taskSubtitle"></p>
-      <div class="progress-wrap">
-        <div class="progress-text" id="progressText">0 / 0</div>
-        <div class="progress-bar"><div id=\"progressBar\" class=\"progress-fill\"></div></div>
-      </div>
+      <h1>作答紀錄查詢</h1>
+      <p>可依 Reviewer、策略、資料集與模型查看每題作答情況。</p>
     </section>
 
-    <section class="form-card image-card">
-      <div class="image-meta" id="imageMeta"></div>
-      <img id="tripanelImage" class="tripanel" alt="Tripanel ultrasound image" />
+    <section class="form-card question-card">
+      <div class="filter-grid">
+        <label>
+          Reviewer
+          <select id="reviewerFilter" class="select-input"></select>
+        </label>
+
+        <label>
+          Strategy
+          <input id="strategyFilter" class="text-input" placeholder="例如 v7_v7">
+        </label>
+
+        <label>
+          Dataset
+          <input id="datasetFilter" class="text-input" placeholder="例如 v7-only">
+        </label>
+
+        <label>
+          Model
+          <input id="modelFilter" class="text-input" placeholder="cut / cyc / fast / p2p / reg">
+        </label>
+      </div>
+
       <div class="nav-row">
-        <button id="prevBtn" class="ghost-button" type="button">上一張</button>
-        <button id="saveProgressBtn" class="primary-button" style="background-color: #2196F3;" type="button">💾 儲存目前進度</button>
-        <button id="finalSubmitBtn" class="primary-button" style="background-color: #4CAF50; display: none;" type="button">🚀 確認完成並送出</button>
-        <button id="nextBtn" class="primary-button" type="button">下一張</button>
+        <button id="reloadBtn" class="primary-button" type="button">查詢 / 重新整理</button>
       </div>
-      <p id="saveHint" class="save-hint" hidden></p>
     </section>
 
-    <div id="missingPanel" hidden></div>
-
-    <form id="ratingForm" onsubmit="return false;"></form>
+    <section class="form-card question-card">
+      <h2>作答紀錄</h2>
+      <div id="historyList" class="history-list"></div>
+    </section>
   </main>
 
   <script src="js/config.js"></script>
   <script src="js/admin.js"></script>
-  <script src="js/survey.js"></script>
+  <script src="js/history.js"></script>
 </body>
 </html>
