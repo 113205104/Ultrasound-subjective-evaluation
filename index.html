@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ultrasound Subjective Evaluation</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="wrap">
+    <section class="card top">
+      <h1>Ultrasound Subjective Evaluation</h1>
+      <p class="muted">請選擇評分者身分後開始或續作。評分者只會看到 Model A–E。</p>
+      <label>Reviewer：
+        <select id="reviewer"></select>
+      </label>
+      <button id="reload" class="button">重新整理任務</button>
+    </section>
+    <section class="card">
+      <h2>評分任務</h2>
+      <div id="tasks">Loading...</div>
+    </section>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

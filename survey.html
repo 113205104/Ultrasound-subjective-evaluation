@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ultrasound Survey</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="wrap">
+    <section class="card top">
+      <p><a href="index.html">← 回首頁</a>　<a id="historyLink" href="#">查看作答記錄</a></p>
+      <h1 id="title">Loading...</h1>
+      <p id="meta" class="muted"></p>
+      <p><span id="count">0 / 0</span></p>
+      <div class="bar"><div id="bar"></div></div>
+    </section>
+
+    <section class="card">
+      <p id="imageTitle" class="muted"></p>
+      <div class="imgbox"><img id="img" alt="Ultrasound image"></div>
+      <div class="nav">
+        <button id="prev">上一張</button>
+        <button id="save" class="primary">💾 儲存目前進度</button>
+        <button id="next" class="purple">下一張</button>
+      </div>
+    </section>
+
+    <form id="form"></form>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/survey.js"></script>
+</body>
+</html>
