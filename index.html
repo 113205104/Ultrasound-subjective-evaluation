@@ -1,28 +1,39 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ultrasound Subjective Evaluation</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <main class="wrap">
-    <section class="card top">
+  <div class="forms-topbar"></div>
+  <main class="page-shell">
+    <section class="form-card form-header">
       <h1>Ultrasound Subjective Evaluation</h1>
-      <p class="muted">請選擇評分者身分後開始或續作。評分者只會看到 Model A–E。</p>
-      <label>Reviewer：
-        <select id="reviewer"></select>
-      </label>
-      <button id="reload" class="button">重新整理任務</button>
+      <p>超音波影像主觀評分平台。請選擇固定評分者後開始作答。</p>
+      <div class="notice">模型名稱已匿名顯示為 Model A–E，避免評分者得知真實模型名稱。</div>
     </section>
-    <section class="card">
-      <h2>評分任務</h2>
-      <div id="tasks">Loading...</div>
+
+    <section class="form-card question-card">
+      <label class="question-title" for="reviewerSelect">Reviewer</label>
+      <select id="reviewerSelect" class="select-input" aria-label="Reviewer"></select>
+    </section>
+
+    <section class="form-card question-card">
+      <div class="section-row">
+        <div>
+          <h2>評分任務</h2>
+          <p class="muted">首頁會直接讀取 Google Drive 任務，並從 Google Sheet 載入作答進度。</p>
+        </div>
+        <a class="ghost-button" href="history.html">查看作答紀錄</a>
+      </div>
+      <div id="taskList" class="task-list" aria-live="polite"></div>
     </section>
   </main>
+
   <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>
