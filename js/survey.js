@@ -7,7 +7,9 @@
   let manifest = [];
   let task = null;
   let current = 0;
-  let localMemoryDraft = {};
+
+  const localMemoryDraft = {};
+  const touchedImages = new Set();
 
   const title = document.getElementById('taskTitle');
   const subtitle = document.getElementById('taskSubtitle');
@@ -36,6 +38,24 @@
 
   function getImageDraftKey(img) {
     return img.id || img.fileId || img.filename || img.url;
+  }
+
+  function hasAnyScore(rating) {
+    return USE.ratingKeys().some(k =>
+      rating &&
+      rating[k] !== undefined &&
+      rating[k] !== null &&
+      rating[k] !== ''
+    );
+  }
+
+  function isCompleteRating(rating) {
+    return USE.ratingKeys().every(k =>
+      rating &&
+      rating[k] !== undefined &&
+      rating[k] !== null &&
+      rating[k] !== ''
+    );
   }
 
   function buildMatrixQuestion(field) {
@@ -75,9 +95,14 @@
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
 
     form.addEventListener('change', () => {
-      if (!task || !task.images || !task.images[current]) return;
+      if (!task || !task.images[current]) return;
+
       const imgKey = getImageDraftKey(task.images[current]);
-      localMemoryDraft[imgKey] = readFormValues();
+      const values = readFormValues();
+
+      localMemoryDraft[imgKey] = values;
+      touchedImages.add(imgKey);
+
       updateProgressDisplay();
     });
   }
@@ -86,21 +111,33 @@
     if (!form) return;
 
     USE.ratingKeys().forEach(k => {
-      const targetValue = String(rating && rating[k] ? rating[k] : '');
       const radios = form.querySelectorAll(`input[name="${CSS.escape(k)}"]`);
       radios.forEach(radio => {
-        radio.checked = radio.value === targetValue;
+        radio.checked = false;
       });
+    });
+
+    if (!rating) return;
+
+    USE.ratingKeys().forEach(k => {
+      const targetValue = rating[k];
+
+      if (targetValue === undefined || targetValue === null || targetValue === '') return;
+
+      const radio = form.querySelector(
+        `input[name="${CSS.escape(k)}"][value="${CSS.escape(String(targetValue))}"]`
+      );
+
+      if (radio) radio.checked = true;
     });
   }
 
   function readFormValues() {
     const out = {};
-    if (!form) return out;
 
     USE.ratingKeys().forEach(k => {
-      const checkedRadio = form.querySelector(`input[name="${CSS.escape(k)}"]:checked`);
-      out[k] = checkedRadio ? Number(checkedRadio.value) : '';
+      const checked = form.querySelector(`input[name="${CSS.escape(k)}"]:checked`);
+      out[k] = checked ? Number(checked.value) : '';
     });
 
     return out;
@@ -123,65 +160,61 @@
     }, values);
   }
 
-  function isRatingComplete(rating) {
-    return USE.ratingKeys().every(k =>
-      rating &&
-      rating[k] !== undefined &&
-      rating[k] !== null &&
-      rating[k] !== ''
-    );
-  }
-
   function countCompletedFromDraft() {
     if (!task || !task.images) return 0;
 
     return task.images.filter(img => {
       const imgKey = getImageDraftKey(img);
-      const rating = localMemoryDraft[imgKey] || {};
-      return isRatingComplete(rating);
+      return isCompleteRating(localMemoryDraft[imgKey]);
     }).length;
   }
 
   function updateProgressDisplay() {
     if (!task || !task.images) return;
 
-    const completedCount = countCompletedFromDraft();
+    const completed = countCompletedFromDraft();
     const total = task.images.length;
 
-    if (progressText) progressText.textContent = `${completedCount} / ${total}`;
+    if (progressText) progressText.textContent = `${completed} / ${total}`;
     if (progressBar) {
-      progressBar.style.width = total > 0
-        ? Math.round(completedCount * 100 / total) + '%'
-        : '0%';
+      progressBar.style.width = total ? Math.round(completed * 100 / total) + '%' : '0%';
     }
   }
 
   async function saveAllToCloud(isFinal = false) {
-    if (!task || !task.images || !task.images[current]) return;
+    if (!task || !task.images[current]) return;
 
-    showHint('正在同步作答進度與紀錄至雲端試算表...');
+    showHint('正在儲存目前已作答內容...');
 
-    const currentImgKey = getImageDraftKey(task.images[current]);
-    localMemoryDraft[currentImgKey] = readFormValues();
+    const currentImg = task.images[current];
+    const currentImgKey = getImageDraftKey(currentImg);
+    const currentValues = readFormValues();
 
-    let savedCount = 0;
+    if (hasAnyScore(currentValues)) {
+      localMemoryDraft[currentImgKey] = currentValues;
+      touchedImages.add(currentImgKey);
+    }
+
     const promises = [];
+    let savedCount = 0;
 
     task.images.forEach((img, idx) => {
       const imgKey = getImageDraftKey(img);
       const ratingData = localMemoryDraft[imgKey];
 
-      if (!ratingData) return;
+      if (!touchedImages.has(imgKey)) return;
+      if (!hasAnyScore(ratingData)) return;
 
       const payload = makePayloadForImage(idx, ratingData);
       const storageKey = USE.imageKey(task, img);
 
       USE.saveLocalRating(reviewer, storageKey, payload);
       promises.push(USE.postToSheet(payload));
+
       savedCount++;
     });
 
-    const completedCount = countCompletedFromDraft();
+    const completed = countCompletedFromDraft();
 
     USE.saveLocalProgress(reviewer, task, current, task.images.length);
 
@@ -194,8 +227,8 @@
       displayModel: USE.displayModel(task.model),
       currentIndex: current,
       total: task.images.length,
-      completed: completedCount,
-      completedStatus: completedCount >= task.images.length ? 'Completed' : 'In Progress'
+      completed,
+      completedStatus: completed >= task.images.length ? 'Completed' : 'In Progress'
     }));
 
     await Promise.all(promises);
@@ -203,22 +236,19 @@
     updateProgressDisplay();
 
     if (!isFinal) {
-      showHint(`💾 儲存成功！已更新 ${savedCount} 筆作答至 responses，並儲存目前進度。`);
+      showHint(`💾 儲存完成：已寫入 ${savedCount} 題作答紀錄，並儲存目前進度。`);
     }
   }
 
   function missingIndices() {
     const missing = [];
-    if (!task || !task.images) return missing;
 
-    for (let i = 0; i < task.images.length; i++) {
-      const imgKey = getImageDraftKey(task.images[i]);
-      const rating = localMemoryDraft[imgKey] || {};
-
-      if (!isRatingComplete(rating)) {
-        missing.push(i);
+    task.images.forEach((img, idx) => {
+      const imgKey = getImageDraftKey(img);
+      if (!isCompleteRating(localMemoryDraft[imgKey])) {
+        missing.push(idx);
       }
-    }
+    });
 
     return missing;
   }
@@ -235,17 +265,24 @@
     missingPanel.hidden = false;
     missingPanel.innerHTML = `
       <section class="form-card question-card missing-card">
-        <h2 style="color: #d32f2f;">⚠️ 尚有 ${missing.length} 張未完成</h2>
-        <p class="muted">您可以點選下方按鈕直接跳至漏題補充分數，補完後請到最後一張點擊確認送出。</p>
+        <h2 style="color:#d32f2f;">⚠️ 尚有 ${missing.length} 張未完成</h2>
+        <p class="muted">請點選下方題號補齊。</p>
         <div class="missing-jump-list">
-          ${missing.map(i => `<button type="button" class="ghost-button missing-jump" data-index="${i}">第 ${i + 1} 張</button>`).join('')}
+          ${missing.map(i =>
+            `<button type="button" class="ghost-button missing-jump" data-index="${i}">第 ${i + 1} 張</button>`
+          ).join('')}
         </div>
       </section>`;
 
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
         const imgKey = getImageDraftKey(task.images[current]);
-        localMemoryDraft[imgKey] = readFormValues();
+        const values = readFormValues();
+
+        if (hasAnyScore(values)) {
+          localMemoryDraft[imgKey] = values;
+          touchedImages.add(imgKey);
+        }
 
         current = Number(btn.dataset.index);
         render();
@@ -259,14 +296,14 @@
 
     const missing = missingIndices();
 
-    if (missing.length > 0) {
+    if (missing.length) {
       renderMissingPanel(missing);
-      showHint(`雲端同步完成！但尚有 ${missing.length} 張圖未填滿分數，請補齊後再送出。`);
+      showHint(`已儲存目前作答，但尚有 ${missing.length} 張未完成。`);
       return;
     }
 
     renderMissingPanel([]);
-    showHint('🎉 恭喜！本項任務已全部評分完畢並成功送出！');
+    showHint('🎉 本任務已完成並送出。');
 
     setTimeout(() => {
       location.href = 'index.html';
@@ -274,10 +311,11 @@
   }
 
   function render() {
-    if (!task || !task.images || !task.images.length) return;
+    if (!task || !task.images.length) return;
 
     const img = task.images[current];
     const total = task.images.length;
+    const imgKey = getImageDraftKey(img);
 
     if (title) title.textContent = USE.displayModel(task.model);
     if (subtitle) subtitle.textContent = reviewer;
@@ -295,20 +333,27 @@
       if (finalSubmitBtn) finalSubmitBtn.style.display = 'none';
     }
 
-    const imgKey = getImageDraftKey(img);
     setFormValues(localMemoryDraft[imgKey] || {});
-
     updateProgressDisplay();
     showHint('');
   }
 
+  function saveCurrentIfAnswered() {
+    if (!task || !task.images[current]) return;
+
+    const imgKey = getImageDraftKey(task.images[current]);
+    const values = readFormValues();
+
+    if (hasAnyScore(values)) {
+      localMemoryDraft[imgKey] = values;
+      touchedImages.add(imgKey);
+    }
+  }
+
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
-      if (!task || current <= 0) return;
-
-      const imgKey = getImageDraftKey(task.images[current]);
-      localMemoryDraft[imgKey] = readFormValues();
-
+      if (current <= 0) return;
+      saveCurrentIfAnswered();
       current--;
       render();
     });
@@ -316,11 +361,8 @@
 
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      if (!task || current >= task.images.length - 1) return;
-
-      const imgKey = getImageDraftKey(task.images[current]);
-      localMemoryDraft[imgKey] = readFormValues();
-
+      if (current >= task.images.length - 1) return;
+      saveCurrentIfAnswered();
       current++;
       render();
     });
@@ -340,9 +382,7 @@
     manifest = m;
     task = manifest[taskIndex];
 
-    if (!task) {
-      throw new Error('找不到指定的評分任務。');
-    }
+    if (!task) throw new Error('找不到指定任務。');
 
     await USE.loadServerRatings(reviewer, task);
 
@@ -351,49 +391,32 @@
       const imgKey = getImageDraftKey(img);
       const serverRating = USE.readRating(reviewer, serverKey);
 
-      if (serverRating) {
+      if (hasAnyScore(serverRating)) {
         localMemoryDraft[imgKey] = serverRating;
       }
     });
 
-    let loadedProgress = null;
-
     try {
-      const cloudData = await USE.jsonp('loadProgressAndRatings', {
+      const result = await USE.jsonp('loadProgressAndRatings', {
         reviewer,
         strategy: task.strategy,
         dataset: task.dataset,
         model: task.model
       });
 
-      if (
-        cloudData &&
-        cloudData.success &&
-        cloudData.data &&
-        cloudData.data.progress
-      ) {
-        loadedProgress = cloudData.data.progress;
-      }
-    } catch (_) {
-      loadedProgress = null;
-    }
+      const progress = result && result.data && result.data.progress;
 
-    if (loadedProgress && loadedProgress.currentIndex !== undefined && loadedProgress.currentIndex !== '') {
-      current = Number(loadedProgress.currentIndex);
-
-      if (Number.isNaN(current)) current = 0;
-      if (current < 0) current = 0;
-      if (current >= task.images.length) current = task.images.length - 1;
-    } else {
-      const localProgress = USE.readLocalProgress(reviewer, task);
-
-      if (localProgress && localProgress.currentIndex !== undefined) {
-        current = Number(localProgress.currentIndex);
-        if (Number.isNaN(current)) current = 0;
+      if (progress && progress.currentIndex !== undefined && progress.currentIndex !== '') {
+        current = Number(progress.currentIndex);
       } else {
         current = USE.firstIncompleteIndex(reviewer, task);
       }
+    } catch (_) {
+      current = USE.firstIncompleteIndex(reviewer, task);
     }
+
+    if (Number.isNaN(current) || current < 0) current = 0;
+    if (current >= task.images.length) current = task.images.length - 1;
 
     updateProgressDisplay();
     render();
