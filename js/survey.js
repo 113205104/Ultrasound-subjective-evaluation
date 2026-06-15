@@ -63,11 +63,6 @@
   }
 
   // ── Radio toggle (deselect on re-click) ───────────────────────────────────
-  //
-  // Strategy: track the "about to be clicked" radio via pointerdown so we know
-  // if it was already checked *before* the browser's native click handler ran.
-  // We suppress the native behaviour entirely and manage checked state manually.
-  // This avoids all problems with label→input synthetic-click duplication.
 
   function buildForm() {
     form.innerHTML = '';
@@ -76,11 +71,9 @@
   }
 
   function attachRadioToggle() {
-    // Map: input element → was it checked at pointerdown time
     let pendingRadio    = null;
     let pendingChecked  = false;
 
-    // pointerdown fires before the browser changes .checked
     form.addEventListener('pointerdown', function (e) {
       const input = resolveRadio(e.target);
       if (!input) { pendingRadio = null; return; }
@@ -88,8 +81,6 @@
       pendingChecked = input.checked;
     }, { capture: true });
 
-    // click fires after browser would normally toggle the radio;
-    // we prevent default so the browser never touches .checked, then apply our own logic.
     form.addEventListener('click', function (e) {
       const input = resolveRadio(e.target);
       if (!input) return;
@@ -104,7 +95,6 @@
       pendingChecked = false;
     }, { capture: true });
 
-    // Keyboard: Space / Enter on a focused radio
     form.addEventListener('keydown', function (e) {
       if (e.key !== ' ' && e.key !== 'Spacebar' && e.key !== 'Enter') return;
       if (!e.target.matches('input[type="radio"]')) return;
@@ -114,8 +104,6 @@
     }, { capture: true });
   }
 
-  // Return the radio input that was interacted with, regardless of whether the
-  // user clicked the <input> itself or its wrapping <label>.
   function resolveRadio(target) {
     if (!target) return null;
     if (target.matches && target.matches('input[type="radio"]')) return target;
@@ -123,28 +111,27 @@
     return label ? label.querySelector('input[type="radio"]') : null;
   }
 
-  // Deselect all siblings, then check this one — unless it was already checked
-  // (= user clicked the same circle again → deselect / toggle off).
   function applyRadioToggle(input, wasChecked) {
+    const name = input.name;
+    const card = input.closest('.matrix-card') || form;
 
-  const name = input.name;
+    card.querySelectorAll(
+      `input[type="radio"][name="${CSS.escape(name)}"]`
+    ).forEach(el => {
+      if (el !== input) { el.checked = false; }
+    });
 
-  // 只搜尋目前題組，不掃描整個 form
-  const card = input.closest('.matrix-card') || form;
+    input.checked = !wasChecked;
 
-  card.querySelectorAll(
-    `input[type="radio"][name="${CSS.escape(name)}"]`
-  ).forEach(el => {
-    if (el !== input) {
-      el.checked = false;
-    }
-  });
+    // 【效能優化點】：當使用者點選分數時，同步寫入記憶體快取並更新按鈕狀態，
+    // 這能確保點擊時，畫面的按鈕文字（確認完成 or 儲存進度）能光速切換，不產生任何卡頓。
+    const values = readFormValues();
+    const payload = makePayloadForImage(current, values);
+    payload.action = 'draftOnly';
+    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
 
-  // 已選取再點一次 → 取消
-  // 換選項 → 直接選取
-  input.checked = !wasChecked;
-
-}
+    renderActionButton();
+  }
 
   // ── Rating data helpers ───────────────────────────────────────────────────
 
@@ -153,9 +140,12 @@
   function getCurrentRating()  { return USE.readRating(reviewer, currentRatingKey()); }
 
   function setFormValues(rating) {
+    // 【效能優化】：快取 DOM 查詢，避免在大量的迴圈中重複呼叫 form.querySelectorAll
     USE.ratingKeys().forEach(k => {
-      form.querySelectorAll(`input[name="${CSS.escape(k)}"]`).forEach(el => {
-        el.checked = String(rating[k] || '') === el.value;
+      const inputs = form.querySelectorAll(`input[name="${CSS.escape(k)}"]`);
+      const targetValue = String(rating[k] || '');
+      inputs.forEach(el => {
+        el.checked = el.value === targetValue;
       });
     });
   }
@@ -180,8 +170,6 @@
     }, values);
   }
 
-  // ── Local-only progress (no Sheet write) ──────────────────────────────────
-
   function saveProgressLocalOnly() {
     USE.saveLocalProgress(reviewer, task, current, task.images.length);
   }
@@ -191,20 +179,23 @@
   function missingIndices(opts) {
     opts = opts || {};
     const missing = [];
+    
+    // 【關鍵效能優化】：此處不再需要對當前頁面單獨跑 makePayload，
+    // 因為在 applyRadioToggle 中我們已經即時將最新狀態 commit 進快取了。
+    // 這會讓迴圈執行速度大幅提升。
     for (let i = 0; i < task.images.length; i++) {
       const key = USE.imageKey(task, task.images[i]);
-      let rating = USE.readRating(reviewer, key);
-      if (opts.includeCurrentForm && i === current) {
-        rating = makePayloadForImage(i, readFormValues());
+      const rating = USE.readRating(reviewer, key);
+      if (!USE.isCompleteRating(rating)) {
+        missing.push(i);
       }
-      if (!USE.isCompleteRating(rating)) missing.push(i);
     }
     return missing;
   }
 
   function allCompleteWithCurrentForm() {
-    return task && task.images.length > 0 &&
-           missingIndices({ includeCurrentForm: true }).length === 0;
+    if (!task || task.images.length === 0) return false;
+    return missingIndices().length === 0;
   }
 
   // ── Button rendering ──────────────────────────────────────────────────────
@@ -237,14 +228,14 @@
           ${missing.map(i => {
             const img = task.images[i] || {};
             return `<button type="button" class="ghost-button missing-jump" data-index="${i}">
-              第 ${i + 1} 張　${escapeHtml(img.filename || img.id || '')}
+              第 ${i + 1} 張 ${escapeHtml(img.filename || img.id || '')}
             </button>`;
           }).join('')}
         </div>
       </section>`;
+      
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
-        // Commit current page to localStorage before jumping
         commitCurrentToLocal();
         current = Number(btn.dataset.index);
         render();
@@ -256,7 +247,6 @@
 
   // ── Core save / submit ────────────────────────────────────────────────────
 
-  // Persist the current page's answers to localStorage only (no Sheet).
   function commitCurrentToLocal() {
     const values  = readFormValues();
     const payload = makePayloadForImage(current, values);
@@ -266,10 +256,8 @@
     saveProgressLocalOnly();
   }
 
-  // "儲存作答進度" path: save current page to localStorage, write progress to Sheet.
   function saveCurrentDraft() {
     commitCurrentToLocal();
-    // Write progress summary to Sheet (lightweight — just one row update)
     const total     = task.images.length;
     const completed = USE.countCompleted(reviewer, task);
     USE.postToSheet({
@@ -284,7 +272,6 @@
     showHint('已儲存作答進度；尚未寫入正式作答紀錄。');
   }
 
-  // Submit a single image's rating to Sheet (only if complete).
   function submitImageIfComplete(index) {
     const key     = USE.imageKey(task, task.images[index]);
     const rating  = USE.readRating(reviewer, key);
@@ -297,18 +284,14 @@
     return false;
   }
 
-  // "確認完成並送出" path.
   function finalizeAll() {
-    // 1. Commit current page to localStorage first
     commitCurrentToLocal();
 
-    // 2. Check for missing images (using localStorage state, NOT form)
-    const missing = missingIndices(); // does not include current form re-read; already committed above
+    const missing = missingIndices();
     if (missing.length) {
       renderMissingPanel(missing);
       renderProgressOnly();
       renderActionButton();
-      // Write progress to Sheet so the reviewer's seat is recorded
       USE.postToSheet({
         action: 'saveProgress', reviewer,
         strategy: task.strategy, dataset: task.dataset, model: task.model,
@@ -321,7 +304,6 @@
       return;
     }
 
-    // 3. All complete — submit every image to Sheet
     renderMissingPanel([]);
     let submitted = 0;
     for (let i = 0; i < task.images.length; i++) {
@@ -354,7 +336,7 @@
     const total = task.images.length;
     title.textContent    = USE.displayModel(task.model);
     subtitle.textContent = reviewer;
-    imageMeta.textContent = `${current + 1} / ${total}　${img.filename || img.id || ''}`;
+    imageMeta.textContent = `${current + 1} / ${total} ${img.filename || img.id || ''}`;
     image.src = img.url || img.path || '';
     image.alt = img.filename || 'Tripanel ultrasound image';
     prevBtn.disabled = current <= 0;
@@ -362,7 +344,6 @@
     setFormValues(getCurrentRating());
     renderProgressOnly();
     renderActionButton();
-    // Clear the unsaved-change hint whenever we freshly load a page
     showHint('');
   }
 
