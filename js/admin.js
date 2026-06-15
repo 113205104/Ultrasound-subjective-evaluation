@@ -47,12 +47,14 @@
   }
   function readLocalProgress(reviewer, task) { return getJson(localProgressKey(reviewer), {})[taskKey(task)] || null; }
 
-  // ➔ 放行防線：允許沒選滿 12 格的草稿在任何地方正常讀取還原
+  // ─── 【重要修正 1】鬆綁草稿驗證 ───
+  // 以前限定 1~4 分才算有效；現在只要有資料（不管是草稿還是滿分），
+  // 在讀取與還原階段一律放行，允許前端將草稿撈出來
   function isCompleteRating(r) {
+    if (!r) return false;
     return true; 
   }
 
-  // 確保只有在真正沒有快取時才解析一次硬碟
   function mergedRatings(reviewer) {
     if (!(reviewer in mergedCache) || !mergedCache[reviewer]) {
       mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
@@ -64,24 +66,19 @@
   // 計算完美填滿 12 格的圖片數量 (用來展示給進度條看)
   function countCompleted(reviewer, task) {
     const all = mergedRatings(reviewer);
-    return task.images.filter(img => {
-      const key = imageKey(task, img);
-      const r = all[key];
-      if (!r) return false;
+    return Object.keys(all).filter(k => {
+      if (!k.startsWith(taskKey(task) + '||')) return false;
+      const r = all[k];
+      // 只有在 12 格都有填值的情況下，進度條數字才會往前進
       return ratingKeys().every(keyName => r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '');
     }).length;
   }
 
-  // 進網頁時，依照原本系統預設的機制尋找第一個沒填滿分數的格子
+  // ─── 【重要修正 2】解決不同電腦進度問題 ───
+  // 進網頁時，不要自作聰明去抓前面沒選滿的格子來干擾
+  // 優先遵守在 survey.js 中由雲端 progress 所推薦回傳的最新 currentIndex 位置
   function firstIncompleteIndex(reviewer, task) {
-    const allRatings = mergedRatings(reviewer); 
-    for (let i = 0; i < task.images.length; i++) {
-      const key = imageKey(task, task.images[i]);
-      const r = allRatings[key] || {};
-      const isAllFilled = ratingKeys().every(keyName => r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '');
-      if (!isAllFilled) return i; 
-    }
-    return Math.max(task.images.length - 1, 0);
+    return 0; 
   }
 
   function postToSheet(payload) {
@@ -110,7 +107,8 @@
     return raw.map(task => Object.assign({}, task, { images: Array.isArray(task.images) ? task.images : [] }));
   }
 
-  // ➔ 修正：這裡的呼叫動作名稱確定為唯一的 'loadManifest'
+  // ─── 【重要修正 3】修正動作名稱衝突 ───
+  // 原本呼叫 'getManifest'，但新版 Code.gs 裡面的實作叫 'loadManifest'，在這裡將其拉回一致
   async function loadManifest() {
     if (cfg.manifestSource === 'drive') {
       const data = await jsonp('loadManifest', {});
@@ -122,54 +120,35 @@
     return normalizeManifest(await res.json());
   }
 
-  // 回歸原生盲載，避免不帶 task 參數時的首頁閃退
   async function loadServerRatings(reviewer, task) {
-  const params = { reviewer };
-
-  if (task) {
-    Object.assign(params, {
-      strategy: task.strategy,
-      dataset: task.dataset,
-      model: task.model
-    });
+    const params = { reviewer };
+    if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
+    
+    // 呼叫雲端一鍵載入進度與評分的新接口
+    const data = await jsonp('loadProgressAndRatings', params);
+    const map = {};
+    
+    if (data.success && data.data) {
+      (data.data.ratings || []).forEach(r => {
+        const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
+        map[key] = r;
+      });
+      serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+      
+      // 將雲端最新的 progress 暫存在 localStorage 供初始定位讀取
+      if (data.data.progress) {
+        const progKey = 'use_progress_' + reviewer;
+        const allProg = getJson(progKey, {});
+        allProg[taskKey(task)] = data.data.progress;
+        setJson(progKey, allProg);
+      }
+    }
+    
+    const local = getJson(localRatingsKey(reviewer), {});
+    setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
+    invalidateMergedCache(reviewer);
+    return map;
   }
-
-  const data = await jsonp('listResponses', params);
-
-  const rows =
-    (data && data.data && data.data.rows)
-    || data.rows
-    || [];
-
-  const map = {};
-
-  rows.forEach(r => {
-      const key = [
-        r.strategy,
-        r.dataset,
-        r.model,
-        r.imageId || r.fileId || r.filename
-      ].join('||');
-
-      map[key] = r;
-  });
-
-  serverRatings[reviewer] = Object.assign(
-    serverRatings[reviewer] || {},
-    map
-  );
-
-  const local = getJson(localRatingsKey(reviewer), {});
-
-  setJson(
-    localRatingsKey(reviewer),
-    Object.assign({}, map, local)
-  );
-
-  invalidateMergedCache(reviewer);
-
-  return map;
-}
 
   function populateReviewerSelect(select, includeAll) {
     if (!select) return;
