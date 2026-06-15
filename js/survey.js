@@ -39,6 +39,7 @@
     [prevBtn, nextBtn, saveProgressBtn, finalSubmitBtn].forEach(btn => { if (btn) btn.disabled = flag; });
   }
 
+  // ➔ 修復亮點：確保取得正確的索引物件
   function currentImage() { return images[currentIndex]; }
   function currentKey() { return USE.imageKey(task, currentImage()); }
 
@@ -146,12 +147,17 @@
     updateProgressUI();
   }
 
+  // ➔ 修正與優化亮點：點選儲存後同步上傳雲端，並強刷一次後端紀錄以更新介面
   async function saveCurrentToCloud() {
     const rating = collectRating();
     USE.saveLocalRating(reviewer, currentKey(), rating);
     USE.saveLocalProgress(reviewer, task, currentIndex, images.length);
+    
     await USE.saveServerRating(reviewer, task, currentImage(), rating);
     await USE.saveServerProgress(reviewer, task, currentIndex, images.length);
+    
+    // 強刷以跟最新後端一致，這能即時更新作答紀錄頁面
+    await USE.loadServerRatings(reviewer, task);
     updateProgressUI();
   }
 
@@ -206,6 +212,7 @@
     });
   }
 
+  // ➔ 修正與優化亮點：在按下確認送出時，全量並載所有答案，確保 excel 和作答介面都是最新資料
   async function finalSubmit() {
     if (saving) return;
     USE.saveLocalRating(reviewer, currentKey(), collectRating());
@@ -218,12 +225,19 @@
 
     setBusy(true);
     try {
-      for (let i = 0; i < images.length; i++) {
-        const img = images[i];
+      // 全量上傳：打包全部照片的答案依序或併行寫入 Excel，保證無資料差
+      const uploadPromises = images.map(async (img) => {
         const rating = USE.readRating(reviewer, USE.imageKey(task, img));
-        await USE.saveServerRating(reviewer, task, img, rating);
-      }
+        return USE.saveServerRating(reviewer, task, img, rating);
+      });
+      await Promise.all(uploadPromises);
+      
+      // 更新最後完成狀態
       await USE.saveServerProgress(reviewer, task, currentIndex, images.length);
+      
+      // 送出後立刻重抓資料庫，刷新作答記錄介面
+      await USE.loadServerRatings(reviewer, task);
+      
       showHint('已確認送出：本任務全部作答結果已更新到 responses、progress 與作答紀錄頁。', false);
       updateProgressUI();
     } catch (err) {
