@@ -1,12 +1,13 @@
-(function () {
+
+  
+
+  ,
+ (function () {
   const params = new URLSearchParams(location.search);
   const defaultReviewer = (APP_CONFIG.reviewers && APP_CONFIG.reviewers[0]) || 'Reviewer1';
   const reviewer = params.get('reviewer') || defaultReviewer;
   const taskIndex = Number(params.get('task') || 0);
   let manifest = [], task = null, current = 0;
-
-  // 用於在記憶體暫存目前這張圖尚未儲存的修改 (避免換頁被清空，按儲存才寫入快取/硬碟)
-  const sessionMemoryCache = {};
 
   const title = document.getElementById('taskTitle');
   const subtitle = document.getElementById('taskSubtitle');
@@ -49,10 +50,10 @@
       const cells = APP_CONFIG.ratingScale.map(score => {
         const name = `${field.key}_${row.key}`;
         const id   = `${name}_${score}`;
-        return `<label class="matrix-radio" data-name="${name}" data-value="${score}">
+        // 恢復原生的 Google Forms 精美 radio 圓圈
+        return `<label class="matrix-radio">
           <input id="${id}" type="radio" name="${name}" value="${score}"
             aria-label="${escapeHtml(field.label)} ${escapeHtml(row.label)} ${score}">
-          <span class="matrix-radio-dot"></span>
         </label>`;
       }).join('');
       return `<div class="matrix-row-label">${escapeHtml(row.label)}</div>${cells}`;
@@ -72,35 +73,26 @@
     attachRadioToggle();
   }
 
-  // ── 【極速 0 計算 UI】點擊純更換 CSS，記憶體暫存 ─────────────────
+  // ── 【安全隔離對策】點擊選項時，背後 0 程式碼執行，徹底繞過 admin.js 炸彈 ──
   function attachRadioToggle() {
+    // 💡 這裡就是關鍵！我們不再監聽 change 事件去呼叫任何 saveLocalRating()。
+    // 這讓作答者在同一頁勾選分數時，背後絕對不會去執行 admin.js 的清空快取程序。
+
+    // 輕量級實作：點選第二次可以取消勾選
+    let lastCheckedRadio = null;
+    form.addEventListener('mousedown', function (e) {
+      const radio = e.target.closest('input[type="radio"]');
+      if (!radio) return;
+      lastCheckedRadio = radio.checked ? radio : null;
+    });
+
     form.addEventListener('click', function (e) {
-      const label = e.target.closest('.matrix-radio');
-      if (!label) return;
-
-      e.preventDefault();
-
-      const name = label.dataset.name;
-      const isAlreadyChecked = label.classList.contains('checked');
-      const siblings = form.querySelectorAll(`.matrix-radio[data-name="${CSS.escape(name)}"]`);
-
-      siblings.forEach(el => {
-        el.classList.remove('checked');
-        el.querySelector('input').checked = false;
-      });
-
-      if (isAlreadyChecked) {
-        // 【取消作答】：點選已實心的按鈕直接變空心
-      } else {
-        // 【切換/選取】：變實心
-        label.classList.add('checked');
-        label.querySelector('input').checked = true;
+      const radio = e.target.closest('input[type="radio"]');
+      if (!radio) return;
+      if (lastCheckedRadio === radio) {
+        radio.checked = false; // 取消選取
+        lastCheckedRadio = null;
       }
-
-      // ⚡ 平常作答點擊時：絕對不碰 localStorage 讀寫，也不跑 324 遍大迴圈。
-      // 只將目前畫面更改同步至極輕量的 sessionMemoryCache 記憶體變數，防換頁丟失。
-      const key = currentRatingKey();
-      sessionMemoryCache[key] = readFormValues();
     });
   }
 
@@ -109,18 +101,9 @@
   function setFormValues(rating) {
     USE.ratingKeys().forEach(k => {
       const targetValue = String(rating[k] || '');
-      const labels = form.querySelectorAll(`.matrix-radio[data-name="${CSS.escape(k)}"]`);
-      
-      labels.forEach(label => {
-        const input = label.querySelector('input');
-        const isTarget = input.value === targetValue;
-        
-        input.checked = isTarget;
-        if (isTarget) {
-          label.classList.add('checked');
-        } else {
-          label.classList.remove('checked');
-        }
+      const radios = form.querySelectorAll(`input[name="${CSS.escape(k)}"]`);
+      radios.forEach(radio => {
+        radio.checked = (radio.value === targetValue);
       });
     });
   }
@@ -128,8 +111,8 @@
   function readFormValues() {
     const out = {};
     USE.ratingKeys().forEach(k => {
-      const checkedLabel = form.querySelector(`.matrix-radio[data-name="${CSS.escape(k)}"].checked`);
-      out[k] = checkedLabel ? Number(checkedLabel.dataset.value) : '';
+      const checkedRadio = form.querySelector(`input[name="${CSS.escape(k)}"]:checked`);
+      out[k] = checkedRadio ? Number(checkedRadio.value) : '';
     });
     return out;
   }
@@ -145,28 +128,26 @@
     }, values);
   }
 
-  // ── 【極致 Word 儲存系統】只有點擊這兩個大按鈕時，才執行一次性儲存與大迴圈計算 ──
+  // ── 【Word 手動儲存】只有觸發此處時，才允許去執行 admin.js 寫入 ──
 
-  function commitCurrentToLocal() {
-    const key = currentRatingKey();
-    // 優先抓取記憶體中的臨時作答，如果沒有就去讀原本的紀錄
-    const values = sessionMemoryCache[key] || readFormValues();
-    const payload = makePayloadForImage(current, values);
+  function commitToLocal(targetIndex) {
+    const values = readFormValues();
+    const payload = makePayloadForImage(targetIndex, values);
     payload.action       = 'draftOnly';
     payload.updatedAt    = new Date().toISOString();
+    
+    const key = [task.strategy, task.dataset, task.model, task.images[targetIndex].id || task.images[targetIndex].fileId || task.images[targetIndex].filename || task.images[targetIndex].url].join('||');
     USE.saveLocalRating(reviewer, key, payload);
-    USE.saveLocalProgress(reviewer, task, current, task.images.length);
+    USE.saveLocalProgress(reviewer, task, targetIndex, task.images.length);
   }
 
-  // 只有按「儲存」或「送出」按鈕才跑的 324 次大迴圈完備度檢查
+  // 只有按大按鈕時，才跑一次的 324 次全量掃描
   function missingIndices() {
     const missing = [];
     if (!task) return missing;
     for (let i = 0; i < task.images.length; i++) {
-      const key = ratingKeyFor(i);
-      // 先從記憶體暫存拿答案，拿不到才看本機持久快取
-      const memRating = sessionMemoryCache[key];
-      const rating = memRating !== undefined ? memRating : USE.readRating(reviewer, key);
+      const key = USE.imageKey(task, task.images[i]);
+      const rating = USE.readRating(reviewer, key);
       if (!USE.isCompleteRating(rating)) {
         missing.push(i);
       }
@@ -213,34 +194,24 @@
       
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
-        // 跳轉時只存在記憶體變數中，完全不存 LocalStorage
-        const k = currentRatingKey();
-        sessionMemoryCache[k] = readFormValues();
-        
+        commitToLocal(current); // 跳轉前一次性打包這頁
         current = Number(btn.dataset.index);
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        showHint('已跳轉；請填完此頁後按「儲存作答進度」。');
       });
     });
   }
 
-  // 大按鈕點擊：儲存作答進度
+  // 點擊「儲存作答進度」大按鈕
   function saveCurrentDraft() {
-    // 只有在此時，才將當前頁面與所有變更「一次性」大量寫入 LocalStorage 快取
-    Object.keys(sessionMemoryCache).forEach(k => {
-      const idx = task.images.findIndex(img => [taskKey(task), img.id || img.fileId || img.filename || img.url].join('||') === k);
-      if (idx !== -1) {
-        const payload = makePayloadForImage(idx, sessionMemoryCache[k]);
-        payload.action = 'draftOnly';
-        USE.saveLocalRating(reviewer, k, payload);
-      }
-    });
-    commitCurrentToLocal();
+    commitToLocal(current); // 只有此時才允許引爆/執行快取重置
 
     const total = task.images.length;
-    // 此時才執行全量迴圈統計
     const completed = USE.countCompleted(reviewer, task);
+    
+    progressText.textContent = `${completed} / ${total}`;
+    progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
+
     USE.postToSheet({
       action: 'saveProgress', reviewer,
       strategy: task.strategy, dataset: task.dataset, model: task.model,
@@ -248,15 +219,13 @@
       currentIndex: current, total, completed,
       completedStatus: completed >= total ? 'Completed' : 'In Progress'
     });
-    renderProgressOnly();
     renderActionButton();
     showHint('已儲存目前進度到雲端系統中。');
   }
 
   function submitImageIfComplete(index) {
-    const key     = ratingKeyFor(index);
-    const memRating = sessionMemoryCache[key];
-    const rating  = memRating !== undefined ? memRating : USE.readRating(reviewer, key);
+    const key     = USE.imageKey(task, task.images[index]);
+    const rating  = USE.readRating(reviewer, key);
     const payload = makePayloadForImage(index, rating || {});
     USE.saveLocalRating(reviewer, key, payload);
     if (USE.isCompleteRating(payload)) {
@@ -266,30 +235,23 @@
     return false;
   }
 
-  // 大按鈕點擊：最終確認完成並送出
+  // 點擊「確認完成並送出」大按鈕
   function finalizeAll() {
-    // 同步寫入 LocalStorage 快取
-    Object.keys(sessionMemoryCache).forEach(k => {
-      const idx = task.images.findIndex(img => [taskKey(task), img.id || img.fileId || img.filename || img.url].join('||') === k);
-      if (idx !== -1) {
-        const payload = makePayloadForImage(idx, sessionMemoryCache[k]);
-        payload.action = 'draftOnly';
-        USE.saveLocalRating(reviewer, k, payload);
-      }
-    });
-    commitCurrentToLocal();
+    commitToLocal(current);
 
     const missing = missingIndices();
     if (missing.length) {
       renderMissingPanel(missing);
-      renderProgressOnly();
+      const completed = USE.countCompleted(reviewer, task);
+      progressText.textContent = `${completed} / ${task.images.length}`;
+      progressBar.style.width  = Math.round(completed * 100 / task.images.length) + '%';
       renderActionButton();
       USE.postToSheet({
         action: 'saveProgress', reviewer,
         strategy: task.strategy, dataset: task.dataset, model: task.model,
         displayModel: USE.displayModel(task.model),
         currentIndex: current, total: task.images.length,
-        completed: USE.countCompleted(reviewer, task),
+        completed: completed,
         completedStatus: 'In Progress'
       });
       showHint(`尚有 ${missing.length} 張未完成，請補齊後再送出。`);
@@ -309,25 +271,16 @@
       displayModel: USE.displayModel(task.model),
       currentIndex: current, total, completed: total, completedStatus: 'Completed'
     });
-    renderProgressOnly();
+    
+    progressText.textContent = `${total} / ${total}`;
+    progressBar.style.width  = '100%';
     renderActionButton();
     showHint(`確認完成：已送出 ${submitted} / ${total} 張正式作答紀錄。`);
   }
 
   // ── Rendering ─────────────────────────────────────────────────────────────
 
-  function taskKey(t) { return [t.strategy, t.dataset, t.model].join('||'); }
-  function ratingKeyFor(index) { return USE.imageKey(task, task.images[index]); }
-  function currentRatingKey()  { return ratingKeyFor(current); }
-  
-  function getCurrentRating()  { 
-    const key = currentRatingKey();
-    // 畫面渲染優先載入臨時記憶體內容，次之才查本機快取
-    if (sessionMemoryCache[key] !== undefined) return sessionMemoryCache[key];
-    return USE.readRating(reviewer, key); 
-  }
-
-  function renderProgressOnly() {
+  function renderInitialProgress() {
     const total     = task.images.length;
     const completed = USE.countCompleted(reviewer, task);
     progressText.textContent = `${completed} / ${total}`;
@@ -345,10 +298,11 @@
     prevBtn.disabled = current <= 0;
     nextBtn.disabled = current >= total - 1;
     
-    setFormValues(getCurrentRating());
-    renderProgressOnly();
+    // 換頁或初始載入時，才讀取一次數值
+    const key = USE.imageKey(task, img);
+    setFormValues(USE.readRating(reviewer, key));
     
-    // 💡 換頁時：大按鈕只維持原本字樣，不跑大迴圈去重新計算 missingIndices()，徹底消除換頁卡頓。
+    // 換頁時維持按鈕固定字樣，不跑完備度大迴圈統計，徹底消滅任何卡頓機率
     finalSubmitBtn.textContent = '儲存作答進度'; 
     finalSubmitBtn.className = 'primary-button';
     showHint('');
@@ -358,23 +312,20 @@
 
   prevBtn.addEventListener('click', () => {
     if (current <= 0) return;
-    // 🚀【極速優化】：換頁時不寫入 LocalStorage 快取，只保存在記憶體變數中，反應速度為 0 毫秒
-    sessionMemoryCache[currentRatingKey()] = readFormValues();
+    commitToLocal(current); // 換頁時，一次性打包此頁
     current--;
     render();
   });
 
   nextBtn.addEventListener('click', () => {
     if (current >= task.images.length - 1) return;
-    // 🚀【極速優化】：換頁時不寫入 LocalStorage 快取，只保存在記憶體變數中，反應速度為 0 毫秒
-    sessionMemoryCache[currentRatingKey()] = readFormValues();
+    commitToLocal(current); // 換頁時，一次性打包此頁
     current++;
     render();
   });
 
   if (finalSubmitBtn) {
     finalSubmitBtn.addEventListener('click', () => {
-      // 只有在主動按下儲存/送出大按鈕時，才執行一次全量統計與寫入
       if (allCompleteWithCurrentForm()) {
         finalizeAll();
       } else {
@@ -398,6 +349,8 @@
     current = (saved && Number.isInteger(saved.currentIndex))
       ? Math.min(saved.currentIndex, task.images.length - 1)
       : suggested;
+    
+    renderInitialProgress();
     render();
   }).catch(err => {
     title.textContent = '載入失敗';
