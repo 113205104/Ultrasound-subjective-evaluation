@@ -80,8 +80,8 @@
       </section>
     `).join('');
 
-    // 簡化作答：使用瀏覽器原生 radio 行為。
-    // 已移除「再次點擊同一選項可取消」功能，避免快速點選時卡頓或誤取消。
+    // 簡化作答：使用原生 radio 行為。
+    // 點一次就是選取；不再支援再次點擊取消，避免快速作答時卡頓或誤清除。
     form.addEventListener('change', e => {
       if (!e.target.matches('input[type="radio"]')) return;
       USE.saveLocalRating(reviewer, currentKey(), collectRating());

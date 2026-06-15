@@ -23,23 +23,34 @@
     return escapeHtml(v);
   }
 
-  function matrixHtml(r) {
-    return '<div class="matrix-history">' + APP_CONFIG.ratingFields.map(f => {
-      const rows = APP_CONFIG.tripanelRows.map(row => {
-        const key = `${f.key}_${row.key}`;
-        return `<div>${escapeHtml(row.label)}</div><div>${scoreValue(r, key)}</div>`;
-      }).join('');
+  function questionNoFromRow(r, fallbackIndex) {
+    if (r.questionNo !== undefined && r.questionNo !== null && r.questionNo !== '') return r.questionNo;
+    const text = String(r.filename || r.imageId || '');
+    const m = text.match(/_(\d+)(?:\.[^.]+)?$/);
+    return m ? m[1] : String(fallbackIndex + 1);
+  }
 
-      return `
-        <div class="matrix-history-block">
-          <div class="matrix-history-title">${escapeHtml(f.label)}</div>
-          <div class="matrix-history-grid">
-            <div class="head">影像</div>
-            <div class="head">分數</div>
-            ${rows}
-          </div>
-        </div>`;
-    }).join('') + '</div>';
+  function imageLink(r) {
+    return r.imageLink || r.webViewUrl || r.imageUrl || '';
+  }
+
+  function matrixHtml(r) {
+    const shortName = {
+      whole_quality: 'Whole',
+      noise_suppression: 'Noise',
+      contrast: 'Contrast',
+      edge_sharpness: 'Edge'
+    };
+    const head = APP_CONFIG.tripanelRows.map(row => `<div class="head">${escapeHtml(row.key)}</div>`).join('');
+    const rows = APP_CONFIG.ratingFields.map(f => {
+      const scores = APP_CONFIG.tripanelRows.map(row => scoreValue(r, `${f.key}_${row.key}`)).join('');
+      return `<div class="score-label">${escapeHtml(shortName[f.key] || f.label)}</div>${scores}`;
+    }).join('');
+    return `
+      <div class="score-table">
+        <div class="head">項目</div>${head}
+        ${rows}
+      </div>`;
   }
 
   function renderRows(rows) {
@@ -55,7 +66,7 @@
       card.className = 'form-card history-card';
 
       card.innerHTML = `
-        <h2>題號 ${index + 1}　${escapeHtml(r.displayModel || USE.displayModel(r.model))}</h2>
+        <h2>題號 ${escapeHtml(questionNoFromRow(r, index))}　${escapeHtml(r.displayModel || USE.displayModel(r.model))}</h2>
         <p class="muted">
           Reviewer：${escapeHtml(r.reviewer || '')}
           ｜ Strategy：${escapeHtml(r.strategy || '')}
@@ -63,8 +74,8 @@
           ｜ Model：${escapeHtml(r.model || '')}
         </p>
         <p class="muted">檔名：${escapeHtml(r.filename || r.imageId || '')}</p>
-        <p class="muted">時間：${escapeHtml(r.timestamp || '')}</p>
-        ${r.imageUrl ? `<img src="${escapeHtml(r.imageUrl)}" alt="${escapeHtml(r.filename || 'Tripanel ultrasound image')}">` : ''}
+        <p class="muted">最後修改時間：${escapeHtml(r.timestamp || '')}</p>
+        ${imageLink(r) ? `<p><a class="image-link" href="${escapeHtml(imageLink(r))}" target="_blank" rel="noopener">查看圖片</a></p>` : ''}
         ${matrixHtml(r)}
       `;
 

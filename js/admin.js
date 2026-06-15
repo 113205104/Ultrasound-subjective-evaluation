@@ -17,6 +17,16 @@
   function imageKey(task, image) { return [taskKey(task), imageStableId(image)].join('||'); }
   function displayModel(model) { return (cfg.modelDisplayMap && cfg.modelDisplayMap[model]) || model; }
 
+  function questionNoFromImage(image) {
+    if (!image) return '';
+    if (image.questionNo !== undefined && image.questionNo !== null && image.questionNo !== '') return image.questionNo;
+    if (image.number !== undefined && image.number !== null && image.number !== '') return image.number;
+    const text = String(image.filename || image.id || '');
+    const m = text.match(/_(\d+)(?:\.[^.]+)?$/);
+    return m ? m[1] : '';
+  }
+
+
   function ratingKeys() {
     const rows = cfg.tripanelRows || [{ key: '1' }, { key: '2' }, { key: '3' }];
     return (cfg.ratingFields || []).flatMap(f => rows.map(r => `${f.key}_${r.key}`));
@@ -167,7 +177,9 @@
       imageId: imageStableId(image),
       fileId: image.fileId || '',
       filename: image.filename || imageStableId(image),
-      imageUrl: image.url || image.imageUrl || ''
+      imageUrl: image.url || image.imageUrl || '',
+      imageLink: image.webViewUrl || image.imageLink || image.url || image.imageUrl || '',
+      questionNo: questionNoFromImage(image)
     };
     ratingKeys().forEach(k => { payload[k] = rating[k] === undefined || rating[k] === null ? '' : rating[k]; });
     return payload;
@@ -227,6 +239,6 @@
     saveLocalProgress, readLocalProgress, countCompleted, firstIncompleteIndex,
     isCompleteRating, postToSheet, jsonp, loadManifest, loadServerRatings,
     saveServerRating, saveServerProgress, buildRatingPayload,
-    populateReviewerSelect
+    populateReviewerSelect, questionNoFromImage
   };
 })();
