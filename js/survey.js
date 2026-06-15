@@ -5,7 +5,6 @@
   const taskIndex = Number(params.get('task') || 0);
   let manifest = [], task = null, current = 0;
 
-  // 核心草稿記憶體：暫存當前瀏覽器畫面的作答狀態，不論是否有填滿
   let localMemoryDraft = {}; 
 
   const title = document.getElementById('taskTitle');
@@ -33,8 +32,6 @@
     saveHint.textContent = message || '';
   }
 
-  // ── Form building ─────────────────────────────────────────────────────────
-
   function buildMatrixQuestion(field) {
     const section = document.createElement('section');
     section.className = 'form-card question-card matrix-card';
@@ -58,15 +55,12 @@
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
     
-    // 當使用者在畫面上勾選時，即時更新至記憶體，絕不拖慢操作速度
     form.addEventListener('change', () => {
       const currentValues = readFormValues();
       const imgKey = task.images[current].id || task.images[current].filename;
       localMemoryDraft[imgKey] = currentValues;
     });
   }
-
-  // ── Value conversion ──────────────────────────────────────────────────────
 
   function setFormValues(rating) {
     USE.ratingKeys().forEach(k => {
@@ -96,12 +90,9 @@
     }, values);
   }
 
-  // ── 【重要改善】強制作答與目前題號同步至雲端（不阻擋未完成項目） ──
-
   async function saveAllToCloud(isFinal = false) {
     showHint('正在同步作答進度與紀錄至雲端試算表...');
     
-    // 將目前畫面最新值收進快取
     const currentValues = readFormValues();
     const currentImgKey = task.images[current].id || task.images[current].filename;
     localMemoryDraft[currentImgKey] = currentValues;
@@ -109,13 +100,10 @@
     let savedCount = 0;
     const promises = [];
 
-    // 掃描全部任務影像
     task.images.forEach((img, idx) => {
       const imgKey = img.id || img.filename;
       if (localMemoryDraft[imgKey]) {
         const ratingData = localMemoryDraft[imgKey];
-        
-        // 移除 isCompleteRating 限制：不管是填 1 格還是 12 格，一律打包強推上傳雲端
         const payload = makePayloadForImage(idx, ratingData);
         
         const storageKey = [task.strategy, task.dataset, task.model, imgKey].join('||');
@@ -126,18 +114,8 @@
       }
     });
 
-    // 計算真正「填滿 12 格」的總數，以此為標準刷新 UI 進度條
-    let completedCount = 0;
-    task.images.forEach(img => {
-      const imgKey = img.id || img.filename;
-      const r = localMemoryDraft[imgKey];
-      if (r) {
-        const isAllFilled = USE.ratingKeys().every(k => r[k] !== undefined && r[k] !== '');
-        if (isAllFilled) completedCount++;
-      }
-    });
+    let completedCount = USE.countCompleted(reviewer, task);
 
-    // 【改善不同電腦進度】直接將目前所在的 current 題號綁定 Reviewer 寫入雲端的 progress 表
     promises.push(USE.postToSheet({
       action: 'saveProgress', reviewer,
       strategy: task.strategy, dataset: task.dataset, model: task.model,
@@ -156,15 +134,13 @@
     }
   }
 
-  // ── Missing scan ──────────────────────────────────────────────────────────
-
   function missingIndices() {
     const missing = [];
     if (!task) return missing;
     for (let i = 0; i < task.images.length; i++) {
       const imgKey = task.images[i].id || task.images[i].filename;
       const rating = localMemoryDraft[imgKey] || {};
-      const isAllFilled = USE.ratingKeys().every(k => rating[k] !== undefined && rating[k] !== '');
+      const isAllFilled = USE.ratingKeys().every(k => rating[k] !== undefined && rating[k] !== null && rating[k] !== '');
       if (!isAllFilled) {
         missing.push(i);
       }
@@ -213,8 +189,6 @@
     }
   }
 
-  // ── Rendering ─────────────────────────────────────────────────────────────
-
   function render() {
     const img   = task.images[current];
     const total = task.images.length;
@@ -226,7 +200,6 @@
     prevBtn.disabled = current <= 0;
     nextBtn.disabled = current >= total - 1;
 
-    // 當切換到最後一張影像時，右下角動態代換成確認送出
     if (current >= total - 1) {
       saveProgressBtn.style.display = 'none';
       finalSubmitBtn.style.display = 'inline-block';
@@ -235,7 +208,6 @@
       finalSubmitBtn.style.display = 'none';
     }
     
-    // 優先從本地記憶體草稿讀取，次之則用雲端初始化下載的歷史，保證換頁時不遺失剛點的內容
     const imgKey = img.id || img.filename;
     if (localMemoryDraft[imgKey]) {
       setFormValues(localMemoryDraft[imgKey]);
@@ -245,8 +217,6 @@
     }
     showHint('');
   }
-
-  // ── Navigation ────────────────────────────────────────────────────────────
 
   prevBtn.addEventListener('click', () => {
     if (current <= 0) return;
@@ -265,18 +235,14 @@
   saveProgressBtn.addEventListener('click', () => saveAllToCloud(false));
   finalSubmitBtn.addEventListener('click', handleFinalSubmit);
 
-  // ── Init ──────────────────────────────────────────────────────────────────
-
   buildForm();
 
   USE.loadManifest().then(async m => {
     manifest = m;
     task = manifest[taskIndex];
     
-    // 1. 同步從遠端試算表完整拉取該 Reviewer 已作答的所有 responses 紀錄
     await USE.loadServerRatings(reviewer, task);
     
-    // 2. 將已下載的紀錄填滿記憶體暫存
     task.images.forEach(img => {
       const skey = USE.imageKey(task, img);
       const serverRating = USE.readRating(reviewer, skey);
@@ -285,25 +251,15 @@
       }
     });
 
-    // 3. 【核心改善不同電腦進度】讀取雲端 progress 所推薦回傳的最新位置 (而不是由本地 localStorage 綁定)
+    // 🟢 這裡修正為：優先從雲端 progress 抓取上次最後儲存的 current 題號
     const saved = USE.readLocalProgress(reviewer, task); 
-    if (saved && Number.isInteger(saved.currentIndex)) {
+    if (saved && typeof saved.currentIndex === 'number') {
       current = Math.min(saved.currentIndex, task.images.length - 1);
     } else {
-      const suggested = USE.firstIncompleteIndex(reviewer, task);
-      current = suggested >= 0 ? suggested : 0;
+      current = 0;
     }
     
-    // 刷新進度條
-    let completedCount = 0;
-    task.images.forEach(img => {
-      const imgKey = img.id || img.filename;
-      const r = localMemoryDraft[imgKey];
-      if (r) {
-        const isAllFilled = USE.ratingKeys().every(k => r[k] !== undefined && r[k] !== '');
-        if (isAllFilled) completedCount++;
-      }
-    });
+    let completedCount = USE.countCompleted(reviewer, task);
     progressText.textContent = `${completedCount} / ${task.images.length}`;
     progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
     
