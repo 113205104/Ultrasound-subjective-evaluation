@@ -15,14 +15,14 @@
       <p id="taskSubtitle"></p>
       <div class="progress-wrap">
         <div class="progress-text" id="progressText">0 / 0</div>
-        <div class="progress-bar"><div id="progressBar" class="progress-fill"></div></div>
+        <div class="progress-bar"><div id=\"progressBar\" class=\"progress-fill\"></div></div>
       </div>
     </section>
 
     <section class="form-card image-card">
       <div class="image-meta" id="imageMeta"></div>
       <img id="tripanelImage" class="tripanel" alt="Tripanel ultrasound image" />
-     <div class="nav-row">
+      <div class="nav-row">
         <button id="prevBtn" class="ghost-button" type="button">上一張</button>
         <button id="saveProgressBtn" class="primary-button" style="background-color: #2196F3;" type="button">💾 儲存目前進度</button>
         <button id="finalSubmitBtn" class="primary-button" style="background-color: #4CAF50; display: none;" type="button">🚀 確認完成並送出</button>
@@ -33,7 +33,7 @@
 
     <div id="missingPanel" hidden></div>
 
-    <form id="ratingForm" class="rating-form" aria-label="Tripanel rating form"></form>
+    <form id="ratingForm" onsubmit="return false;"></form>
   </main>
 
   <script src="js/config.js"></script>
