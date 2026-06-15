@@ -5,6 +5,9 @@
   const taskIndex = Number(params.get('task') || 0);
   let manifest = [], task = null, current = 0;
 
+  // 用於在記憶體暫存目前這張圖尚未儲存的修改 (避免換頁被清空，按儲存才寫入快取/硬碟)
+  const sessionMemoryCache = {};
+
   const title = document.getElementById('taskTitle');
   const subtitle = document.getElementById('taskSubtitle');
   const progressText = document.getElementById('progressText');
@@ -46,10 +49,10 @@
       const cells = APP_CONFIG.ratingScale.map(score => {
         const name = `${field.key}_${row.key}`;
         const id   = `${name}_${score}`;
-        // 回歸最乾淨的標準 HTML 結構，不帶任何自訂點擊包裝
-        return `<label class="matrix-radio" for="${id}">
+        return `<label class="matrix-radio" data-name="${name}" data-value="${score}">
           <input id="${id}" type="radio" name="${name}" value="${score}"
             aria-label="${escapeHtml(field.label)} ${escapeHtml(row.label)} ${score}">
+          <span class="matrix-radio-dot"></span>
         </label>`;
       }).join('');
       return `<div class="matrix-row-label">${escapeHtml(row.label)}</div>${cells}`;
@@ -69,44 +72,64 @@
     attachRadioToggle();
   }
 
-  // ── 【極簡高效】純原生 Radio 變更事件 ──────────────────────────────────────────
+  // ── 【極速 0 計算 UI】點擊純更換 CSS，記憶體暫存 ─────────────────
   function attachRadioToggle() {
-    // 徹底拋棄 click 攔截，改用瀏覽器效能最好的原生 change 事件（只在選項真正改變時觸發）
-    form.addEventListener('change', function (e) {
-      if (!e.target.matches('input[type="radio"]')) return;
+    form.addEventListener('click', function (e) {
+      const label = e.target.closest('.matrix-radio');
+      if (!label) return;
 
-      // 0毫秒極速寫入記憶體快取
-      const values = readFormValues();
-      const payload = makePayloadForImage(current, values);
-      payload.action = 'draftOnly';
-      USE.saveLocalRating(reviewer, currentRatingKey(), payload);
-      
-      // 點選分數時，絕對不呼叫任何大迴圈或按鈕更新，保持極致流暢
+      e.preventDefault();
+
+      const name = label.dataset.name;
+      const isAlreadyChecked = label.classList.contains('checked');
+      const siblings = form.querySelectorAll(`.matrix-radio[data-name="${CSS.escape(name)}"]`);
+
+      siblings.forEach(el => {
+        el.classList.remove('checked');
+        el.querySelector('input').checked = false;
+      });
+
+      if (isAlreadyChecked) {
+        // 【取消作答】：點選已實心的按鈕直接變空心
+      } else {
+        // 【切換/選取】：變實心
+        label.classList.add('checked');
+        label.querySelector('input').checked = true;
+      }
+
+      // ⚡ 平常作答點擊時：絕對不碰 localStorage 讀寫，也不跑 324 遍大迴圈。
+      // 只將目前畫面更改同步至極輕量的 sessionMemoryCache 記憶體變數，防換頁丟失。
+      const key = currentRatingKey();
+      sessionMemoryCache[key] = readFormValues();
     });
   }
 
-  // ── Rating data helpers ───────────────────────────────────────────────────
-
-  function ratingKeyFor(index) { return USE.imageKey(task, task.images[index]); }
-  function currentRatingKey()  { return ratingKeyFor(current); }
-  function getCurrentRating()  { return USE.readRating(reviewer, currentRatingKey()); }
+  // ── 畫面值與答案物件轉換 ─────────────────────────────────────────────────
 
   function setFormValues(rating) {
     USE.ratingKeys().forEach(k => {
-      const inputs = form.querySelectorAll(`input[name="${CSS.escape(k)}"]`);
       const targetValue = String(rating[k] || '');
-      inputs.forEach(el => {
-        el.checked = el.value === targetValue;
+      const labels = form.querySelectorAll(`.matrix-radio[data-name="${CSS.escape(k)}"]`);
+      
+      labels.forEach(label => {
+        const input = label.querySelector('input');
+        const isTarget = input.value === targetValue;
+        
+        input.checked = isTarget;
+        if (isTarget) {
+          label.classList.add('checked');
+        } else {
+          label.classList.remove('checked');
+        }
       });
     });
   }
 
-  // ── 讀取目前的選項值 ────────────────────────────────────────────────────────
   function readFormValues() {
     const out = {};
     USE.ratingKeys().forEach(k => {
-      const checked = form.querySelector(`input[name="${CSS.escape(k)}"]:checked`);
-      out[k] = checked ? Number(checked.value) : '';
+      const checkedLabel = form.querySelector(`.matrix-radio[data-name="${CSS.escape(k)}"].checked`);
+      out[k] = checkedLabel ? Number(checkedLabel.dataset.value) : '';
     });
     return out;
   }
@@ -122,18 +145,28 @@
     }, values);
   }
 
-  function saveProgressLocalOnly() {
+  // ── 【極致 Word 儲存系統】只有點擊這兩個大按鈕時，才執行一次性儲存與大迴圈計算 ──
+
+  function commitCurrentToLocal() {
+    const key = currentRatingKey();
+    // 優先抓取記憶體中的臨時作答，如果沒有就去讀原本的紀錄
+    const values = sessionMemoryCache[key] || readFormValues();
+    const payload = makePayloadForImage(current, values);
+    payload.action       = 'draftOnly';
+    payload.updatedAt    = new Date().toISOString();
+    USE.saveLocalRating(reviewer, key, payload);
     USE.saveLocalProgress(reviewer, task, current, task.images.length);
   }
 
-  // ── Missing-image helpers ─────────────────────────────────────────────────
-
+  // 只有按「儲存」或「送出」按鈕才跑的 324 次大迴圈完備度檢查
   function missingIndices() {
     const missing = [];
     if (!task) return missing;
     for (let i = 0; i < task.images.length; i++) {
-      const key = USE.imageKey(task, task.images[i]);
-      const rating = USE.readRating(reviewer, key);
+      const key = ratingKeyFor(i);
+      // 先從記憶體暫存拿答案，拿不到才看本機持久快取
+      const memRating = sessionMemoryCache[key];
+      const rating = memRating !== undefined ? memRating : USE.readRating(reviewer, key);
       if (!USE.isCompleteRating(rating)) {
         missing.push(i);
       }
@@ -146,8 +179,6 @@
     return missingIndices().length === 0;
   }
 
-  // ── Button rendering ──────────────────────────────────────────────────────
-
   function renderActionButton() {
     if (!finalSubmitBtn || !task) return;
     if (allCompleteWithCurrentForm()) {
@@ -157,8 +188,6 @@
     }
     finalSubmitBtn.className = 'primary-button';
   }
-
-  // ── Missing panel ─────────────────────────────────────────────────────────
 
   function renderMissingPanel(missing) {
     if (!missingPanel) return;
@@ -184,7 +213,10 @@
       
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
-        commitCurrentToLocal();
+        // 跳轉時只存在記憶體變數中，完全不存 LocalStorage
+        const k = currentRatingKey();
+        sessionMemoryCache[k] = readFormValues();
+        
         current = Number(btn.dataset.index);
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -193,20 +225,21 @@
     });
   }
 
-  // ── Core save / submit ────────────────────────────────────────────────────
-
-  function commitCurrentToLocal() {
-    const values  = readFormValues();
-    const payload = makePayloadForImage(current, values);
-    payload.action       = 'draftOnly';
-    payload.updatedAt    = new Date().toISOString();
-    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
-    saveProgressLocalOnly();
-  }
-
+  // 大按鈕點擊：儲存作答進度
   function saveCurrentDraft() {
+    // 只有在此時，才將當前頁面與所有變更「一次性」大量寫入 LocalStorage 快取
+    Object.keys(sessionMemoryCache).forEach(k => {
+      const idx = task.images.findIndex(img => [taskKey(task), img.id || img.fileId || img.filename || img.url].join('||') === k);
+      if (idx !== -1) {
+        const payload = makePayloadForImage(idx, sessionMemoryCache[k]);
+        payload.action = 'draftOnly';
+        USE.saveLocalRating(reviewer, k, payload);
+      }
+    });
     commitCurrentToLocal();
-    const total     = task.images.length;
+
+    const total = task.images.length;
+    // 此時才執行全量迴圈統計
     const completed = USE.countCompleted(reviewer, task);
     USE.postToSheet({
       action: 'saveProgress', reviewer,
@@ -216,13 +249,14 @@
       completedStatus: completed >= total ? 'Completed' : 'In Progress'
     });
     renderProgressOnly();
-    renderActionButton(); // 點擊儲存進度大按鈕時，才更新按鈕文字
-    showHint('已儲存作答進度；尚未寫入正式作答紀錄。');
+    renderActionButton();
+    showHint('已儲存目前進度到雲端系統中。');
   }
 
   function submitImageIfComplete(index) {
-    const key     = USE.imageKey(task, task.images[index]);
-    const rating  = USE.readRating(reviewer, key);
+    const key     = ratingKeyFor(index);
+    const memRating = sessionMemoryCache[key];
+    const rating  = memRating !== undefined ? memRating : USE.readRating(reviewer, key);
     const payload = makePayloadForImage(index, rating || {});
     USE.saveLocalRating(reviewer, key, payload);
     if (USE.isCompleteRating(payload)) {
@@ -232,7 +266,17 @@
     return false;
   }
 
+  // 大按鈕點擊：最終確認完成並送出
   function finalizeAll() {
+    // 同步寫入 LocalStorage 快取
+    Object.keys(sessionMemoryCache).forEach(k => {
+      const idx = task.images.findIndex(img => [taskKey(task), img.id || img.fileId || img.filename || img.url].join('||') === k);
+      if (idx !== -1) {
+        const payload = makePayloadForImage(idx, sessionMemoryCache[k]);
+        payload.action = 'draftOnly';
+        USE.saveLocalRating(reviewer, k, payload);
+      }
+    });
     commitCurrentToLocal();
 
     const missing = missingIndices();
@@ -272,6 +316,17 @@
 
   // ── Rendering ─────────────────────────────────────────────────────────────
 
+  function taskKey(t) { return [t.strategy, t.dataset, t.model].join('||'); }
+  function ratingKeyFor(index) { return USE.imageKey(task, task.images[index]); }
+  function currentRatingKey()  { return ratingKeyFor(current); }
+  
+  function getCurrentRating()  { 
+    const key = currentRatingKey();
+    // 畫面渲染優先載入臨時記憶體內容，次之才查本機快取
+    if (sessionMemoryCache[key] !== undefined) return sessionMemoryCache[key];
+    return USE.readRating(reviewer, key); 
+  }
+
   function renderProgressOnly() {
     const total     = task.images.length;
     const completed = USE.countCompleted(reviewer, task);
@@ -289,9 +344,13 @@
     image.alt = img.filename || 'Tripanel ultrasound image';
     prevBtn.disabled = current <= 0;
     nextBtn.disabled = current >= total - 1;
+    
     setFormValues(getCurrentRating());
     renderProgressOnly();
-    renderActionButton(); // 換頁時更新大按鈕狀態
+    
+    // 💡 換頁時：大按鈕只維持原本字樣，不跑大迴圈去重新計算 missingIndices()，徹底消除換頁卡頓。
+    finalSubmitBtn.textContent = '儲存作答進度'; 
+    finalSubmitBtn.className = 'primary-button';
     showHint('');
   }
 
@@ -299,22 +358,23 @@
 
   prevBtn.addEventListener('click', () => {
     if (current <= 0) return;
-    commitCurrentToLocal();
+    // 🚀【極速優化】：換頁時不寫入 LocalStorage 快取，只保存在記憶體變數中，反應速度為 0 毫秒
+    sessionMemoryCache[currentRatingKey()] = readFormValues();
     current--;
     render();
   });
 
   nextBtn.addEventListener('click', () => {
     if (current >= task.images.length - 1) return;
-    commitCurrentToLocal();
+    // 🚀【極速優化】：換頁時不寫入 LocalStorage 快取，只保存在記憶體變數中，反應速度為 0 毫秒
+    sessionMemoryCache[currentRatingKey()] = readFormValues();
     current++;
     render();
   });
 
-  // ── Save / Submit button ──────────────────────────────────────────────────
-
   if (finalSubmitBtn) {
     finalSubmitBtn.addEventListener('click', () => {
+      // 只有在主動按下儲存/送出大按鈕時，才執行一次全量統計與寫入
       if (allCompleteWithCurrentForm()) {
         finalizeAll();
       } else {
@@ -331,7 +391,7 @@
     manifest = m;
     task = manifest[taskIndex];
     if (!task) throw new Error('找不到指定任務');
-    if (!task.images.length) throw new Error('此任務沒有影像，請確認 Google Drive 資料夾架構與檔名。');
+    if (!task.images.length) throw new Error('此任務沒有影像');
     await USE.loadServerRatings(reviewer, task);
     const saved     = USE.readLocalProgress(reviewer, task);
     const suggested = USE.firstIncompleteIndex(reviewer, task);
