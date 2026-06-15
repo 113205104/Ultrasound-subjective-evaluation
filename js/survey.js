@@ -137,9 +137,7 @@
   
   }
 
-  function onFormChanged() {
-  // 點選評分時不做任何重計算
-  // 避免大量影像時每次點選都重新檢查全部任務
+  renderActionButton();
 }
 
   // ── Rating data helpers ───────────────────────────────────────────────────
