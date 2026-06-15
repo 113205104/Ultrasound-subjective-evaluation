@@ -47,12 +47,15 @@
   }
   function readLocalProgress(reviewer, task) { return getJson(localProgressKey(reviewer), {})[taskKey(task)] || null; }
 
+  // ─── 【重要修正 1】鬆綁草稿驗證 ───
+  // 以前限定 1~4 分才算有效；現在只要有資料（不管是草稿還是滿分），
+  // 在讀取與還原階段一律放行，允許前端將草稿撈出來
   function isCompleteRating(r) {
-    return ratingKeys().every(k => Number(r && r[k]) >= 1 && Number(r && r[k]) <= 4);
+    if (!r) return false;
+    return true; 
   }
 
   function mergedRatings(reviewer) {
-    // ⚡ 確保只有在真正沒有快取時才解析一次硬碟，絕不重複 JSON.parse
     if (!(reviewer in mergedCache) || !mergedCache[reviewer]) {
       mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
     }
@@ -60,23 +63,22 @@
   }
   function readRating(reviewer, key) { return mergedRatings(reviewer)[key] || {}; }
 
+  // 計算完美填滿 12 格的圖片數量 (用來展示給進度條看)
   function countCompleted(reviewer, task) {
     const all = mergedRatings(reviewer);
-    return Object.keys(all).filter(k => k.startsWith(taskKey(task) + '||') && isCompleteRating(all[k])).length;
+    return Object.keys(all).filter(k => {
+      if (!k.startsWith(taskKey(task) + '||')) return false;
+      const r = all[k];
+      // 只有在 12 格都有填值的情況下，進度條數字才會往前進
+      return ratingKeys().every(keyName => r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '');
+    }).length;
   }
 
-  // 🚀【超重量級優化】：徹底消滅 Loading 凍結卡死很久的元凶！
+  // ─── 【重要修正 2】解決不同電腦進度問題 ───
+  // 進網頁時，不要自作聰明去抓前面沒選滿的格子來干擾
+  // 優先遵守在 survey.js 中由雲端 progress 所推薦回傳的最新 currentIndex 位置
   function firstIncompleteIndex(reviewer, task) {
-    // 先把大物件拿出來一次（只執行一次 JSON.parse 與合併）
-    const allRatings = mergedRatings(reviewer); 
-    
-    // 接下來的 324 次迴圈全部在純記憶體裡跑，速度提升數萬倍！
-    for (let i = 0; i < task.images.length; i++) {
-      const key = imageKey(task, task.images[i]);
-      const rating = allRatings[key] || {};
-      if (!isCompleteRating(rating)) return i;
-    }
-    return Math.max(task.images.length - 1, 0);
+    return 0; 
   }
 
   function postToSheet(payload) {
@@ -105,11 +107,13 @@
     return raw.map(task => Object.assign({}, task, { images: Array.isArray(task.images) ? task.images : [] }));
   }
 
+  // ─── 【重要修正 3】修正動作名稱衝突 ───
+  // 原本呼叫 'getManifest'，但新版 Code.gs 裡面的實作叫 'loadManifest'，在這裡將其拉回一致
   async function loadManifest() {
     if (cfg.manifestSource === 'drive') {
-      const data = await jsonp('getManifest', {});
-      if (!data.ok) throw new Error(data.error || 'Google Drive manifest 載入失敗');
-      return normalizeManifest(data.manifest || []);
+      const data = await jsonp('loadManifest', {});
+      if (!data.success) throw new Error(data.error || 'Google Drive manifest 載入失敗');
+      return normalizeManifest(data.data.manifest || []);
     }
     const res = await fetch((cfg.manifestPath || 'manifest.json') + '?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('manifest.json 載入失敗');
@@ -119,13 +123,27 @@
   async function loadServerRatings(reviewer, task) {
     const params = { reviewer };
     if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
-    const data = await jsonp('listResponses', params);
+    
+    // 呼叫雲端一鍵載入進度與評分的新接口
+    const data = await jsonp('loadProgressAndRatings', params);
     const map = {};
-    (data.rows || []).forEach(r => {
-      const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
-      map[key] = r;
-    });
-    serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+    
+    if (data.success && data.data) {
+      (data.data.ratings || []).forEach(r => {
+        const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
+        map[key] = r;
+      });
+      serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+      
+      // 將雲端最新的 progress 暫存在 localStorage 供初始定位讀取
+      if (data.data.progress) {
+        const progKey = 'use_progress_' + reviewer;
+        const allProg = getJson(progKey, {});
+        allProg[taskKey(task)] = data.data.progress;
+        setJson(progKey, allProg);
+      }
+    }
+    
     const local = getJson(localRatingsKey(reviewer), {});
     setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
     invalidateMergedCache(reviewer);
@@ -160,5 +178,3 @@
     populateReviewerSelect
   };
 })();
-
-  
