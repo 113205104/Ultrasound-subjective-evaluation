@@ -46,6 +46,7 @@
       const cells = APP_CONFIG.ratingScale.map(score => {
         const name = `${field.key}_${row.key}`;
         const id   = `${name}_${score}`;
+        // 回歸最乾淨的標準 HTML 結構，不帶任何自訂點擊包裝
         return `<label class="matrix-radio" for="${id}">
           <input id="${id}" type="radio" name="${name}" value="${score}"
             aria-label="${escapeHtml(field.label)} ${escapeHtml(row.label)} ${score}">
@@ -62,75 +63,26 @@
     return section;
   }
 
-  // ── Radio toggle (deselect on re-click) ───────────────────────────────────
-
   function buildForm() {
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
     attachRadioToggle();
   }
 
+  // ── 【極簡高效】純原生 Radio 變更事件 ──────────────────────────────────────────
   function attachRadioToggle() {
-    let pendingRadio    = null;
-    let pendingChecked  = false;
-
-    form.addEventListener('pointerdown', function (e) {
-      const input = resolveRadio(e.target);
-      if (!input) { pendingRadio = null; return; }
-      pendingRadio   = input;
-      pendingChecked = input.checked;
-    }, { capture: true });
-
-    form.addEventListener('click', function (e) {
-      const input = resolveRadio(e.target);
-      if (!input) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const wasChecked = (input === pendingRadio) ? pendingChecked : input.checked;
-      applyRadioToggle(input, wasChecked);
-
-      pendingRadio   = null;
-      pendingChecked = false;
-    }, { capture: true });
-
-    form.addEventListener('keydown', function (e) {
-      if (e.key !== ' ' && e.key !== 'Spacebar' && e.key !== 'Enter') return;
+    // 徹底拋棄 click 攔截，改用瀏覽器效能最好的原生 change 事件（只在選項真正改變時觸發）
+    form.addEventListener('change', function (e) {
       if (!e.target.matches('input[type="radio"]')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      applyRadioToggle(e.target, e.target.checked);
-    }, { capture: true });
-  }
 
-  function resolveRadio(target) {
-    if (!target) return null;
-    if (target.matches && target.matches('input[type="radio"]')) return target;
-    const label = target.closest ? target.closest('label.matrix-radio') : null;
-    return label ? label.querySelector('input[type="radio"]') : null;
-  }
-
-  function applyRadioToggle(input, wasChecked) {
-    const name = input.name;
-    const card = input.closest('.matrix-card') || form;
-
-    card.querySelectorAll(
-      `input[type="radio"][name="${CSS.escape(name)}"]`
-    ).forEach(el => {
-      if (el !== input) { el.checked = false; }
+      // 0毫秒極速寫入記憶體快取
+      const values = readFormValues();
+      const payload = makePayloadForImage(current, values);
+      payload.action = 'draftOnly';
+      USE.saveLocalRating(reviewer, currentRatingKey(), payload);
+      
+      // 點選分數時，絕對不呼叫任何大迴圈或按鈕更新，保持極致流暢
     });
-
-    input.checked = !wasChecked;
-
-    // 【效能優化點】：當使用者點選分數時，同步寫入記憶體快取並更新按鈕狀態，
-    // 這能確保點擊時，畫面的按鈕文字（確認完成 or 儲存進度）能光速切換，不產生任何卡頓。
-    const values = readFormValues();
-    const payload = makePayloadForImage(current, values);
-    payload.action = 'draftOnly';
-    USE.saveLocalRating(reviewer, currentRatingKey(), payload);
-
-    renderActionButton();
   }
 
   // ── Rating data helpers ───────────────────────────────────────────────────
@@ -140,7 +92,6 @@
   function getCurrentRating()  { return USE.readRating(reviewer, currentRatingKey()); }
 
   function setFormValues(rating) {
-    // 【效能優化】：快取 DOM 查詢，避免在大量的迴圈中重複呼叫 form.querySelectorAll
     USE.ratingKeys().forEach(k => {
       const inputs = form.querySelectorAll(`input[name="${CSS.escape(k)}"]`);
       const targetValue = String(rating[k] || '');
@@ -150,6 +101,7 @@
     });
   }
 
+  // ── 讀取目前的選項值 ────────────────────────────────────────────────────────
   function readFormValues() {
     const out = {};
     USE.ratingKeys().forEach(k => {
@@ -176,13 +128,9 @@
 
   // ── Missing-image helpers ─────────────────────────────────────────────────
 
-  function missingIndices(opts) {
-    opts = opts || {};
+  function missingIndices() {
     const missing = [];
-    
-    // 【關鍵效能優化】：此處不再需要對當前頁面單獨跑 makePayload，
-    // 因為在 applyRadioToggle 中我們已經即時將最新狀態 commit 進快取了。
-    // 這會讓迴圈執行速度大幅提升。
+    if (!task) return missing;
     for (let i = 0; i < task.images.length; i++) {
       const key = USE.imageKey(task, task.images[i]);
       const rating = USE.readRating(reviewer, key);
@@ -268,7 +216,7 @@
       completedStatus: completed >= total ? 'Completed' : 'In Progress'
     });
     renderProgressOnly();
-    renderActionButton();
+    renderActionButton(); // 點擊儲存進度大按鈕時，才更新按鈕文字
     showHint('已儲存作答進度；尚未寫入正式作答紀錄。');
   }
 
@@ -343,11 +291,11 @@
     nextBtn.disabled = current >= total - 1;
     setFormValues(getCurrentRating());
     renderProgressOnly();
-    renderActionButton();
+    renderActionButton(); // 換頁時更新大按鈕狀態
     showHint('');
   }
 
-  // ── Navigation (local only — no Sheet write) ──────────────────────────────
+  // ── Navigation ────────────────────────────────────────────────────────────
 
   prevBtn.addEventListener('click', () => {
     if (current <= 0) return;
