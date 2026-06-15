@@ -1,8 +1,4 @@
-
-  
-
-  ,
- (function () {
+(function () {
   const params = new URLSearchParams(location.search);
   const defaultReviewer = (APP_CONFIG.reviewers && APP_CONFIG.reviewers[0]) || 'Reviewer1';
   const reviewer = params.get('reviewer') || defaultReviewer;
