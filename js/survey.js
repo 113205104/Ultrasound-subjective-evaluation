@@ -68,10 +68,9 @@
     attachRadioToggle();
   }
 
-  // ── 【效能優化】移除二次點擊取消與任何 change 監聽，回歸原生單選鈕效能 ──
+  // ── 徹底刪除二次點擊取消功能，維持原生單選效能 ──
   function attachRadioToggle() {
-    // 刪除原有的 mousedown 與 click 取消選取邏輯。
-    // 當前點選時背後無任何運算，徹底消滅卡頓。
+    // 此處不處理任何滑鼠點擊與即時暫存事件，勾選時 0 卡頓
   }
 
   // ── 畫面值與答案物件轉換 ─────────────────────────────────────────────────
@@ -106,20 +105,40 @@
     }, values);
   }
 
-  // ── 【Word 式存檔】僅在切換頁面或手動點擊按鈕時，才將當前頁面資料寫入暫存 ──
-
-  function commitToLocal(targetIndex) {
+  // ── 【重要修改】儲存當頁資料：同步寫入本機快取與雲端試算表 responses ──
+  function saveAndSyncCurrentPage() {
     const values = readFormValues();
-    const payload = makePayloadForImage(targetIndex, values);
-    payload.action       = 'draftOnly';
-    payload.updatedAt    = new Date().toISOString();
+    const payload = makePayloadForImage(current, values);
     
-    const key = [task.strategy, task.dataset, task.model, task.images[targetIndex].id || task.images[targetIndex].fileId || task.images[targetIndex].filename || task.images[targetIndex].url].join('||');
+    // 1. 寫入本地快取備份
+    const key = [task.strategy, task.dataset, task.model, task.images[current].id || task.images[current].fileId || task.images[current].filename || task.images[current].url].join('||');
     USE.saveLocalRating(reviewer, key, payload);
-    USE.saveLocalProgress(reviewer, task, targetIndex, task.images.length);
+    
+    // 2. 即時發送給雲端試算表 responses (即使未填滿也寫入，方便後台統計)
+    USE.postToSheet(payload);
+
+    // 3. 更新進度表 (progress) 狀態
+    updateCloudProgress();
   }
 
-  // 掃描所有題目的未完成清單（改為僅在提交或點擊特定按鈕時觸發）
+  // 同步更新雲端進度條紀錄
+  function updateCloudProgress() {
+    const total = task.images.length;
+    const completed = USE.countCompleted(reviewer, task);
+    
+    progressText.textContent = `${completed} / ${total}`;
+    progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
+
+    USE.postToSheet({
+      action: 'saveProgress', reviewer,
+      strategy: task.strategy, dataset: task.dataset, model: task.model,
+      displayModel: USE.displayModel(task.model),
+      currentIndex: current, total, completed,
+      completedStatus: completed >= total ? 'Completed' : 'In Progress'
+    });
+  }
+
+  // 全量掃描漏題
   function missingIndices() {
     const missing = [];
     if (!task) return missing;
@@ -144,7 +163,7 @@
     missingPanel.innerHTML = `
       <section class="form-card question-card missing-card">
         <h2>尚有 ${missing.length} 張未完成</h2>
-        <p class="muted">點選下方項目可直接跳到漏題，補完後再按「確認完成並送出」。</p>
+        <p class="muted">點選下方項目可直接跳到漏題，補完後點選下一張或最後送出。</p>
         <div class="missing-jump-list">
           ${missing.map(i => {
             const img = task.images[i] || {};
@@ -157,7 +176,7 @@
       
     missingPanel.querySelectorAll('.missing-jump').forEach(btn => {
       btn.addEventListener('click', () => {
-        commitToLocal(current); // 跳轉前儲存當前頁面
+        saveAndSyncCurrentPage(); // 跳轉前存檔
         current = Number(btn.dataset.index);
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -165,70 +184,22 @@
     });
   }
 
-  // ── 【主動觸發：儲存與送出】 ──────────────────────────────────────────────
-
-  function handleFinalSubmitAction() {
-    // 1. 動作前，先儲存當前這張圖的最新填寫狀態 (如同 Word 存檔)
-    commitToLocal(current);
-
-    // 2. 執行全量掃描以判斷是否全部完成
+  // 最後一題的最終確認送出處理
+  function handleFinalSubmit() {
+    saveAndSyncCurrentPage(); // 先存最後一頁
     const missing = missingIndices();
 
     if (missing.length > 0) {
-      // 有漏題 -> 執行【儲存目前進度到雲端】邏輯
-      const total = task.images.length;
-      const completed = USE.countCompleted(reviewer, task);
-      
-      progressText.textContent = `${completed} / ${total}`;
-      progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
-
-      USE.postToSheet({
-        action: 'saveProgress', reviewer,
-        strategy: task.strategy, dataset: task.dataset, model: task.model,
-        displayModel: USE.displayModel(task.model),
-        currentIndex: current, total, completed,
-        completedStatus: 'In Progress'
-      });
-
       renderMissingPanel(missing);
       showHint(`進度已儲存。但尚有 ${missing.length} 張未完成，請補齊後再送出。`);
     } else {
-      // 全數完成 -> 執行【正式確認送出】邏輯
       renderMissingPanel([]);
-      let submitted = 0;
-      for (let i = 0; i < task.images.length; i++) {
-        const key = USE.imageKey(task, task.images[i]);
-        const rating = USE.readRating(reviewer, key);
-        const payload = makePayloadForImage(i, rating || {});
-        USE.saveLocalRating(reviewer, key, payload);
-        if (USE.isCompleteRating(payload)) {
-          USE.postToSheet(payload);
-          submitted += 1;
-        }
-      }
-      const total = task.images.length;
-      USE.saveLocalProgress(reviewer, task, current, total);
-      USE.postToSheet({
-        action: 'saveProgress', reviewer,
-        strategy: task.strategy, dataset: task.dataset, model: task.model,
-        displayModel: USE.displayModel(task.model),
-        currentIndex: current, total, completed: total, completedStatus: 'Completed'
-      });
-      
-      progressText.textContent = `${total} / ${total}`;
-      progressBar.style.width  = '100%';
-      showHint(`確認完成：已正式送出 ${submitted} / ${total} 張作答紀錄！`);
+      showHint(`🎉 恭喜！本項任務所有超音波影像已全部完成並成功送出！`);
+      setTimeout(() => { location.href = 'index.html'; }, 2000);
     }
   }
 
   // ── Rendering ─────────────────────────────────────────────────────────────
-
-  function renderInitialProgress() {
-    const total     = task.images.length;
-    const completed = USE.countCompleted(reviewer, task);
-    progressText.textContent = `${completed} / ${total}`;
-    progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
-  }
 
   function render() {
     const img   = task.images[current];
@@ -238,16 +209,22 @@
     imageMeta.textContent = `${current + 1} / ${total} ${img.filename || img.id || ''}`;
     image.src = img.url || img.path || '';
     image.alt = img.filename || 'Tripanel ultrasound image';
-    prevBtn.disabled = current <= 0;
-    nextBtn.disabled = current >= total - 1;
     
-    // 僅在換頁載入時，讀取一次該頁面的歷史填寫數值
+    prevBtn.disabled = current <= 0;
+
+    // ── 按鈕邏輯切換：只有在最後一頁，Next 按鈕才會隱藏，FinalSubmit 按鈕才會出現 ──
+    if (current >= total - 1) {
+      nextBtn.style.display = 'none';
+      finalSubmitBtn.style.display = 'inline-block';
+      finalSubmitBtn.textContent = '確認完成並送出';
+    } else {
+      nextBtn.style.display = 'inline-block';
+      finalSubmitBtn.style.display = 'none';
+    }
+    
+    // 讀取當前頁面的填寫歷史
     const key = USE.imageKey(task, img);
     setFormValues(USE.readRating(reviewer, key));
-    
-    // 按鈕文字固定為綜合功能鈕，不在此處計算完備度，完全省去迴圈消耗
-    finalSubmitBtn.textContent = '確認完成並送出 / 儲存進度'; 
-    finalSubmitBtn.className = 'primary-button';
     showHint('');
   }
 
@@ -255,21 +232,20 @@
 
   prevBtn.addEventListener('click', () => {
     if (current <= 0) return;
-    commitToLocal(current); // 換頁時，一次性打包此頁
+    saveAndSyncCurrentPage(); // 像 Word 同步存檔
     current--;
     render();
   });
 
   nextBtn.addEventListener('click', () => {
     if (current >= task.images.length - 1) return;
-    commitToLocal(current); // 換頁時，一次性打包此頁
+    saveAndSyncCurrentPage(); // 像 Word 同步存檔
     current++;
     render();
   });
 
   if (finalSubmitBtn) {
-    // 整合為單一高效觸發入口
-    finalSubmitBtn.addEventListener('click', handleFinalSubmitAction);
+    finalSubmitBtn.addEventListener('click', handleFinalSubmit);
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
@@ -281,14 +257,21 @@
     task = manifest[taskIndex];
     if (!task) throw new Error('找不到指定任務');
     if (!task.images.length) throw new Error('此任務沒有影像');
-    await USE.loadServerRatings(reviewer, task);
-    const saved     = USE.readLocalProgress(reviewer, task);
-    const suggested = USE.firstIncompleteIndex(reviewer, task);
-    current = (saved && Number.isInteger(saved.currentIndex))
-      ? Math.min(saved.currentIndex, task.images.length - 1)
-      : suggested;
     
-    renderInitialProgress();
+    // 從伺服器下載最新的正式紀錄
+    await USE.loadServerRatings(reviewer, task);
+    
+    // 【解決問題 1】捨棄 readLocalProgress 本機紀錄，初始頁面完全由伺服器推薦的未完成第一題（suggested）決定
+    // 這樣在任何電腦登入，只要 Reviewer 相同，初始看到的畫面與進度位置就會一致！
+    const suggested = USE.firstIncompleteIndex(reviewer, task);
+    current = suggested >= 0 ? suggested : 0;
+    
+    // 初始化進度條 UI 顯示
+    const total = task.images.length;
+    const completed = USE.countCompleted(reviewer, task);
+    progressText.textContent = `${completed} / ${total}`;
+    progressBar.style.width  = total ? Math.round(completed * 100 / total) + '%' : '0%';
+    
     render();
   }).catch(err => {
     title.textContent = '載入失敗';
