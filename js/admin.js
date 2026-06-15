@@ -1,6 +1,16 @@
 (function () {
   const cfg = window.APP_CONFIG;
   const serverRatings = {};
+  // Cache of mergedRatings(reviewer) results. Rebuilding this requires
+  // JSON.parse'ing the entire localStorage ratings blob and Object.assign-ing
+  // it onto serverRatings — expensive, and readRating() is called once per
+  // image in the task on EVERY radio click (via renderActionButton ->
+  // missingIndices). Without caching, a task with many images re-parses
+  // localStorage dozens of times per click, which is what causes the UI
+  // to feel laggy/frozen. Cache is invalidated whenever local or server
+  // rating data actually changes.
+  const mergedCache = {};
+  function invalidateMergedCache(reviewer) { delete mergedCache[reviewer]; }
 
   function encodeQuery(params) {
     return Object.keys(params)
@@ -33,6 +43,7 @@
     rkeys.forEach(k => { delete prev[k]; });
     all[key] = Object.assign({}, prev, data, { draftUpdatedAt: new Date().toISOString() });
     setJson(localRatingsKey(reviewer), all);
+    invalidateMergedCache(reviewer);
   }
   function readLocalRating(reviewer, key) { return getJson(localRatingsKey(reviewer), {})[key] || {}; }
 
@@ -51,7 +62,10 @@
   // Draft progress merges official server responses with local unfinished edits.
   // Local draft intentionally wins so canceling a radio can reduce progress without deleting official history.
   function mergedRatings(reviewer) {
-    return Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
+    if (!(reviewer in mergedCache)) {
+      mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
+    }
+    return mergedCache[reviewer];
   }
   function readRating(reviewer, key) { return mergedRatings(reviewer)[key] || {}; }
 
@@ -117,6 +131,7 @@
     // Restore server records locally, but preserve unfinished local drafts over server answers.
     const local = getJson(localRatingsKey(reviewer), {});
     setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
+    invalidateMergedCache(reviewer);
     return map;
   }
 
