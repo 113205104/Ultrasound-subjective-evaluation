@@ -237,6 +237,7 @@
 
   buildForm();
 
+  // ➔ 確定呼叫 loadManifest
   USE.loadManifest().then(async m => {
     manifest = m;
     task = manifest[taskIndex];
@@ -251,13 +252,7 @@
       }
     });
 
-    // 🟢 這裡修正為：優先從雲端 progress 抓取上次最後儲存的 current 題號
-    const saved = USE.readLocalProgress(reviewer, task); 
-    if (saved && typeof saved.currentIndex === 'number') {
-      current = Math.min(saved.currentIndex, task.images.length - 1);
-    } else {
-      current = 0;
-    }
+    current = USE.firstIncompleteIndex(reviewer, task);
     
     let completedCount = USE.countCompleted(reviewer, task);
     progressText.textContent = `${completedCount} / ${task.images.length}`;
