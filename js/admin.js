@@ -30,15 +30,9 @@
   }
   function setJson(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
+  // ➔ 修正亮點：移除混淆的舊互轉轉換，統一為全名稱格式以供 Excel/SPSS 使用
   function normalizeRating(data) {
-    const out = Object.assign({}, data || {});
-    // 舊欄位相容：若曾經用 whole_image_quality_*，自動轉回 whole_quality_*
-    ['1', '2', '3'].forEach(n => {
-      if ((out[`whole_quality_${n}`] === undefined || out[`whole_quality_${n}`] === '') && out[`whole_image_quality_${n}`] !== undefined) {
-        out[`whole_quality_${n}`] = out[`whole_image_quality_${n}`];
-      }
-    });
-    return out;
+    return Object.assign({}, data || {});
   }
 
   function saveLocalRating(reviewer, key, data) {
@@ -109,7 +103,6 @@
   }
 
   async function postToSheet(payload) {
-    // 保留舊接口；改用 JSONP 才能知道是否真的成功。
     const res = await jsonp(payload.action || 'saveRating', payload);
     if (!res.success) throw new Error(res.error || 'Google Sheet 儲存失敗');
     return true;
@@ -173,12 +166,21 @@
     return payload;
   }
 
+  // ➔ 修正亮點：儲存時即時更新本地與全域快取，確保更換裝置不會有遺失或同步時間差
   async function saveServerRating(reviewer, task, image, rating) {
     const payload = buildRatingPayload(reviewer, task, image, rating);
     const res = await jsonp('saveRating', payload);
     if (!res.success) throw new Error(res.error || '作答結果儲存失敗');
+    
     serverRatings[reviewer] = serverRatings[reviewer] || {};
-    serverRatings[reviewer][imageKey(task, image)] = normalizeRating(Object.assign({}, payload, { timestamp: new Date().toISOString() }));
+    const savedData = normalizeRating(Object.assign({}, payload, { timestamp: new Date().toISOString() }));
+    serverRatings[reviewer][imageKey(task, image)] = savedData;
+    
+    // 同步到 localStorage 避免重複打架
+    const local = getJson(localRatingsKey(reviewer), {});
+    local[imageKey(task, image)] = savedData;
+    setJson(localRatingsKey(reviewer), local);
+
     invalidateMergedCache(reviewer);
     return res.data;
   }
@@ -198,6 +200,11 @@
     };
     const res = await jsonp('saveProgress', payload);
     if (!res.success) throw new Error(res.error || '進度儲存失敗');
+
+    const allProg = getJson(localProgressKey(reviewer), {});
+    allProg[taskKey(task)] = payload;
+    setJson(localProgressKey(reviewer), allProg);
+
     return res.data;
   }
 
