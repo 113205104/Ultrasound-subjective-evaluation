@@ -1,16 +1,20 @@
 (function () {
   const cfg = window.APP_CONFIG;
   const serverRatings = {};
-  // Cache of mergedRatings(reviewer) results. Rebuilding this requires
-  // JSON.parse'ing the entire localStorage ratings blob and Object.assign-ing
-  // it onto serverRatings — expensive, and readRating() is called once per
-  // image in the task on EVERY radio click (via renderActionButton ->
-  // missingIndices). Without caching, a task with many images re-parses
-  // localStorage dozens of times per click, which is what causes the UI
-  // to feel laggy/frozen. Cache is invalidated whenever local or server
-  // rating data actually changes.
+  
+  // 【效能優化】優化快取機制
+  // 不再刪除快取，而是改為直接在記憶體中同步維護更新，
+  // 徹底解決因 Radio Click 頻繁觸發 readRating 導致 JSON.parse 造成的 UI 凍結卡頓。
   const mergedCache = {};
-  function invalidateMergedCache(reviewer) { delete mergedCache[reviewer]; }
+  
+  function updateMergedCache(reviewer, key, data) {
+    if (!mergedCache[reviewer]) {
+      // 如果快取尚未建立，先載入初始化
+      mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
+    }
+    // 直接更新記憶體中的該筆影像評分，不需 delete 整個快取物件
+    mergedCache[reviewer][key] = Object.assign({}, mergedCache[reviewer][key] || {}, data);
+  }
 
   function encodeQuery(params) {
     return Object.keys(params)
@@ -37,13 +41,16 @@
   function saveLocalRating(reviewer, key, data) {
     const all = getJson(localRatingsKey(reviewer), {});
     const prev = all[key] || {};
-    // Remove all old rating-value fields before merging so that deselected
-    // radios (value='') actually overwrite previously stored numbers.
+    // 移除舊的評分欄位，讓取消選取的項目能確實被複寫為空值
     const rkeys = ratingKeys();
     rkeys.forEach(k => { delete prev[k]; });
-    all[key] = Object.assign({}, prev, data, { draftUpdatedAt: new Date().toISOString() });
+    
+    const updatedRecord = Object.assign({}, prev, data, { draftUpdatedAt: new Date().toISOString() });
+    all[key] = updatedRecord;
     setJson(localRatingsKey(reviewer), all);
-    invalidateMergedCache(reviewer);
+    
+    // 【關鍵修改】：不再呼叫 invalidate，而是直接將更新同步寫入記憶體快取
+    updateMergedCache(reviewer, key, updatedRecord);
   }
   function readLocalRating(reviewer, key) { return getJson(localRatingsKey(reviewer), {})[key] || {}; }
 
@@ -59,8 +66,7 @@
     return ratingKeys().every(k => Number(r && r[k]) >= 1 && Number(r && r[k]) <= 4);
   }
 
-  // Draft progress merges official server responses with local unfinished edits.
-  // Local draft intentionally wins so canceling a radio can reduce progress without deleting official history.
+  // 讀取進度時直接從快速的記憶體快取中撈取，不存在時才初始化
   function mergedRatings(reviewer) {
     if (!(reviewer in mergedCache)) {
       mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer] || {}, getJson(localRatingsKey(reviewer), {}));
@@ -128,10 +134,12 @@
       map[key] = r;
     });
     serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
-    // Restore server records locally, but preserve unfinished local drafts over server answers.
+    // 回放伺服器資料至本地，但本地草稿擁有最高優先權
     const local = getJson(localRatingsKey(reviewer), {});
     setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
-    invalidateMergedCache(reviewer);
+    
+    // 伺服器資料有變動時，才重新同步更新一次快取
+    mergedCache[reviewer] = Object.assign({}, serverRatings[reviewer], local);
     return map;
   }
 
