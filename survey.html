@@ -3,41 +3,37 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Survey | Ultrasound Subjective Evaluation</title>
+  <title>Ultrasound Subjective Evaluation</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div class="forms-topbar"></div>
   <main class="page-shell">
-    <section class="form-card form-header compact">
-      <a class="back-link" href="index.html">← 回首頁</a>
-      <h1 id="taskTitle">Loading...</h1>
-      <p id="taskSubtitle"></p>
-      <div class="progress-wrap">
-        <div class="progress-text" id="progressText">0 / 0</div>
-        <div class="progress-bar"><div id=\"progressBar\" class=\"progress-fill\"></div></div>
-      </div>
+    <section class="form-card form-header">
+      <h1>Ultrasound Subjective Evaluation</h1>
+      <p>超音波影像主觀評分平台。請選擇固定評分者後開始作答。</p>
+      <div class="notice">模型名稱已匿名顯示為 Model A–E，避免評分者得知真實模型名稱。</div>
     </section>
 
-    <section class="form-card image-card">
-      <div class="image-meta" id="imageMeta"></div>
-      <img id="tripanelImage" class="tripanel" alt="Tripanel ultrasound image" />
-      <div class="nav-row">
-        <button id="prevBtn" class="ghost-button" type="button">上一張</button>
-        <button id="saveProgressBtn" class="primary-button" style="background-color: #2196F3;" type="button">💾 儲存目前進度</button>
-        <button id="finalSubmitBtn" class="primary-button" style="background-color: #4CAF50; display: none;" type="button">🚀 確認完成並送出</button>
-        <button id="nextBtn" class="primary-button" type="button">下一張</button>
-      </div>
-      <p id="saveHint" class="save-hint" hidden></p>
+    <section class="form-card question-card">
+      <label class="question-title" for="reviewerSelect">Reviewer</label>
+      <select id="reviewerSelect" class="select-input" aria-label="Reviewer"></select>
     </section>
 
-    <div id="missingPanel" hidden></div>
-
-    <form id="ratingForm" onsubmit="return false;"></form>
+    <section class="form-card question-card">
+      <div class="section-row">
+        <div>
+          <h2>評分任務</h2>
+          <p class="muted">首頁會直接讀取 Google Drive 任務，並從 Google Sheet 載入作答進度。</p>
+        </div>
+        <a class="ghost-button" href="history.html">查看作答紀錄</a>
+      </div>
+      <div id="taskList" class="task-list" aria-live="polite"></div>
+    </section>
   </main>
 
   <script src="js/config.js"></script>
   <script src="js/admin.js"></script>
-  <script src="js/survey.js"></script>
+  <script src="js/home.js"></script>
 </body>
 </html>
