@@ -52,6 +52,7 @@
   }
 
   function buildForm() {
+    if (!form) return;
     form.innerHTML = '';
     APP_CONFIG.ratingFields.forEach(f => form.appendChild(buildMatrixQuestion(f)));
     
@@ -63,6 +64,7 @@
   }
 
   function setFormValues(rating) {
+    if (!form) return;
     USE.ratingKeys().forEach(k => {
       const targetValue = String(rating[k] || '');
       const radios = form.querySelectorAll(`input[name="${CSS.escape(k)}"]`);
@@ -72,6 +74,7 @@
 
   function readFormValues() {
     const out = {};
+    if (!form) return out;
     USE.ratingKeys().forEach(k => {
       const checkedRadio = form.querySelector(`input[name="${CSS.escape(k)}"]:checked`);
       out[k] = checkedRadio ? Number(checkedRadio.value) : '';
@@ -126,8 +129,8 @@
 
     await Promise.all(promises);
 
-    progressText.textContent = `${completedCount} / ${task.images.length}`;
-    progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
+    if (progressText) progressText.textContent = `${completedCount} / ${task.images.length}`;
+    if (progressBar) progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
 
     if (!isFinal) {
       showHint(`💾 儲存成功！已將 ${savedCount} 筆作答更新至 responses（未選欄位在後台已保留空白）。`);
@@ -192,20 +195,21 @@
   function render() {
     const img   = task.images[current];
     const total = task.images.length;
-    title.textContent     = USE.displayModel(task.model);
-    subtitle.textContent  = reviewer;
-    imageMeta.textContent = `${current + 1} / ${total} ${img.filename || img.id || ''}`;
-    image.src             = img.url || img.path || '';
+    if (title) title.textContent     = USE.displayModel(task.model);
+    if (subtitle) subtitle.textContent  = reviewer;
+    if (imageMeta) imageMeta.textContent = `${current + 1} / ${total} ${img.filename || img.id || ''}`;
+    if (image) image.src             = img.url || img.path || '';
     
-    prevBtn.disabled = current <= 0;
-    nextBtn.disabled = current >= total - 1;
+    if (prevBtn) prevBtn.disabled = current <= 0;
+    if (nextBtn) nextBtn.disabled = current >= total - 1;
 
+    // ➔ 加上安全鎖，防止這兩個按鈕在某些介面不存在時引發 style 崩潰
     if (current >= total - 1) {
-      saveProgressBtn.style.display = 'none';
-      finalSubmitBtn.style.display = 'inline-block';
+      if (saveProgressBtn) saveProgressBtn.style.display = 'none';
+      if (finalSubmitBtn) finalSubmitBtn.style.display = 'inline-block';
     } else {
-      saveProgressBtn.style.display = 'inline-block';
-      finalSubmitBtn.style.display = 'none';
+      if (saveProgressBtn) saveProgressBtn.style.display = 'inline-block';
+      if (finalSubmitBtn) finalSubmitBtn.style.display = 'none';
     }
     
     const imgKey = img.id || img.filename;
@@ -218,26 +222,30 @@
     showHint('');
   }
 
-  prevBtn.addEventListener('click', () => {
-    if (current <= 0) return;
-    localMemoryDraft[task.images[current].id || task.images[current].filename] = readFormValues();
-    current--;
-    render();
-  });
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (current <= 0) return;
+      localMemoryDraft[task.images[current].id || task.images[current].filename] = readFormValues();
+      current--;
+      render();
+    });
+  }
 
-  nextBtn.addEventListener('click', () => {
-    if (current >= task.images.length - 1) return;
-    localMemoryDraft[task.images[current].id || task.images[current].filename] = readFormValues();
-    current++;
-    render();
-  });
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (current >= task.images.length - 1) return;
+      localMemoryDraft[task.images[current].id || task.images[current].filename] = readFormValues();
+      current++;
+      render();
+    });
+  }
 
-  saveProgressBtn.addEventListener('click', () => saveAllToCloud(false));
-  finalSubmitBtn.addEventListener('click', handleFinalSubmit);
+  if (saveProgressBtn) saveProgressBtn.addEventListener('click', () => saveAllToCloud(false));
+  if (finalSubmitBtn) finalSubmitBtn.addEventListener('click', handleFinalSubmit);
 
   buildForm();
 
-  // ➔ 確定呼叫 loadManifest
+  // ➔ 完全回歸調用您 admin.js 定義好的唯一 loadManifest
   USE.loadManifest().then(async m => {
     manifest = m;
     task = manifest[taskIndex];
@@ -255,12 +263,12 @@
     current = USE.firstIncompleteIndex(reviewer, task);
     
     let completedCount = USE.countCompleted(reviewer, task);
-    progressText.textContent = `${completedCount} / ${task.images.length}`;
-    progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
+    if (progressText) progressText.textContent = `${completedCount} / ${task.images.length}`;
+    if (progressBar) progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
     
     render();
   }).catch(err => {
-    title.textContent = '載入失敗';
-    subtitle.innerHTML = `<span class="error">${escapeHtml(err.message)}</span>`;
+    if (title) title.textContent = '載入失敗';
+    if (subtitle) subtitle.innerHTML = `<span class="error">${escapeHtml(err.message)}</span>`;
   });
 })();
