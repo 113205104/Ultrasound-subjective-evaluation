@@ -110,8 +110,10 @@
       strategy: val('strategyFilter'),
       dataset: val('datasetFilter'),
       model: val('modelFilter')
-    }).then(data => {
-      renderRows(data.rows || []);
+    }).then(res => {
+  renderRows((res.data && res.data.rows) || res.rows || []);
+})
+})
     }).catch(err => {
       list.innerHTML = `
         <section class="form-card history-card">
