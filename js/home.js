@@ -1,29 +1,47 @@
-const reviewerEl = document.getElementById('reviewer');
-const tasksEl = document.getElementById('tasks');
-CONFIG.REVIEWERS.forEach(r => reviewerEl.add(new Option(r, r)));
-reviewerEl.value = qs('reviewer', CONFIG.REVIEWERS[0]);
-reviewerEl.onchange = load;
-document.getElementById('reload').onclick = load;
+(function () {
+  const reviewerSelect = document.getElementById('reviewerSelect');
+  const taskList = document.getElementById('taskList');
+  let manifest = [];
+  USE.populateReviewerSelect(reviewerSelect, false);
 
-async function load(){
-  tasksEl.textContent = 'Loading...';
-  try{
-    const reviewer = reviewerEl.value;
-    const [m, p] = await Promise.all([apiGet('manifest'), apiGet('progress', {reviewer})]);
-    const progress = new Map((p.progress||[]).map(x => [x.taskId, x]));
-    tasksEl.innerHTML = '';
-    (m.tasks||[]).forEach(t => {
-      const pr = progress.get(t.taskId) || {};
-      const done = Number(pr.completedCount || 0);
-      const total = Number(t.total_groups || pr.totalGroups || 0);
-      const status = pr.submitted === 'YES' ? 'Submitted' : done ? 'In Progress' : 'Not Started';
-      const div = document.createElement('div');
-      div.className = 'task';
-      div.innerHTML = `<div><b>${t.modelAlias}｜${t.strategy}｜${t.dataset}</b><br><span class="muted">${t.model}　${done} / ${total}　${status}</span></div>
-      <div class="actions"><a href="survey.html?reviewer=${encodeURIComponent(reviewer)}&taskId=${encodeURIComponent(t.taskId)}">開始/續作</a><a href="history.html?reviewer=${encodeURIComponent(reviewer)}&taskId=${encodeURIComponent(t.taskId)}">查看作答記錄</a></div>`;
-      tasksEl.appendChild(div);
+  function render() {
+    const reviewer = reviewerSelect.value;
+    taskList.innerHTML = '';
+    if (!manifest.length) {
+      taskList.innerHTML = '<p class="muted">目前 Google Drive 尚未建立評分任務，或 Apps Script 尚未設定 DRIVE_ROOT_FOLDER_ID。</p>';
+      return;
+    }
+    manifest.forEach((task, idx) => {
+      const total = task.images.length;
+      const completed = USE.countCompleted(reviewer, task);
+      const statusText = total > 0 && completed >= total ? 'Completed' : 'In Progress';
+      const a = document.createElement('a');
+      a.className = 'primary-button';
+      a.href = 'survey.html?' + new URLSearchParams({ reviewer, task: idx }).toString();
+      a.textContent = total > 0 && completed > 0 ? '繼續作答' : '開始作答';
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <div>
+          <div class="task-title">${USE.displayModel(task.model)}</div>
+          <span class="status ${statusText === 'Completed' ? 'completed' : ''}">${completed} / ${total}　${statusText}</span>
+        </div>`;
+      row.appendChild(a);
+      taskList.appendChild(row);
     });
-    if (!(m.tasks||[]).length) tasksEl.innerHTML = '<p class="warn">Code.gs 的 CONFIG.tasks 尚未填入 Drive folderId，所以目前沒有任務。</p>';
-  }catch(err){ tasksEl.innerHTML = `<p class="warn">${err.message}</p>`; }
-}
-load();
+  }
+
+  async function loadAll() {
+    taskList.innerHTML = '<p class="muted">正在讀取 Google Drive 任務與 Google Sheet 作答紀錄...</p>';
+    try {
+      manifest = await USE.loadManifest();
+      await USE.loadServerRatings(reviewerSelect.value);
+      render();
+    } catch (err) {
+      taskList.innerHTML = `<div class="error">${err.message}</div>`;
+    }
+  }
+
+  reviewerSelect.addEventListener('change', loadAll);
+  loadAll();
+})();

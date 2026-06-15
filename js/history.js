@@ -1,36 +1,104 @@
-const reviewer = qs('reviewer', CONFIG.REVIEWERS[0]);
-const taskId = qs('taskId');
-document.getElementById('reload').onclick = load;
-load();
-async function load(){
-  const box = document.getElementById('history');
-  box.textContent = 'Loading...';
-  try{
-    const data = await apiGet('history', {reviewer, taskId});
-    document.getElementById('title').textContent = `作答記錄｜${reviewer}`;
-    const rows = data.rows || [];
-    if(!rows.length){ box.innerHTML = '<p class="warn">目前尚無伺服器端作答記錄。請先在評分頁按「儲存目前進度」。</p>'; return; }
-    const scoreCols=[]; CONFIG.CRITERIA.forEach(c=>CONFIG.PANELS.forEach(p=>scoreCols.push(`${c.key}_${p.key}`)));
-    let html = `<p>共 ${rows.length} 筆影像記錄。此頁直接讀取 Google Sheet responses。</p>`;
-    html += `<table class="historyTable"><thead><tr>`;
-    html += `<th>最後修改時間</th><th>Reviewer</th><th>策略</th><th>來源組別</th><th>模型</th><th>顯示</th><th>題號</th><th>圖片連結</th><th>filename</th>`;
-    html += scoreCols.map(c=>`<th>${c}</th>`).join('');
-    html += `</tr></thead><tbody>`;
-    rows.forEach(r=>{
-      const imgLink = r.imageUrl ? `<a href="${r.imageUrl}" target="_blank" rel="noopener">圖片</a>` : '';
-      html += `<tr>` +
-        `<td>${r.timestamp||''}</td>` +
-        `<td>${r.reviewer||''}</td>` +
-        `<td>${r.strategy||''}</td>` +
-        `<td>${r.dataset||''}</td>` +
-        `<td>${r.model||''}</td>` +
-        `<td>${r.modelAlias||''}</td>` +
-        `<td>${r.questionNo||''}</td>` +
-        `<td>${imgLink}</td>` +
-        `<td>${r.filename||''}</td>` +
-        scoreCols.map(c=>`<td>${r[c] ?? ''}</td>`).join('') +
-        `</tr>`;
+(function () {
+  const list = document.getElementById('historyList');
+  const reloadBtn = document.getElementById('reloadBtn');
+  const reviewerFilter = document.getElementById('reviewerFilter');
+
+  USE.populateReviewerSelect(reviewerFilter, true);
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"]/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
+
+  function scoreValue(r, key) {
+    const v = r[key];
+    if (v === undefined || v === null || v === '') {
+      return '<span class="muted">未填</span>';
+    }
+    return escapeHtml(v);
+  }
+
+  function matrixHtml(r) {
+    return '<div class="matrix-history">' + APP_CONFIG.ratingFields.map(f => {
+      const rows = APP_CONFIG.tripanelRows.map(row => {
+        const key = `${f.key}_${row.key}`;
+        return `<div>${escapeHtml(row.label)}</div><div>${scoreValue(r, key)}</div>`;
+      }).join('');
+
+      return `
+        <div class="matrix-history-block">
+          <div class="matrix-history-title">${escapeHtml(f.label)}</div>
+          <div class="matrix-history-grid">
+            <div class="head">影像</div>
+            <div class="head">分數</div>
+            ${rows}
+          </div>
+        </div>`;
+    }).join('') + '</div>';
+  }
+
+  function renderRows(rows) {
+    list.innerHTML = '';
+
+    if (!rows || !rows.length) {
+      list.innerHTML = '<section class="form-card history-card"><p class="muted">目前沒有符合條件的作答紀錄。</p></section>';
+      return;
+    }
+
+    rows.forEach((r, index) => {
+      const card = document.createElement('section');
+      card.className = 'form-card history-card';
+
+      card.innerHTML = `
+        <h2>題號 ${index + 1}　${escapeHtml(r.displayModel || USE.displayModel(r.model))}</h2>
+        <p class="muted">
+          Reviewer：${escapeHtml(r.reviewer || '')}
+          ｜ Strategy：${escapeHtml(r.strategy || '')}
+          ｜ Dataset：${escapeHtml(r.dataset || '')}
+          ｜ Model：${escapeHtml(r.model || '')}
+        </p>
+        <p class="muted">檔名：${escapeHtml(r.filename || r.imageId || '')}</p>
+        <p class="muted">時間：${escapeHtml(r.timestamp || '')}</p>
+        ${r.imageUrl ? `<img src="${escapeHtml(r.imageUrl)}" alt="${escapeHtml(r.filename || 'Tripanel ultrasound image')}">` : ''}
+        ${matrixHtml(r)}
+      `;
+
+      list.appendChild(card);
     });
-    html += '</tbody></table>'; box.innerHTML = html;
-  }catch(err){ box.innerHTML = `<p class="warn">${err.message}</p>`; }
-}
+  }
+
+  function load() {
+    if (!list) return;
+
+    list.innerHTML = '<section class="form-card history-card"><p class="muted">載入中...</p></section>';
+
+    USE.jsonp('listResponses', {
+      reviewer: val('reviewerFilter'),
+      strategy: val('strategyFilter'),
+      dataset: val('datasetFilter'),
+      model: val('modelFilter')
+    }).then(res => {
+      renderRows((res.data && res.data.rows) || res.rows || []);
+    }).catch(err => {
+      list.innerHTML = `<section class="form-card history-card"><div class="error">無法讀取 Google Sheet：${escapeHtml(err.message)}</div></section>`;
+    });
+  }
+
+  if (reloadBtn) reloadBtn.addEventListener('click', load);
+  if (reviewerFilter) reviewerFilter.addEventListener('change', load);
+
+  ['strategyFilter', 'datasetFilter', 'modelFilter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') load();
+    });
+  });
+
+  load();
+})();
