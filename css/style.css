@@ -130,3 +130,45 @@ p { margin: 0 0 10px; line-height: 1.6; }
   justify-content: flex-start;
 }
 .save-hint[hidden] { display: none !important; }
+/* 隱藏原生的 radio 圓圈，避免干擾與卡頓 */
+.matrix-radio input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 自訂空心圓圈外框 */
+.matrix-radio-dot {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  transition: border-color 0.1s ease, background-color 0.1s ease;
+}
+
+/* 當被點選（有 .checked 類別）時，外框變紫色 */
+.matrix-radio.checked .matrix-radio-dot {
+  border-color: var(--forms-purple);
+}
+
+/* 當被點選時，中間出現漂亮的紫色實心圓點 */
+.matrix-radio.checked .matrix-radio-dot::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: var(--forms-purple);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 點選整列的背景微調 */
+.matrix-radio.checked {
+  background: #f7f3ff;
+}
