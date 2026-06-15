@@ -126,16 +126,23 @@
   // Deselect all siblings, then check this one — unless it was already checked
   // (= user clicked the same circle again → deselect / toggle off).
   function applyRadioToggle(input, wasChecked) {
-    // Uncheck every radio with the same name in this form
-    form.querySelectorAll(`input[type="radio"][name="${CSS.escape(input.name)}"]`)
-      .forEach(el => { el.checked = false; });
 
-    if (!wasChecked) {
-      // It was unchecked → check it now
-      input.checked = true;
+  const name = input.name;
+
+  // 只搜尋目前題組，不掃描整個 form
+  const card = input.closest('.matrix-card') || form;
+
+  card.querySelectorAll(
+    `input[type="radio"][name="${CSS.escape(name)}"]`
+  ).forEach(el => {
+    if (el !== input) {
+      el.checked = false;
     }
-  
-  }
+  });
+
+  // 已選取再點一次 → 取消
+  // 換選項 → 直接選取
+  input.checked = !wasChecked;
 
   renderActionButton();
 }
