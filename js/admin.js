@@ -124,21 +124,52 @@
 
   // 回歸原生盲載，避免不帶 task 參數時的首頁閃退
   async function loadServerRatings(reviewer, task) {
-    const params = { reviewer };
-    if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
-    
-    const data = await jsonp('listResponses', params);
-    const map = {};
-    (data.rows || []).forEach(r => {
-      const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
-      map[key] = r;
+  const params = { reviewer };
+
+  if (task) {
+    Object.assign(params, {
+      strategy: task.strategy,
+      dataset: task.dataset,
+      model: task.model
     });
-    serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
-    const local = getJson(localRatingsKey(reviewer), {});
-    setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
-    invalidateMergedCache(reviewer);
-    return map;
   }
+
+  const data = await jsonp('listResponses', params);
+
+  const rows =
+    (data && data.data && data.data.rows)
+    || data.rows
+    || [];
+
+  const map = {};
+
+  rows.forEach(r => {
+      const key = [
+        r.strategy,
+        r.dataset,
+        r.model,
+        r.imageId || r.fileId || r.filename
+      ].join('||');
+
+      map[key] = r;
+  });
+
+  serverRatings[reviewer] = Object.assign(
+    serverRatings[reviewer] || {},
+    map
+  );
+
+  const local = getJson(localRatingsKey(reviewer), {});
+
+  setJson(
+    localRatingsKey(reviewer),
+    Object.assign({}, map, local)
+  );
+
+  invalidateMergedCache(reviewer);
+
+  return map;
+}
 
   function populateReviewerSelect(select, includeAll) {
     if (!select) return;
