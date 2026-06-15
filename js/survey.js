@@ -140,11 +140,8 @@
   }
 
   function onFormChanged() {
-  if (finalSubmitBtn) {
-    finalSubmitBtn.textContent = '儲存作答進度';
-    finalSubmitBtn.className = 'primary-button';
-  }
-  showHint('');
+  // 點選評分時不做任何重計算
+  // 避免大量影像時每次點選都重新檢查全部任務
 }
 
   // ── Rating data helpers ───────────────────────────────────────────────────
