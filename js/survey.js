@@ -140,9 +140,12 @@
   }
 
   function onFormChanged() {
-    renderActionButton();
-    showHint('尚未儲存；請按「儲存作答進度」才會保留目前作答。');
+  if (finalSubmitBtn) {
+    finalSubmitBtn.textContent = '儲存作答進度';
+    finalSubmitBtn.className = 'primary-button';
   }
+  showHint('');
+}
 
   // ── Rating data helpers ───────────────────────────────────────────────────
 
