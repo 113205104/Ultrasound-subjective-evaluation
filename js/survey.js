@@ -134,9 +134,7 @@
       // It was unchecked → check it now
       input.checked = true;
     }
-    // If it was already checked → leave everything unchecked (deselect)
-
-    onFormChanged();
+  
   }
 
   function onFormChanged() {
