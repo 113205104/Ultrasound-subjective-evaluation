@@ -96,8 +96,9 @@
       action: 'saveRating', reviewer,
       strategy: task.strategy, dataset: task.dataset, model: task.model,
       displayModel: USE.displayModel(task.model),
-      imageId: img.id || '', fileId: img.fileId || '',
-      filename: img.filename || '', imageUrl: img.url || img.path || ''
+      imageId: img.id || img.fileId || img.filename || '', fileId: img.fileId || '',
+      filename: img.filename || '', imageUrl: img.url || img.path || '',
+      imageLink: img.imageLink || img.webViewUrl || '', questionNo: img.questionNo || img.number || ''
     }, values);
   }
 
@@ -161,7 +162,8 @@
     if (!task) return missing;
     for (let i = 0; i < task.images.length; i++) {
       const imgKey = task.images[i].id || task.images[i].filename;
-      const rating = localMemoryDraft[imgKey] || {};
+      const serverKey = USE.imageKey(task, task.images[i]);
+      const rating = localMemoryDraft[imgKey] || USE.readRating(reviewer, serverKey) || {};
       const isAllFilled = USE.ratingKeys().every(k => rating[k] !== undefined && rating[k] !== null && rating[k] !== '');
       if (!isAllFilled) {
         missing.push(i);

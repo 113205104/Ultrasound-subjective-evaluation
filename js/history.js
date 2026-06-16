@@ -12,8 +12,7 @@
     return String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   }
 
-  // ➔ 精簡版作答記錄：從 answer_log 讀取（新格式：每張影像 3 行，四個指標為並列欄位）
-  //    顯示欄位：reviewer | strategy | dataset | model | filename | imagePosition | whole_quality | noise_suppression | contrast | edge_sharpness
+  // answer_log 新格式：每一題/每一張 tripanel 影像只佔一列；12 個評分欄位展開為「項目+張數」。
   function renderTable(rows) {
     list.innerHTML = '';
     if (!rows || !rows.length) {
@@ -21,10 +20,20 @@
       return;
     }
 
-    const cols   = ['reviewer', 'strategy', 'dataset', 'model', 'filename', 'imagePosition',
-                     'whole_quality', 'noise_suppression', 'contrast', 'edge_sharpness'];
-    const labels = ['Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', '影像位置',
-                     'Whole Quality', 'Noise Suppression', 'Contrast', 'Edge Sharpness'];
+    const cols = [
+      'reviewer', 'strategy', 'dataset', 'model', 'filename', 'questionNo',
+      'whole_quality1', 'whole_quality2', 'whole_quality3',
+      'noise_suppression1', 'noise_suppression2', 'noise_suppression3',
+      'contrast1', 'contrast2', 'contrast3',
+      'edge_sharpness1', 'edge_sharpness2', 'edge_sharpness3'
+    ];
+    const labels = [
+      'Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', 'Question No',
+      'whole_quality1', 'whole_quality2', 'whole_quality3',
+      'noise_suppression1', 'noise_suppression2', 'noise_suppression3',
+      'contrast1', 'contrast2', 'contrast3',
+      'edge_sharpness1', 'edge_sharpness2', 'edge_sharpness3'
+    ];
 
     const headCells = labels.map(h => `<th>${escapeHtml(h)}</th>`).join('');
     const bodyRows  = rows.map(r =>
@@ -34,8 +43,8 @@
     const section = document.createElement('section');
     section.className = 'form-card history-card';
     section.innerHTML = `
-      <h2>作答記錄（精簡版）</h2>
-      <p class="muted">共 ${rows.length} 列，依題號 → 影像位置排序</p>
+      <h2>作答記錄（answer_log）</h2>
+      <p class="muted">共 ${rows.length} 列；每列為一題，12 個評分欄位已展開。</p>
       <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:0.9em;">
           <thead><tr>${headCells}</tr></thead>
@@ -48,7 +57,7 @@
       th.style.cssText = 'text-align:left;border-bottom:2px solid #ccc;padding:6px 10px;white-space:nowrap;';
     });
     section.querySelectorAll('td').forEach(td => {
-      td.style.cssText = 'padding:5px 10px;border-bottom:1px solid #eee;';
+      td.style.cssText = 'padding:5px 10px;border-bottom:1px solid #eee;white-space:nowrap;';
     });
   }
 
