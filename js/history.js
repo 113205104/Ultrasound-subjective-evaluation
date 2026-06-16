@@ -12,8 +12,8 @@
     return String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   }
 
-  // ➔ 精簡版作答記錄：從 answer_log 讀取，依題號排序，
-  //    顯示 reviewer | strategy | dataset | model | filename | imagePosition | ratingItem | score
+  // ➔ 精簡版作答記錄：從 answer_log 讀取（新格式：每張影像 3 行，四個指標為並列欄位）
+  //    顯示欄位：reviewer | strategy | dataset | model | filename | imagePosition | whole_quality | noise_suppression | contrast | edge_sharpness
   function renderTable(rows) {
     list.innerHTML = '';
     if (!rows || !rows.length) {
@@ -21,19 +21,21 @@
       return;
     }
 
-    const cols = ['reviewer', 'strategy', 'dataset', 'model', 'filename', 'imagePosition', 'ratingItem', 'score'];
-    const labels = ['Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', '影像位置', '評分指標', '分數'];
+    const cols   = ['reviewer', 'strategy', 'dataset', 'model', 'filename', 'imagePosition',
+                     'whole_quality', 'noise_suppression', 'contrast', 'edge_sharpness'];
+    const labels = ['Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', '影像位置',
+                     'Whole Quality', 'Noise Suppression', 'Contrast', 'Edge Sharpness'];
 
     const headCells = labels.map(h => `<th>${escapeHtml(h)}</th>`).join('');
-    const bodyRows = rows.map(r => {
-      return '<tr>' + cols.map(k => `<td>${escapeHtml(r[k])}</td>`).join('') + '</tr>';
-    }).join('');
+    const bodyRows  = rows.map(r =>
+      '<tr>' + cols.map(k => `<td>${escapeHtml(r[k])}</td>`).join('') + '</tr>'
+    ).join('');
 
     const section = document.createElement('section');
     section.className = 'form-card history-card';
     section.innerHTML = `
       <h2>作答記錄（精簡版）</h2>
-      <p class="muted">共 ${rows.length} 筆，依題號 → 影像位置 → 評分指標排序</p>
+      <p class="muted">共 ${rows.length} 列，依題號 → 影像位置排序</p>
       <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:0.9em;">
           <thead><tr>${headCells}</tr></thead>
@@ -65,3 +67,4 @@
   reloadBtn.addEventListener('click', load);
   load();
 })();
+
