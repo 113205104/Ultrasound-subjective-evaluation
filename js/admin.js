@@ -23,29 +23,6 @@
     return (cfg.ratingFields || []).flatMap(f => rows.map(r => `${f.key}_${r.key}`));
   }
 
-  function tripanelRowLabel(posKey) {
-    const row = (cfg.tripanelRows || []).find(r => r.key === String(posKey));
-    return row ? row.label : posKey;
-  }
-
-  // ➔ 將單張圖片的 wide 評分 (whole_quality_1, whole_quality_2, ...) 拆解成
-  //    SPSS 友善的長表格 rows：每個 imagePosition (第一張/第二張/第三張) 一行，
-  //    4 個評分指標 (whole_quality, noise_suppression, contrast, edge_sharpness) 為並列欄位。
-  function buildLongRows(base, values) {
-    return (cfg.tripanelRows || []).map(posRow => {
-      const row = Object.assign({}, base, {
-        imagePosition: posRow.key,
-        imagePositionLabel: posRow.label
-      });
-      (cfg.ratingFields || []).forEach(field => {
-        const k = `${field.key}_${posRow.key}`;
-        const score = values[k];
-        row[field.key] = (score === undefined || score === null) ? '' : score;
-      });
-      return row;
-    });
-  }
-
   function localRatingsKey(reviewer) { return 'use_ratings_' + reviewer; }
   function localProgressKey(reviewer) { return 'use_progress_' + reviewer; }
   function getJson(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (_) { return fallback; } }
@@ -113,16 +90,6 @@
     return fetch(cfg.appsScriptUrl, { method: 'POST', mode: 'no-cors', body }).then(() => true).catch(() => false);
   }
 
-  // ➔ 將一張影像的 3 列（第一張/第二張/第三張）以 JSON 字串一次送出。
-  //    後端依 action='saveRatingRows'，以 (reviewer, strategy, dataset, model, imageId/filename, imagePosition)
-  //    為唯一鍵，找到就覆蓋(更新)分數，找不到就新增一列。
-  function postRowsToSheet(rows, extra) {
-    if (!cfg.appsScriptUrl) return Promise.resolve(false);
-    const payload = Object.assign({ action: 'saveRatingRows', rows: JSON.stringify(rows) }, extra || {});
-    const body = new URLSearchParams(payload);
-    return fetch(cfg.appsScriptUrl, { method: 'POST', mode: 'no-cors', body }).then(() => true).catch(() => false);
-  }
-
   function jsonp(action, params) {
     return new Promise((resolve, reject) => {
       if (!cfg.appsScriptUrl) return reject(new Error('Apps Script URL 未設定'));
@@ -155,30 +122,31 @@
     return normalizeManifest(await res.json());
   }
 
-  // 回歸原生盲載，避免不帶 task 參數時的首頁閃退
-  // ➔ 後端 listResponses 現在回傳長表格 rows（每張影像 3 行：第一張/第二張/第三張，
-  //    whole_quality/noise_suppression/contrast/edge_sharpness 為並列欄位）。
-  //    這裡將其還原成前端沿用的 wide 格式 (whole_quality_1, whole_quality_2, ...)。
+  // ➔ 從 Google Sheet 載入該 reviewer 的作答記錄（帳號綁定，跨裝置同步）。
+  //    合併順序：local 草稿優先（尚未送出的本機編輯）覆蓋 server，
+  //    但 server 已儲存的欄位不被本機的空白 {} 污染。
   async function loadServerRatings(reviewer, task) {
     const params = { reviewer };
     if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
-
+    
     const data = await jsonp('listResponses', params);
     const map = {};
     (data.rows || []).forEach(r => {
       const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
-      if (!map[key]) map[key] = Object.assign({}, r);
-      const pos = r.imagePosition;
-      if (pos !== undefined && pos !== null && pos !== '') {
-        (cfg.ratingFields || []).forEach(field => {
-          const score = r[field.key];
-          map[key][`${field.key}_${pos}`] = (score === '' || score === undefined || score === null) ? '' : score;
-        });
-      }
+      map[key] = r;
     });
     serverRatings[reviewer] = Object.assign(serverRatings[reviewer] || {}, map);
+
+    // ➔ 合併：以 server 為底，local 草稿中只有真正有作答（hasAnyAnswer）的才覆蓋上去，
+    //    避免舊裝置殘留的空白 {} 把 server 的正確答案蓋掉。
     const local = getJson(localRatingsKey(reviewer), {});
-    setJson(localRatingsKey(reviewer), Object.assign({}, map, local));
+    const merged = Object.assign({}, map);
+    Object.keys(local).forEach(k => {
+      const loc = local[k];
+      const hasAnswer = loc && ratingKeys().some(rk => loc[rk] !== undefined && loc[rk] !== null && loc[rk] !== '');
+      if (hasAnswer) merged[k] = Object.assign({}, map[k] || {}, loc);
+    });
+    setJson(localRatingsKey(reviewer), merged);
     invalidateMergedCache(reviewer);
     return map;
   }
@@ -204,10 +172,10 @@
   }
 
   window.USE = {
-    taskKey, imageKey, imageStableId, displayModel, ratingKeys, buildLongRows, tripanelRowLabel,
+    taskKey, imageKey, imageStableId, displayModel, ratingKeys,
     saveLocalRating, readLocalRating, readRating,
     saveLocalProgress, readLocalProgress, countCompleted, firstIncompleteIndex,
-    isCompleteRating, postToSheet, postRowsToSheet, jsonp, loadManifest, loadServerRatings,
+    isCompleteRating, postToSheet, jsonp, loadManifest, loadServerRatings,
     populateReviewerSelect
   };
 })();

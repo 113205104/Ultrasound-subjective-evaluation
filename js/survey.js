@@ -82,21 +82,23 @@
     return out;
   }
 
-  // ➔ 判斷一筆評分物件是否「有任何已作答的格子」，用來避免把全空的 {} 當成有效草稿
+  // ➔ Bug fix: readRating() 永遠回傳物件（最差是 {}），直接 if(serverRating) 判斷會
+  //    把每張圖都塞進 localMemoryDraft，導致儲存時對未作答的圖送出空白 payload 覆蓋舊答案。
+  //    hasAnyAnswer 確保只有真正有填分數的物件才算有效草稿。
   function hasAnyAnswer(rating) {
     if (!rating) return false;
     return USE.ratingKeys().some(k => rating[k] !== undefined && rating[k] !== null && rating[k] !== '');
   }
 
-  function buildBaseForImage(index) {
+  function makePayloadForImage(index, values) {
     const img = task.images[index];
-    return {
-      reviewer,
+    return Object.assign({
+      action: 'saveRating', reviewer,
       strategy: task.strategy, dataset: task.dataset, model: task.model,
       displayModel: USE.displayModel(task.model),
       imageId: img.id || '', fileId: img.fileId || '',
       filename: img.filename || '', imageUrl: img.url || img.path || ''
-    };
+    }, values);
   }
 
   async function saveAllToCloud(isFinal = false) {
@@ -108,22 +110,17 @@
 
     let savedCount = 0;
     const promises = [];
-    const timestamp = new Date().toISOString();
 
     task.images.forEach((img, idx) => {
       const imgKey = img.id || img.filename;
       if (hasAnyAnswer(localMemoryDraft[imgKey])) {
         const ratingData = localMemoryDraft[imgKey];
-
+        const payload = makePayloadForImage(idx, ratingData);
+        
         const storageKey = [task.strategy, task.dataset, task.model, imgKey].join('||');
-        USE.saveLocalRating(reviewer, storageKey, ratingData);
-
-        const base = Object.assign({ timestamp }, buildBaseForImage(idx));
-        const rows = USE.buildLongRows(base, ratingData);
-
-        // ➔ 每次儲存以「覆蓋」方式送出該影像的 3 列（第一張/第二張/第三張），
-        //    後端依 (reviewer, strategy, dataset, model, imageId/filename, imagePosition) 為唯一鍵更新。
-        promises.push(USE.postRowsToSheet(rows, { reviewer }));
+        USE.saveLocalRating(reviewer, storageKey, payload);
+        
+        promises.push(USE.postToSheet(payload));
         savedCount++;
       }
     });
@@ -144,10 +141,9 @@
     if (progressBar) progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
 
     if (!isFinal) {
-      showHint(`💾 儲存成功！已將 ${savedCount} 張影像的作答更新至 responses（每張影像對應第一張/第二張/第三張共 3 列，未選欄位為空白）。`);
+      showHint(`💾 儲存成功！已將 ${savedCount} 筆作答更新至 responses（未選欄位在後台已保留空白）。`);
     }
   }
-
 
   function missingIndices() {
     const missing = [];
