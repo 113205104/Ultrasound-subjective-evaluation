@@ -103,7 +103,8 @@
 
   async function saveAllToCloud(isFinal = false) {
     showHint('正在同步作答進度與紀錄至雲端試算表...');
-    
+
+    // ➔ 先把當前頁面的最新填答寫入 localMemoryDraft
     const currentValues = readFormValues();
     const currentImgKey = task.images[current].id || task.images[current].filename;
     localMemoryDraft[currentImgKey] = currentValues;
@@ -113,13 +114,23 @@
 
     task.images.forEach((img, idx) => {
       const imgKey = img.id || img.filename;
-      if (hasAnyAnswer(localMemoryDraft[imgKey])) {
-        const ratingData = localMemoryDraft[imgKey];
+
+      // ➔ 修正：localMemoryDraft 沒有記錄時（作答者沒翻頁過），
+      //    從 server 已儲存的評分補回來，確保所有已作答圖片都能被送出，
+      //    不因「未翻頁」而漏掉。
+      let ratingData = localMemoryDraft[imgKey];
+      if (!hasAnyAnswer(ratingData)) {
+        const serverKey = USE.imageKey(task, img);
+        const serverRating = USE.readRating(reviewer, serverKey);
+        if (hasAnyAnswer(serverRating)) ratingData = serverRating;
+      }
+
+      if (hasAnyAnswer(ratingData)) {
         const payload = makePayloadForImage(idx, ratingData);
-        
+
         const storageKey = [task.strategy, task.dataset, task.model, imgKey].join('||');
-        USE.saveLocalRating(reviewer, storageKey, payload);
-        
+        USE.saveLocalRating(reviewer, storageKey, ratingData);
+
         promises.push(USE.postToSheet(payload));
         savedCount++;
       }
@@ -138,10 +149,10 @@
     await Promise.all(promises);
 
     if (progressText) progressText.textContent = `${completedCount} / ${task.images.length}`;
-    if (progressBar) progressBar.style.width  = Math.round(completedCount * 100 / task.images.length) + '%';
+    if (progressBar) progressBar.style.width = Math.round(completedCount * 100 / task.images.length) + '%';
 
     if (!isFinal) {
-      showHint(`💾 儲存成功！已將 ${savedCount} 筆作答更新至 responses（未選欄位在後台已保留空白）。`);
+      showHint(`💾 儲存成功！已將 ${savedCount} 筆作答更新至 responses。`);
     }
   }
 
