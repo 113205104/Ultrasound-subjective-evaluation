@@ -26,8 +26,12 @@ const PROGRESS_HEADERS = [
 ];
 
 const ANSWER_LOG_HEADERS = [
-  'timestamp', 'reviewer', 'filename', 'imagePosition', 'ratingItem', 'score',
-  'strategy', 'dataset', 'model', 'displayModel', 'imageId', 'fileId', 'imageUrl', 'imageLink'
+  'timestamp', 'reviewer', 'strategy', 'dataset', 'model', 'displayModel',
+  'imageId', 'fileId', 'filename', 'imageUrl', 'imageLink', 'questionNo',
+  'whole_quality1', 'whole_quality2', 'whole_quality3',
+  'noise_suppression1', 'noise_suppression2', 'noise_suppression3',
+  'contrast1', 'contrast2', 'contrast3',
+  'edge_sharpness1', 'edge_sharpness2', 'edge_sharpness3'
 ];
 
 const RATING_FIELDS = ['whole_quality', 'noise_suppression', 'contrast', 'edge_sharpness'];
@@ -57,6 +61,10 @@ function handleRequest_(e) {
       data = saveProgress_(p);
     } else if (action === 'listResponses') {
       data = listResponses_(p);
+    } else if (action === 'listAnswerLog') {
+      data = listAnswerLog_(p);
+    } else if (action === 'syncResponsesFromAnswerLog') {
+      data = syncResponsesFromAnswerLog_();
     } else if (action === 'loadProgressAndRatings') {
       data = loadProgressAndRatings_(p);
     } else if (action === 'setup') {
@@ -110,6 +118,52 @@ function ensureHeaders_(sheet, requiredHeaders) {
   }
 }
 
+
+function ensureExactHeaders_(sheet, exactHeaders) {
+  const lastRow = Math.max(sheet.getLastRow(), 1);
+  const lastCol = Math.max(sheet.getLastColumn(), 1);
+  const current = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(String);
+
+  const same = current.length === exactHeaders.length && exactHeaders.every((h, i) => current[i] === h);
+  if (same) return;
+
+  const oldMap = {};
+  current.forEach((h, i) => { if (h) oldMap[h] = i; });
+
+  if (lastRow <= 1) {
+    sheet.clear();
+    sheet.getRange(1, 1, 1, exactHeaders.length).setValues([exactHeaders]);
+    sheet.getRange(1, 1, 1, exactHeaders.length).setFontWeight('bold');
+    if (sheet.getMaxColumns() > exactHeaders.length) {
+      sheet.deleteColumns(exactHeaders.length + 1, sheet.getMaxColumns() - exactHeaders.length);
+    }
+    return;
+  }
+
+  const oldValues = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+  const newValues = oldValues.map(row => exactHeaders.map(h => oldMap[h] !== undefined ? row[oldMap[h]] : ''));
+
+  sheet.clear();
+  if (sheet.getMaxColumns() < exactHeaders.length) {
+    sheet.insertColumnsAfter(sheet.getMaxColumns(), exactHeaders.length - sheet.getMaxColumns());
+  }
+  sheet.getRange(1, 1, 1, exactHeaders.length).setValues([exactHeaders]);
+  sheet.getRange(1, 1, 1, exactHeaders.length).setFontWeight('bold');
+  if (newValues.length) sheet.getRange(2, 1, newValues.length, exactHeaders.length).setValues(newValues);
+  if (sheet.getMaxColumns() > exactHeaders.length) {
+    sheet.deleteColumns(exactHeaders.length + 1, sheet.getMaxColumns() - exactHeaders.length);
+  }
+}
+
+function getOrCreateAnswerLogSheet_(ss) {
+  let sheet = ss.getSheetByName(ANSWER_LOG_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(ANSWER_LOG_SHEET);
+  }
+  ensureExactHeaders_(sheet, ANSWER_LOG_HEADERS);
+  return sheet;
+}
+
 function headerIndexMap_(sheet, requiredHeaders) {
   ensureHeaders_(sheet, requiredHeaders);
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
@@ -122,7 +176,7 @@ function setup_() {
   const ss = getOrCreateSpreadsheet_();
   getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
   getOrCreateSheet_(ss, PROGRESS_SHEET, PROGRESS_HEADERS);
-  getOrCreateSheet_(ss, ANSWER_LOG_SHEET, ANSWER_LOG_HEADERS);
+  getOrCreateAnswerLogSheet_(ss);
   return { status: 'SetupComplete', spreadsheetUrl: ss.getUrl() };
 }
 
@@ -135,8 +189,9 @@ function saveRating_(p) {
   const strategy = p.strategy || '';
   const dataset = p.dataset || '';
   const model = p.model || '';
-  const imageId = p.imageId || '';
+  const imageId = p.imageId || p.fileId || p.filename || '';
 
+  p.imageId = imageId;
   if (!reviewer || !strategy || !dataset || !model || !imageId) {
     throw new Error('Missing core identification fields.');
   }
@@ -173,59 +228,72 @@ function saveRating_(p) {
 }
 
 function saveAnswerLog_(ss, p) {
-  const sheet = getOrCreateSheet_(ss, ANSWER_LOG_SHEET, ANSWER_LOG_HEADERS);
+  const sheet = getOrCreateAnswerLogSheet_(ss);
   const hm = headerIndexMap_(sheet, ANSWER_LOG_HEADERS);
 
-  const reviewer = p.reviewer || '';
-  const strategy = p.strategy || '';
-  const dataset = p.dataset || '';
-  const model = p.model || '';
+  const reviewer     = p.reviewer     || '';
+  const strategy     = p.strategy     || '';
+  const dataset      = p.dataset      || '';
+  const model        = p.model        || '';
   const displayModel = p.displayModel || '';
-  const imageId = p.imageId || '';
-  const fileId = p.fileId || '';
-  const filename = p.filename || '';
-  const imageUrl = p.imageUrl || '';
-  const imageLink = p.imageLink || '';
+  const imageId      = p.imageId || p.fileId || p.filename || '';
+  const fileId       = p.fileId       || '';
+  const filename     = p.filename     || '';
+  const imageUrl     = p.imageUrl     || '';
+  const imageLink    = p.imageLink || p.webViewUrl || imageUrl || '';
+  const questionNo   = p.questionNo || extractQuestionNo_(filename) || '';
 
   if (!reviewer || !strategy || !dataset || !model || !imageId) {
     throw new Error('Missing core identification fields for answer_log.');
   }
 
-  // 先刪除此 reviewer + task + image 的舊簡化紀錄，避免同一題重複累積。
-  const values = sheet.getDataRange().getValues();
-  const idxReviewer = hm.map.reviewer;
-  const idxStrategy = hm.map.strategy;
-  const idxDataset = hm.map.dataset;
-  const idxModel = hm.map.model;
-  const idxImageId = hm.map.imageId;
-  for (let i = values.length - 1; i >= 1; i--) {
-    const r = values[i];
-    if (r[idxReviewer] === reviewer && r[idxStrategy] === strategy && r[idxDataset] === dataset && r[idxModel] === model && r[idxImageId] === imageId) {
-      sheet.deleteRow(i + 1);
-    }
-  }
+  const obj = {
+    timestamp: new Date(), reviewer, strategy, dataset, model, displayModel,
+    imageId, fileId, filename, imageUrl, imageLink, questionNo
+  };
 
-  const now = new Date();
-  const rows = [];
-  TRIPANEL_ROWS.forEach(row => {
-    RATING_FIELDS.forEach(field => {
-      const key = field + '_' + row.key;
-      const score = p[key];
-      if (score === undefined || score === null || score === '') return;
-      const obj = {
-        timestamp: now, reviewer: reviewer, filename: filename,
-        imagePosition: row.label, ratingItem: field, score: score,
-        strategy: strategy, dataset: dataset, model: model, displayModel: displayModel,
-        imageId: imageId, fileId: fileId, imageUrl: imageUrl, imageLink: imageLink
-      };
-      rows.push(hm.headers.map(h => obj[h] !== undefined ? obj[h] : ''));
+  RATING_FIELDS.forEach(field => {
+    TRIPANEL_ROWS.forEach(posRow => {
+      const srcKey = field + '_' + posRow.key;   // 前端 responses 使用的欄位：whole_quality_1
+      const logKey = field + posRow.key;         // answer_log 使用的欄位：whole_quality1
+      const score = p[srcKey] !== undefined ? p[srcKey] : p[logKey];
+      obj[logKey] = (score === undefined || score === null) ? '' : score;
     });
   });
 
-  if (rows.length) {
-    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, hm.headers.length).setValues(rows);
+  const rowData = hm.headers.map(h => obj[h] !== undefined ? obj[h] : '');
+  const values = sheet.getDataRange().getValues();
+  let foundRowIndex = -1;
+
+  const idxReviewer = hm.map.reviewer;
+  const idxStrategy = hm.map.strategy;
+  const idxDataset  = hm.map.dataset;
+  const idxModel    = hm.map.model;
+  const idxImageId  = hm.map.imageId;
+
+  for (let i = 1; i < values.length; i++) {
+    const r = values[i];
+    if (r[idxReviewer] === reviewer &&
+        r[idxStrategy] === strategy &&
+        r[idxDataset]  === dataset &&
+        r[idxModel]    === model &&
+        r[idxImageId]  === imageId) {
+      foundRowIndex = i + 1;
+      break;
+    }
   }
-  return { status: 'AnswerLogSaved', rows: rows.length };
+
+  if (foundRowIndex > 0) {
+    sheet.getRange(foundRowIndex, 1, 1, rowData.length).setValues([rowData]);
+  } else {
+    sheet.appendRow(rowData);
+  }
+  return { status: 'AnswerLogSaved' };
+}
+
+function extractQuestionNo_(filename) {
+  const m = String(filename || '').match(/_(\d+)\.(png|jpg|jpeg|webp)$/i);
+  return m ? m[1] : '';
 }
 
 function saveProgress_(p) {
@@ -271,12 +339,132 @@ function saveProgress_(p) {
   return { status: 'ProgressSaved' };
 }
 
+// ➔ 讀取 answer_log sheet，依 strategy/dataset/model/reviewer 篩選，
+//    並依題號（filename 內數字）→ imagePosition（第一張/第二張/第三張）排列。
+function listAnswerLog_(p) {
+  const ss = getOrCreateSpreadsheet_();
+  const sheet = getOrCreateAnswerLogSheet_(ss);
+  const hm = headerIndexMap_(sheet, ANSWER_LOG_HEADERS);
+  const values = sheet.getDataRange().getValues();
+  if (values.length <= 1) return { rows: [] };
+
+  const filterReviewer = p.reviewer || '';
+  const filterStrategy = p.strategy || '';
+  const filterDataset  = p.dataset  || '';
+  const filterModel    = p.model    || '';
+
+  const out = [];
+  for (let i = 1; i < values.length; i++) {
+    const r = values[i];
+    const row = {};
+    hm.headers.forEach((h, idx) => { row[h] = r[idx]; });
+
+    if (filterReviewer && row.reviewer !== filterReviewer) continue;
+    if (filterStrategy && !String(row.strategy || '').toLowerCase().includes(filterStrategy.toLowerCase())) continue;
+    if (filterDataset  && !String(row.dataset  || '').toLowerCase().includes(filterDataset.toLowerCase()))  continue;
+    if (filterModel    && !String(row.model    || '').toLowerCase().includes(filterModel.toLowerCase()))    continue;
+
+    out.push(row);
+  }
+
+  function questionNum_(row) {
+    const q = row.questionNo || extractQuestionNo_(row.filename);
+    const n = parseInt(q, 10);
+    return isNaN(n) ? 0 : n;
+  }
+
+  out.sort((a, b) => {
+    const qA = questionNum_(a), qB = questionNum_(b);
+    if (qA !== qB) return qA - qB;
+    return String(a.filename || '').localeCompare(String(b.filename || ''), undefined, { numeric: true, sensitivity: 'base' });
+  });
+
+  return { rows: out };
+}
+
+function answerLogRowToResponseRow_(row) {
+  const out = {};
+  RESPONSE_HEADERS.forEach(h => { out[h] = row[h] !== undefined ? row[h] : ''; });
+  out.timestamp = row.timestamp || new Date();
+  out.reviewer = row.reviewer || '';
+  out.strategy = row.strategy || '';
+  out.dataset = row.dataset || '';
+  out.model = row.model || '';
+  out.displayModel = row.displayModel || '';
+  out.imageId = row.imageId || row.fileId || row.filename || '';
+  out.fileId = row.fileId || '';
+  out.filename = row.filename || '';
+  out.imageUrl = row.imageUrl || '';
+  out.imageLink = row.imageLink || row.imageUrl || '';
+  out.questionNo = row.questionNo || extractQuestionNo_(row.filename) || '';
+  RATING_FIELDS.forEach(field => {
+    TRIPANEL_ROWS.forEach(posRow => {
+      const responseKey = field + '_' + posRow.key;
+      const logKey = field + posRow.key;
+      out[responseKey] = row[responseKey] !== undefined && row[responseKey] !== '' ? row[responseKey] : (row[logKey] || '');
+    });
+  });
+  return out;
+}
+
+function responseRowHasAnyScore_(row) {
+  return RATING_FIELDS.some(field => TRIPANEL_ROWS.some(posRow => {
+    const k = field + '_' + posRow.key;
+    return row[k] !== undefined && row[k] !== null && row[k] !== '';
+  }));
+}
+
+function upsertResponseRow_(sheet, hm, obj) {
+  const imageId = obj.imageId || obj.fileId || obj.filename || '';
+  if (!obj.reviewer || !obj.strategy || !obj.dataset || !obj.model || !imageId) return false;
+  obj.imageId = imageId;
+
+  const rowData = hm.headers.map(h => obj[h] !== undefined ? obj[h] : '');
+  const values = sheet.getDataRange().getValues();
+  let foundRowIndex = -1;
+  const idxReviewer = hm.map.reviewer;
+  const idxStrategy = hm.map.strategy;
+  const idxDataset = hm.map.dataset;
+  const idxModel = hm.map.model;
+  const idxImageId = hm.map.imageId;
+
+  for (let i = 1; i < values.length; i++) {
+    const r = values[i];
+    if (r[idxReviewer] === obj.reviewer && r[idxStrategy] === obj.strategy && r[idxDataset] === obj.dataset && r[idxModel] === obj.model && r[idxImageId] === imageId) {
+      foundRowIndex = i + 1;
+      break;
+    }
+  }
+
+  if (foundRowIndex > 0) sheet.getRange(foundRowIndex, 1, 1, rowData.length).setValues([rowData]);
+  else sheet.appendRow(rowData);
+  return true;
+}
+
+function syncResponsesFromAnswerLog_() {
+  const ss = getOrCreateSpreadsheet_();
+  const responseSheet = getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
+  const rhm = headerIndexMap_(responseSheet, RESPONSE_HEADERS);
+  const logSheet = getOrCreateAnswerLogSheet_(ss);
+  const lhm = headerIndexMap_(logSheet, ANSWER_LOG_HEADERS);
+  const values = logSheet.getDataRange().getValues();
+  let synced = 0;
+
+  for (let i = 1; i < values.length; i++) {
+    const raw = values[i];
+    const logRow = {};
+    lhm.headers.forEach((h, idx) => { logRow[h] = raw[idx]; });
+    const responseObj = answerLogRowToResponseRow_(logRow);
+    if (upsertResponseRow_(responseSheet, rhm, responseObj)) synced++;
+  }
+  return { status: 'Synced', synced: synced };
+}
+
 function listResponses_(p) {
   const ss = getOrCreateSpreadsheet_();
   const sheet = getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
   const hm = headerIndexMap_(sheet, RESPONSE_HEADERS);
   const values = sheet.getDataRange().getValues();
-  if (values.length <= 1) return { rows: [] };
 
   const filterReviewer = p.reviewer || '';
   const filterStrategy = p.strategy || '';
@@ -294,8 +482,25 @@ function listResponses_(p) {
     if (filterDataset && !String(rowObj.dataset).toLowerCase().includes(filterDataset.toLowerCase())) continue;
     if (filterModel && !String(rowObj.model).toLowerCase().includes(filterModel.toLowerCase())) continue;
 
-    out.push(rowObj);
+    if (responseRowHasAnyScore_(rowObj)) out.push(rowObj);
   }
+
+  // 保險：若 responses 沒有資料或分數欄空白，但 answer_log 已有答案，讀取時自動回填 responses。
+  if (out.length === 0) {
+    syncResponsesFromAnswerLog_();
+    const refreshed = sheet.getDataRange().getValues();
+    for (let i = 1; i < refreshed.length; i++) {
+      const r = refreshed[i];
+      const rowObj = {};
+      hm.headers.forEach((h, idx) => { rowObj[h] = r[idx]; });
+      if (filterReviewer && rowObj.reviewer !== filterReviewer) continue;
+      if (filterStrategy && !String(rowObj.strategy).toLowerCase().includes(filterStrategy.toLowerCase())) continue;
+      if (filterDataset && !String(rowObj.dataset).toLowerCase().includes(filterDataset.toLowerCase())) continue;
+      if (filterModel && !String(rowObj.model).toLowerCase().includes(filterModel.toLowerCase())) continue;
+      if (responseRowHasAnyScore_(rowObj)) out.push(rowObj);
+    }
+  }
+
   out.sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
   return { rows: out };
 }
