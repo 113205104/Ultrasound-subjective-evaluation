@@ -129,9 +129,10 @@
     const params = { reviewer };
     if (task) Object.assign(params, { strategy: task.strategy, dataset: task.dataset, model: task.model });
     
-    const data = await jsonp('listResponses', params);
+    const res = await jsonp('listResponses', params);
+    const rows = (res && res.data && Array.isArray(res.data.rows)) ? res.data.rows : (Array.isArray(res.rows) ? res.rows : []);
     const map = {};
-    (data.rows || []).forEach(r => {
+    rows.forEach(r => {
       const key = [r.strategy, r.dataset, r.model, r.imageId || r.fileId || r.filename].join('||');
       map[key] = r;
     });

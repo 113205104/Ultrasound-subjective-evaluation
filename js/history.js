@@ -21,14 +21,14 @@
     }
 
     const cols = [
-      'reviewer', 'strategy', 'dataset', 'model', 'filename', 'questionNo',
+      'questionNo',
       'whole_quality1', 'whole_quality2', 'whole_quality3',
       'noise_suppression1', 'noise_suppression2', 'noise_suppression3',
       'contrast1', 'contrast2', 'contrast3',
       'edge_sharpness1', 'edge_sharpness2', 'edge_sharpness3'
     ];
     const labels = [
-      'Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', 'Question No',
+      '題號',
       'whole_quality1', 'whole_quality2', 'whole_quality3',
       'noise_suppression1', 'noise_suppression2', 'noise_suppression3',
       'contrast1', 'contrast2', 'contrast3',
@@ -43,8 +43,8 @@
     const section = document.createElement('section');
     section.className = 'form-card history-card';
     section.innerHTML = `
-      <h2>作答記錄（answer_log）</h2>
-      <p class="muted">共 ${rows.length} 列；每列為一題，12 個評分欄位已展開。</p>
+      <h2>作答記錄查詢結果</h2>
+      <p class="muted">共 ${rows.length} 題；僅顯示題號與 12 欄答案。</p>
       <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:0.9em;">
           <thead><tr>${headCells}</tr></thead>
@@ -68,7 +68,10 @@
       strategy: val('strategyFilter'),
       dataset:  val('datasetFilter'),
       model:    val('modelFilter')
-    }).then(data => renderTable(data.rows || [])).catch(err => {
+    }).then(res => {
+      const rows = (res && res.data && Array.isArray(res.data.rows)) ? res.data.rows : (Array.isArray(res.rows) ? res.rows : []);
+      renderTable(rows);
+    }).catch(err => {
       list.innerHTML = `<section class="form-card history-card"><div class="error">無法讀取 Google Sheet：${escapeHtml(err.message)}</div></section>`;
     });
   }
