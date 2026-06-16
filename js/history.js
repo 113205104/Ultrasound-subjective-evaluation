@@ -9,15 +9,11 @@
   }
 
   function escapeHtml(s) {
-    return String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    return String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   }
 
-  function imagePositionLabel(pos) {
-    return USE.tripanelRowLabel ? USE.tripanelRowLabel(pos) : (APP_CONFIG.tripanelRows.find(r => r.key === String(pos)) || {}).label || pos;
-  }
-
-  // ➔ 精簡版作答記錄表格：reviewer | strategy | dataset | model | filename | imagePosition | whole_quality | noise_suppression | contrast | edge_sharpness
-  //    後端 listResponses 直接回傳長表格 rows（每張影像 3 行：第一張/第二張/第三張）。
+  // ➔ 精簡版作答記錄：從 answer_log 讀取，依題號排序，
+  //    顯示 reviewer | strategy | dataset | model | filename | imagePosition | ratingItem | score
   function renderTable(rows) {
     list.innerHTML = '';
     if (!rows || !rows.length) {
@@ -25,29 +21,21 @@
       return;
     }
 
-    const ratingFieldKeys = (APP_CONFIG.ratingFields || []).map(f => f.key);
-    const ratingFieldLabels = (APP_CONFIG.ratingFields || []).map(f => f.label);
+    const cols = ['reviewer', 'strategy', 'dataset', 'model', 'filename', 'imagePosition', 'ratingItem', 'score'];
+    const labels = ['Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', '影像位置', '評分指標', '分數'];
 
-    const headCells = ['Reviewer', 'Strategy', 'Dataset', 'Model', 'Filename', '影像位置']
-      .concat(ratingFieldLabels)
-      .map(h => `<th>${escapeHtml(h)}</th>`).join('');
-
+    const headCells = labels.map(h => `<th>${escapeHtml(h)}</th>`).join('');
     const bodyRows = rows.map(r => {
-      const cells = [
-        r.reviewer, r.strategy, r.dataset, r.displayModel || USE.displayModel(r.model),
-        r.filename || r.imageId || '', imagePositionLabel(r.imagePosition)
-      ].map(v => `<td>${escapeHtml(v)}</td>`).join('');
-      const scoreCells = ratingFieldKeys.map(k => `<td>${escapeHtml(r[k])}</td>`).join('');
-      return `<tr>${cells}${scoreCells}</tr>`;
+      return '<tr>' + cols.map(k => `<td>${escapeHtml(r[k])}</td>`).join('') + '</tr>';
     }).join('');
 
     const section = document.createElement('section');
     section.className = 'form-card history-card';
     section.innerHTML = `
       <h2>作答記錄（精簡版）</h2>
-      <p class="muted">共 ${rows.length} 列（每張影像對應第一張/第二張/第三張共 3 列）</p>
-      <div class="history-table-wrap" style="overflow-x:auto;">
-        <table class="history-table" style="width:100%;border-collapse:collapse;font-size:0.9em;">
+      <p class="muted">共 ${rows.length} 筆，依題號 → 影像位置 → 評分指標排序</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.9em;">
           <thead><tr>${headCells}</tr></thead>
           <tbody>${bodyRows}</tbody>
         </table>
@@ -55,23 +43,20 @@
     list.appendChild(section);
 
     section.querySelectorAll('th').forEach(th => {
-      th.style.textAlign = 'left';
-      th.style.borderBottom = '1px solid #ccc';
-      th.style.padding = '4px 8px';
+      th.style.cssText = 'text-align:left;border-bottom:2px solid #ccc;padding:6px 10px;white-space:nowrap;';
     });
     section.querySelectorAll('td').forEach(td => {
-      td.style.padding = '4px 8px';
-      td.style.borderBottom = '1px solid #eee';
+      td.style.cssText = 'padding:5px 10px;border-bottom:1px solid #eee;';
     });
   }
 
   function load() {
     list.innerHTML = '<section class="form-card history-card"><p class="muted">載入中...</p></section>';
-    USE.jsonp('listResponses', {
+    USE.jsonp('listAnswerLog', {
       reviewer: val('reviewerFilter'),
       strategy: val('strategyFilter'),
-      dataset: val('datasetFilter'),
-      model: val('modelFilter')
+      dataset:  val('datasetFilter'),
+      model:    val('modelFilter')
     }).then(data => renderTable(data.rows || [])).catch(err => {
       list.innerHTML = `<section class="form-card history-card"><div class="error">無法讀取 Google Sheet：${escapeHtml(err.message)}</div></section>`;
     });
