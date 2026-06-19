@@ -105,56 +105,53 @@
   async function saveAllToCloud(isFinal = false) {
     showHint('正在同步作答進度與紀錄至雲端試算表...');
 
-    // ➔ 先把當前頁面的最新填答寫入 localMemoryDraft
+    // 把當前頁面的最新填答寫入 localMemoryDraft
     const currentValues = readFormValues();
     const currentImgKey = task.images[current].id || task.images[current].filename;
     localMemoryDraft[currentImgKey] = currentValues;
 
-    let savedCount = 0;
-    const promises = [];
-
-    task.images.forEach((img, idx) => {
+    // 補回「沒翻頁過」的圖片（從 server 快取補入 localMemoryDraft）
+    task.images.forEach(img => {
       const imgKey = img.id || img.filename;
-
-      // ➔ 修正：localMemoryDraft 沒有記錄時（作答者沒翻頁過），
-      //    從 server 已儲存的評分補回來，確保所有已作答圖片都能被送出，
-      //    不因「未翻頁」而漏掉。
-      let ratingData = localMemoryDraft[imgKey];
-      if (!hasAnyAnswer(ratingData)) {
+      if (!hasAnyAnswer(localMemoryDraft[imgKey])) {
         const serverKey = USE.imageKey(task, img);
         const serverRating = USE.readRating(reviewer, serverKey);
-        if (hasAnyAnswer(serverRating)) ratingData = serverRating;
-      }
-
-      if (hasAnyAnswer(ratingData)) {
-        const payload = makePayloadForImage(idx, ratingData);
-
-        const storageKey = [task.strategy, task.dataset, task.model, imgKey].join('||');
-        USE.saveLocalRating(reviewer, storageKey, ratingData);
-
-        promises.push(USE.postToSheet(payload));
-        savedCount++;
+        if (hasAnyAnswer(serverRating)) localMemoryDraft[imgKey] = serverRating;
       }
     });
 
-    let completedCount = USE.countCompleted(reviewer, task);
+    // 同步寫入 localStorage
+    task.images.forEach(img => {
+      const imgKey = img.id || img.filename;
+      const ratingData = localMemoryDraft[imgKey];
+      if (hasAnyAnswer(ratingData)) {
+        const storageKey = [task.strategy, task.dataset, task.model, imgKey].join('||');
+        USE.saveLocalRating(reviewer, storageKey, ratingData);
+      }
+    });
 
-    promises.push(USE.postToSheet({
-      action: 'saveProgress', reviewer,
-      strategy: task.strategy, dataset: task.dataset, model: task.model,
-      displayModel: USE.displayModel(task.model),
-      currentIndex: current, total: task.images.length, completed: completedCount,
-      completedStatus: completedCount >= task.images.length ? 'Completed' : 'In Progress'
-    }));
+    const rows = USE.buildBatchPayload(reviewer, task, localMemoryDraft, current);
+    const completedCount = USE.countCompleted(reviewer, task);
 
-    await Promise.all(promises);
+    // ➔ 等待 JSONP 確認結果（postBatchToSheet 內含 POST + 1.5s 後 countSaved）
+    const result = await USE.postBatchToSheet(reviewer, task, rows, current, completedCount);
 
     if (progressText) progressText.textContent = `${completedCount} / ${task.images.length}`;
     if (progressBar) progressBar.style.width = Math.round(completedCount * 100 / task.images.length) + '%';
 
     if (!isFinal) {
-      showHint(`💾 儲存成功！已將 ${savedCount} 筆作答更新至 responses。`);
+      if (result && result.ok) {
+        showHint(`💾 儲存成功！已確認 ${result.saved} 筆寫入雲端。`);
+      } else if (result && result.expected === 0) {
+        showHint(`💾 進度已記錄（本次無新作答）。`);
+      } else {
+        const saved    = (result && result.saved    >= 0) ? result.saved    : '?';
+        const expected = (result && result.expected >= 0) ? result.expected : rows.length;
+        showHint(`⚠️ 雲端確認異常（${saved}/${expected} 筆），資料已暫存本機，請稍後再按一次儲存。`);
+      }
     }
+
+    return result;
   }
 
   function missingIndices() {
@@ -200,7 +197,17 @@
   }
 
   async function handleFinalSubmit() {
-    await saveAllToCloud(true);
+    const result = await saveAllToCloud(true);
+
+    // expected === 0 視為正常（本次無新作答，進度已記錄）
+    const cloudFailed = result && !result.ok && result.expected > 0;
+    if (cloudFailed) {
+      const saved    = result.saved    >= 0 ? result.saved    : '?';
+      const expected = result.expected >= 0 ? result.expected : '?';
+      showHint(`⚠️ 雲端確認失敗（${saved}/${expected} 筆），請重新送出。`);
+      return;
+    }
+
     const missing = missingIndices();
 
     if (missing.length > 0) {
