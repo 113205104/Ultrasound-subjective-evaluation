@@ -54,7 +54,14 @@ function handleRequest_(e) {
     let data = {};
     // ➔ 唯一名稱：loadManifest
     if (action === 'loadManifest') {
-      data = { manifest: loadManifest() };
+      data = { manifest: loadManifestCached_() };
+    } else if (action === 'bustManifestCache') {
+      CacheService.getScriptCache().remove('manifest_v1');
+      data = { status: 'CacheCleared' };
+    } else if (action === 'saveBatchRating') {
+      data = saveBatchRating_(p);
+    } else if (action === 'countSaved') {
+      data = countSaved_(p);
     } else if (action === 'saveRating') {
       data = saveRating_(p);
     } else if (action === 'saveProgress') {
@@ -178,6 +185,166 @@ function setup_() {
   getOrCreateSheet_(ss, PROGRESS_SHEET, PROGRESS_HEADERS);
   getOrCreateAnswerLogSheet_(ss);
   return { status: 'SetupComplete', spreadsheetUrl: ss.getUrl() };
+}
+
+// ─── Batch save ──────────────────────────────────────────────────────────────
+// 前端把整個任務所有有作答的圖片整理成 rows 陣列，一次 POST 送來。
+// GAS 只做一次 getDataRange + 一次 setValues，大幅減少 Sheet API 呼叫次數。
+//
+// payload 格式（URL-encoded）：
+//   action=saveBatchRating
+//   reviewer=...  strategy=...  dataset=...  model=...
+//   rows=<JSON 字串，陣列，每個元素等同於原本單張 saveRating 的 p>
+//   progressCurrentIndex=...  progressTotal=...
+//
+function saveBatchRating_(p) {
+  if (!p.rows) throw new Error('saveBatchRating: missing rows param');
+  let rows;
+  try { rows = JSON.parse(p.rows); } catch(e) { throw new Error('saveBatchRating: rows is not valid JSON'); }
+  if (!Array.isArray(rows) || rows.length === 0) {
+    // rows 為空時跳過 answer_log，但仍繼續執行 progress 儲存
+    if (p.progressCurrentIndex !== undefined) {
+      const fakeP = {
+        reviewer: p.reviewer || '', strategy: p.strategy || '',
+        dataset: p.dataset || '', model: p.model || '',
+        displayModel: p.displayModel || '',
+        currentIndex: p.progressCurrentIndex, total: p.progressTotal || 0,
+        completed: p.progressCompleted || 0,
+        completedStatus: p.progressCompletedStatus || 'In Progress'
+      };
+      saveProgress_(fakeP);
+    }
+    return { status: 'NothingToSave', saved: 0 };
+  }
+
+  const ss = getOrCreateSpreadsheet_();
+
+  // ── 1. answer_log batch upsert ─────────────────────────────────────────────
+  const logSheet  = getOrCreateAnswerLogSheet_(ss);
+  const logHm     = headerIndexMap_(logSheet, ANSWER_LOG_HEADERS);
+  const logValues = logSheet.getDataRange().getValues(); // 一次讀完整個 sheet
+
+  // 建立現有列的 key → 陣列索引（0-based，不含 header）
+  const logKeyMap = {};
+  const idxR = logHm.map.reviewer, idxS = logHm.map.strategy,
+        idxD = logHm.map.dataset,  idxM = logHm.map.model,
+        idxI = logHm.map.imageId;
+  for (var ri = 1; ri < logValues.length; ri++) {
+    var v = logValues[ri];
+    var k = [v[idxR], v[idxS], v[idxD], v[idxM], v[idxI]].join('||');
+    logKeyMap[k] = ri; // 0-based index into logValues
+  }
+
+  // 把所有 rows 分流：已存在的直接改 logValues[ri]，新的放 toAppend
+  var toAppend = [];
+  var updatedSet = {}; // 避免同一批次對同一 key 重複處理
+
+  rows.forEach(function(rp) {
+    var reviewer     = rp.reviewer     || p.reviewer     || '';
+    var strategy     = rp.strategy     || p.strategy     || '';
+    var dataset      = rp.dataset      || p.dataset      || '';
+    var model        = rp.model        || p.model        || '';
+    var displayModel = rp.displayModel || p.displayModel || '';
+    var imageId      = rp.imageId || rp.fileId || rp.filename || '';
+    var fileId       = rp.fileId       || '';
+    var filename     = rp.filename     || '';
+    var imageUrl     = rp.imageUrl     || '';
+    var imageLink    = rp.imageLink    || rp.webViewUrl || imageUrl || '';
+    var questionNo   = rp.questionNo   || extractQuestionNo_(filename) || '';
+
+    if (!reviewer || !strategy || !dataset || !model || !imageId) return;
+
+    var obj = {
+      timestamp: new Date(), reviewer: reviewer, strategy: strategy, dataset: dataset,
+      model: model, displayModel: displayModel,
+      imageId: imageId, fileId: fileId, filename: filename,
+      imageUrl: imageUrl, imageLink: imageLink, questionNo: questionNo
+    };
+    RATING_FIELDS.forEach(function(field) {
+      TRIPANEL_ROWS.forEach(function(posRow) {
+        var srcKey = field + '_' + posRow.key;
+        var logKey = field + posRow.key;
+        var score  = rp[srcKey] !== undefined ? rp[srcKey] : rp[logKey];
+        obj[logKey] = (score === undefined || score === null) ? '' : score;
+      });
+    });
+
+    var rowData = logHm.headers.map(function(h) { return obj[h] !== undefined ? obj[h] : ''; });
+    var mapKey  = [reviewer, strategy, dataset, model, imageId].join('||');
+
+    if (logKeyMap[mapKey] !== undefined && !updatedSet[mapKey]) {
+      // 直接覆寫 logValues 中對應列（稍後一次性 setValues 回 sheet）
+      logValues[logKeyMap[mapKey]] = rowData;
+      updatedSet[mapKey] = true;
+    } else if (!updatedSet[mapKey]) {
+      toAppend.push(rowData);
+      updatedSet[mapKey] = true;
+    }
+  });
+
+  // 把有修改的 body（不含 header 列）一次寫回 sheet
+  var bodyRows = logValues.length - 1;
+  if (bodyRows > 0) {
+    logSheet.getRange(2, 1, bodyRows, logHm.headers.length).setValues(logValues.slice(1));
+  }
+  // 新增列：一次 setValues 追加到尾端
+  if (toAppend.length === 1) {
+    logSheet.appendRow(toAppend[0]);
+  } else if (toAppend.length > 1) {
+    logSheet.getRange(logSheet.getLastRow() + 1, 1, toAppend.length, toAppend[0].length)
+            .setValues(toAppend);
+  }
+
+  // ── 2. progress upsert（沿用原本邏輯，僅一列）────────────────────────────
+  if (p.progressCurrentIndex !== undefined) {
+    const fakeP = {
+      reviewer: p.reviewer || (rows[0] && rows[0].reviewer) || '',
+      strategy: p.strategy || (rows[0] && rows[0].strategy) || '',
+      dataset:  p.dataset  || (rows[0] && rows[0].dataset)  || '',
+      model:    p.model    || (rows[0] && rows[0].model)    || '',
+      displayModel: p.displayModel || '',
+      currentIndex:    p.progressCurrentIndex,
+      total:           p.progressTotal           || rows.length,
+      completed:       p.progressCompleted       || rows.length,
+      completedStatus: p.progressCompletedStatus || 'In Progress'
+    };
+    saveProgress_(fakeP);
+  }
+
+  return { status: 'BatchSaved', updated: Object.keys(updatedSet).length - toAppend.length, appended: toAppend.length };
+}
+
+// 輕量確認：只計算 answer_log 裡符合條件的筆數，供前端 JSONP 驗證儲存是否完整。
+// params: reviewer, strategy, dataset, model, imageIds（逗號分隔的 imageId 清單）
+function countSaved_(p) {
+  var ss        = getOrCreateSpreadsheet_();
+  var sheet     = getOrCreateAnswerLogSheet_(ss);
+  var hm        = headerIndexMap_(sheet, ANSWER_LOG_HEADERS);
+  var values    = sheet.getDataRange().getValues();
+
+  var reviewer = p.reviewer || '';
+  var strategy = p.strategy || '';
+  var dataset  = p.dataset  || '';
+  var model    = p.model    || '';
+  var idList   = p.imageIds ? String(p.imageIds).split(',') : [];
+  var idSet    = {};
+  idList.forEach(function(id) { if (id) idSet[id.trim()] = true; });
+
+  var idxR = hm.map.reviewer, idxS = hm.map.strategy,
+      idxD = hm.map.dataset,  idxM = hm.map.model,
+      idxI = hm.map.imageId;
+
+  var count = 0;
+  for (var i = 1; i < values.length; i++) {
+    var r = values[i];
+    if (reviewer && r[idxR] !== reviewer) continue;
+    if (strategy && r[idxS] !== strategy) continue;
+    if (dataset  && r[idxD] !== dataset)  continue;
+    if (model    && r[idxM] !== model)    continue;
+    if (idList.length > 0 && !idSet[String(r[idxI])]) continue;
+    count++;
+  }
+  return { count: count, expected: idList.length };
 }
 
 function saveRating_(p) {
@@ -507,6 +674,54 @@ function loadProgressAndRatings_(p) {
     break;
   }
   return { ratings: userRatings, progress: userProgress };
+}
+
+// ─── Manifest 快取（分塊，支援大型 manifest）────────────────────────────────
+// CacheService 單個 value 上限 100KB，625 張圖的 manifest 可能超過。
+// 解法：把 JSON 切成 < 95KB 的塊，分別存 manifest_v2_0 / manifest_v2_1 …
+// 並存一個 manifest_v2_meta = { chunks: N } 作為索引。
+const MANIFEST_CACHE_PREFIX = 'manifest_v2_';
+const MANIFEST_CACHE_TTL    = 600;   // seconds
+const MANIFEST_CHUNK_SIZE   = 95000; // bytes per chunk（留 5KB buffer）
+
+function loadManifestCached_() {
+  const cache = CacheService.getScriptCache();
+  const meta  = cache.get(MANIFEST_CACHE_PREFIX + 'meta');
+  if (meta) {
+    try {
+      const metaObj = JSON.parse(meta);
+      const chunks = metaObj.chunks;
+      const keys = [];
+      for (var i = 0; i < chunks; i++) keys.push(MANIFEST_CACHE_PREFIX + i);
+      const parts = cache.getAll(keys);
+      var json = '';
+      var ok = true;
+      for (var j = 0; j < chunks; j++) {
+        var part = parts[MANIFEST_CACHE_PREFIX + j];
+        if (!part) { ok = false; break; }
+        json += part;
+      }
+      if (ok && json) return JSON.parse(json);
+    } catch(e) { /* fallthrough to rebuild */ }
+  }
+
+  const manifest = loadManifest();
+  try {
+    const json   = JSON.stringify(manifest);
+    const chunks = Math.ceil(json.length / MANIFEST_CHUNK_SIZE);
+    const toStore = {};
+    toStore[MANIFEST_CACHE_PREFIX + 'meta'] = JSON.stringify({ chunks: chunks });
+    for (var k = 0; k < chunks; k++) {
+      toStore[MANIFEST_CACHE_PREFIX + k] = json.slice(k * MANIFEST_CHUNK_SIZE, (k + 1) * MANIFEST_CHUNK_SIZE);
+    }
+    cache.putAll(toStore, MANIFEST_CACHE_TTL);
+  } catch(e) {}
+  return manifest;
+}
+
+// meta key 被清掉就等同全部失效（舊 chunk key 等 TTL 自然過期）
+function bustManifestCache_() {
+  CacheService.getScriptCache().remove(MANIFEST_CACHE_PREFIX + 'meta');
 }
 
 function loadManifest() {
