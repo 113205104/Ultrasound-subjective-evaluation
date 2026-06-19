@@ -182,47 +182,19 @@ function setup_() {
 
 function saveRating_(p) {
   const ss = getOrCreateSpreadsheet_();
-  const sheet = getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
-  const hm = headerIndexMap_(sheet, RESPONSE_HEADERS);
 
   const reviewer = p.reviewer || '';
   const strategy = p.strategy || '';
-  const dataset = p.dataset || '';
-  const model = p.model || '';
-  const imageId = p.imageId || p.fileId || p.filename || '';
+  const dataset  = p.dataset  || '';
+  const model    = p.model    || '';
+  const imageId  = p.imageId || p.fileId || p.filename || '';
 
   p.imageId = imageId;
   if (!reviewer || !strategy || !dataset || !model || !imageId) {
     throw new Error('Missing core identification fields.');
   }
 
-  const rowData = hm.headers.map(h => {
-    if (h === 'timestamp') return new Date();
-    if (p[h] !== undefined) return p[h];
-    return '';
-  });
-
-  const values = sheet.getDataRange().getValues();
-  let foundRowIndex = -1;
-  const idxReviewer = hm.map.reviewer;
-  const idxStrategy = hm.map.strategy;
-  const idxDataset = hm.map.dataset;
-  const idxModel = hm.map.model;
-  const idxImageId = hm.map.imageId;
-
-  for (let i = 1; i < values.length; i++) {
-    const r = values[i];
-    if (r[idxReviewer] === reviewer && r[idxStrategy] === strategy && r[idxDataset] === dataset && r[idxModel] === model && r[idxImageId] === imageId) {
-      foundRowIndex = i + 1;
-      break;
-    }
-  }
-
-  if (foundRowIndex > 0) {
-    sheet.getRange(foundRowIndex, 1, 1, rowData.length).setValues([rowData]);
-  } else {
-    sheet.appendRow(rowData);
-  }
+  // ➔ 只寫 answer_log，不再寫 responses。
   saveAnswerLog_(ss, p);
   return { status: 'Saved', imageId: imageId };
 }
@@ -460,73 +432,65 @@ function syncResponsesFromAnswerLog_() {
   return { status: 'Synced', synced: synced };
 }
 
+// ➔ 直接從 answer_log 讀評分，轉換欄位名稱後回傳，不再讀 responses。
 function listResponses_(p) {
   const ss = getOrCreateSpreadsheet_();
-  const sheet = getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
-  const hm = headerIndexMap_(sheet, RESPONSE_HEADERS);
+  const sheet = getOrCreateAnswerLogSheet_(ss);
+  const hm = headerIndexMap_(sheet, ANSWER_LOG_HEADERS);
   const values = sheet.getDataRange().getValues();
 
   const filterReviewer = p.reviewer || '';
   const filterStrategy = p.strategy || '';
-  const filterDataset = p.dataset || '';
-  const filterModel = p.model || '';
+  const filterDataset  = p.dataset  || '';
+  const filterModel    = p.model    || '';
 
   const out = [];
   for (let i = 1; i < values.length; i++) {
     const r = values[i];
-    const rowObj = {};
-    hm.headers.forEach((h, idx) => { rowObj[h] = r[idx]; });
+    const row = {};
+    hm.headers.forEach((h, idx) => { row[h] = r[idx]; });
 
-    if (filterReviewer && rowObj.reviewer !== filterReviewer) continue;
-    if (filterStrategy && !String(rowObj.strategy).toLowerCase().includes(filterStrategy.toLowerCase())) continue;
-    if (filterDataset && !String(rowObj.dataset).toLowerCase().includes(filterDataset.toLowerCase())) continue;
-    if (filterModel && !String(rowObj.model).toLowerCase().includes(filterModel.toLowerCase())) continue;
+    if (filterReviewer && row.reviewer !== filterReviewer) continue;
+    if (filterStrategy && !String(row.strategy || '').toLowerCase().includes(filterStrategy.toLowerCase())) continue;
+    if (filterDataset  && !String(row.dataset  || '').toLowerCase().includes(filterDataset.toLowerCase()))  continue;
+    if (filterModel    && !String(row.model    || '').toLowerCase().includes(filterModel.toLowerCase()))    continue;
 
-    if (responseRowHasAnyScore_(rowObj)) out.push(rowObj);
-  }
-
-  // 保險：若 responses 沒有資料或分數欄空白，但 answer_log 已有答案，讀取時自動回填 responses。
-  if (out.length === 0) {
-    syncResponsesFromAnswerLog_();
-    const refreshed = sheet.getDataRange().getValues();
-    for (let i = 1; i < refreshed.length; i++) {
-      const r = refreshed[i];
-      const rowObj = {};
-      hm.headers.forEach((h, idx) => { rowObj[h] = r[idx]; });
-      if (filterReviewer && rowObj.reviewer !== filterReviewer) continue;
-      if (filterStrategy && !String(rowObj.strategy).toLowerCase().includes(filterStrategy.toLowerCase())) continue;
-      if (filterDataset && !String(rowObj.dataset).toLowerCase().includes(filterDataset.toLowerCase())) continue;
-      if (filterModel && !String(rowObj.model).toLowerCase().includes(filterModel.toLowerCase())) continue;
-      if (responseRowHasAnyScore_(rowObj)) out.push(rowObj);
-    }
+    // ➔ 將 answer_log 的欄位名稱（whole_quality1）轉換為 responses 格式（whole_quality_1），
+    //    確保前端 admin.js 的 ratingKeys() 解析邏輯不需更動。
+    const converted = answerLogRowToResponseRow_(row);
+    if (responseRowHasAnyScore_(converted)) out.push(converted);
   }
 
   out.sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
   return { rows: out };
 }
 
+// ➔ 評分資料改從 answer_log 讀取（已是唯一真實來源），progress 仍從 progress sheet 讀。
 function loadProgressAndRatings_(p) {
   const ss = getOrCreateSpreadsheet_();
   const reviewer = p.reviewer || '';
   const strategy = p.strategy || '';
-  const dataset = p.dataset || '';
-  const model = p.model || '';
+  const dataset  = p.dataset  || '';
+  const model    = p.model    || '';
 
-  const rSheet = getOrCreateSheet_(ss, RESPONSES_SHEET, RESPONSE_HEADERS);
-  const rhm = headerIndexMap_(rSheet, RESPONSE_HEADERS);
-  const rValues = rSheet.getDataRange().getValues();
+  // --- 從 answer_log 讀評分 ---
+  const logSheet = getOrCreateAnswerLogSheet_(ss);
+  const lhm = headerIndexMap_(logSheet, ANSWER_LOG_HEADERS);
+  const lValues = logSheet.getDataRange().getValues();
   const userRatings = [];
-  for (let i = 1; i < rValues.length; i++) {
-    const r = rValues[i];
+  for (let i = 1; i < lValues.length; i++) {
+    const r = lValues[i];
     const rowObj = {};
-    rhm.headers.forEach((h, idx) => { rowObj[h] = r[idx]; });
+    lhm.headers.forEach((h, idx) => { rowObj[h] = r[idx]; });
     if (reviewer && rowObj.reviewer !== reviewer) continue;
     if (strategy && rowObj.strategy !== strategy) continue;
-    if (dataset && rowObj.dataset !== dataset) continue;
-    if (model && rowObj.model !== model) continue;
-    userRatings.push(rowObj);
+    if (dataset  && rowObj.dataset  !== dataset)  continue;
+    if (model    && rowObj.model    !== model)     continue;
+    // 轉換為 responses 格式，讓前端不需感知欄位差異
+    userRatings.push(answerLogRowToResponseRow_(rowObj));
   }
 
+  // --- 從 progress sheet 讀進度 ---
   const pSheet = getOrCreateSheet_(ss, PROGRESS_SHEET, PROGRESS_HEADERS);
   const phm = headerIndexMap_(pSheet, PROGRESS_HEADERS);
   const pValues = pSheet.getDataRange().getValues();
@@ -537,8 +501,8 @@ function loadProgressAndRatings_(p) {
     phm.headers.forEach((h, idx) => { rowObj[h] = r[idx]; });
     if (reviewer && rowObj.reviewer !== reviewer) continue;
     if (strategy && rowObj.strategy !== strategy) continue;
-    if (dataset && rowObj.dataset !== dataset) continue;
-    if (model && rowObj.model !== model) continue;
+    if (dataset  && rowObj.dataset  !== dataset)  continue;
+    if (model    && rowObj.model    !== model)     continue;
     userProgress = rowObj;
     break;
   }
