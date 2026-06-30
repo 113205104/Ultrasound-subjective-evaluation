@@ -1,6 +1,7 @@
 (function () {
   const reviewerSelect = document.getElementById('reviewerSelect');
   const taskList = document.getElementById('taskList');
+  const refreshBtn = document.getElementById('refreshTaskListBtn');
   let manifest = [];
   USE.populateReviewerSelect(reviewerSelect, false);
 
@@ -136,10 +137,10 @@
     });
   }
 
-  async function loadAll() {
+  async function loadAll(forceReload) {
     taskList.innerHTML = '<p class="muted">正在讀取 Google Drive 任務與 Google Sheet 作答紀錄...</p>';
     try {
-      manifest = await USE.loadManifest();
+      manifest = forceReload ? await USE.reloadManifest() : await USE.loadManifest();
       await USE.loadServerRatings(reviewerSelect.value);
       render();
     } catch (err) {
@@ -147,7 +148,23 @@
     }
   }
 
-  reviewerSelect.addEventListener('change', loadAll);
-  loadAll();
+  // 「重新整理任務列表」：同時清掉前端 sessionStorage 快取與 GAS 端的 CacheService 快取，
+  // 強迫重新掃描 Google Drive，避免新增資料夾後要等 10 分鐘或手動清瀏覽器快取才看得到。
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.disabled = true;
+      const originalText = refreshBtn.textContent;
+      refreshBtn.textContent = '重新整理中...';
+      try {
+        await loadAll(true);
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = originalText;
+      }
+    });
+  }
+
+  reviewerSelect.addEventListener('change', () => loadAll(false));
+  loadAll(false);
 })();
 
