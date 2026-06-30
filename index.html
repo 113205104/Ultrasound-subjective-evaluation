@@ -26,7 +26,10 @@
           <h2>評分任務</h2>
           <p class="muted">首頁會直接讀取 Google Drive 任務，並從 Google Sheet 載入作答進度。</p>
         </div>
-        <a class="ghost-button" href="history.html">查看作答紀錄</a>
+        <div style="display:flex; gap:10px;">
+          <button type="button" id="refreshTaskListBtn" class="ghost-button">重新整理任務列表</button>
+          <a class="ghost-button" href="history.html">查看作答紀錄</a>
+        </div>
       </div>
       <div id="taskList" class="task-list" aria-live="polite"></div>
     </section>
